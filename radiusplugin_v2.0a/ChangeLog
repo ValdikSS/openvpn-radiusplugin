@@ -1,0 +1,56 @@
+radiusplugin_v1.1a:
+- Standard configfile: /etc/openvon/radiusplugin.cnf.
+- #include <unistd.h> in IpcSocket.h, is needed for compiling on some systems. 
+- Correct README: A configfile must set with "-c configfile".
+- Correct fprintf statement in UserAuth.cpp (line 300).
+- Set debug level from 7 to 5.
+
+radiusplugin_v1.1.a (5.1.06):
+- correct calculate of ipaddress for ifconfig-push in UserAuth::createCcdFile()
+- FramedIpAddress-Attribute is set to the IP address OpenVPN is assigned to the client,
+	the address is read from ENVP-Array with name ifconfig_pool_remote_ip and set to 
+	FramedIpAddress-Attribute at client connect. (radiusplugin.cpp, openvpn_plugin_func_v1(), part: CLIENT_CONNECT)
+- suppert for topology option (OpenVPN 2.0.1)
+	- read from configfile parameters subnet, p2p
+	- add parameters in config with getters, setters and modify constructors and destructor
+	- modify UserAuth::createCcdFile to set the right topology option
+
+radiusplugin_1.2:
+- use libgcrypt instead openssl (for gpl compability)
+- checking of the authenticator field from received packets
+- correct error on deleting users without an acct-interim-interval in AcctScheduler.cpp::findUser()
+- send message to foreground process if no user was found (else the plugin hangs)
+
+radiusplugin_1.2a:
+- correct error if a user connects again, if he is still known by the plugin, now the user can't reconnect if he is known by the plugin
+- Change GPL text
+- add COPYING file
+
+radiusplugin_1.2b:
+- correct error: don't disconnect at rekeying/renegotiation
+
+radiusplugin_1.2c:
+- new algorithm to generate Acct-Session-ID, so it should be unique ever, see createSessionID in radiusplugin.cpp
+
+radiusplugin_1.2d:
+- option in OpenVPN config file is now: "plugin /etc/openvpn/radiusplugin.so [configfile]
+- correct bug: close of configfile was missing
+
+radiusplugin_1.2e:
+- use RadiusClass_v1.1a for more machine independance (big endian/little endian)
+- use send()/recvInt() instead of sendCode()/recvCode() for internal socket communication
+
+radiusplugin_2.0:
+- new features:
+	- support of vendor specific attributes with example perl script 
+	- support for OpenVPN options: dupliate-cn, client-cert-not-required, username-as-commonname
+    - comments allowd in config file
+    - parsing of OpenVPN config file for options (see radiusplugin.cnf)
+- fixed bugs:
+	- crash on rekeying if no radius server respond
+	- framed ip is sent in access request packets if the client already has one (at rekeying), for dynamical key assignment through the radius server, so it will not send a new one
+	- passwords and sharedsecret are shown as ****** in the logs
+
+radiusplugin_2.0a:
+- fix error in IpcSocket.h, 
+  bad function name: void IpcSocket::recvBuf(User *) -> void recvBuf(User *);
