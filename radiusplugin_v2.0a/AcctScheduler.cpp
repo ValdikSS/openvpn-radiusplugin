@@ -73,13 +73,15 @@ void AcctScheduler::addUser(UserAcct *user)
  */
 void AcctScheduler::delUser(PluginContext * context, UserAcct *user)
 {
-	int bytesin=0, bytesout=0;
+	uint64_t bytesin=0, bytesout=0;
 		
 	//get the sent and received bytes
 	this->parseStatusFile(context, &bytesin, &bytesout,user->getKey().c_str());
 	
-	user->setBytesIn(bytesin);
-	user->setBytesOut(bytesout);
+	user->setBytesIn(bytesin & 0xFFFFFFFF);
+	user->setBytesOut(bytesout & 0xFFFFFFFF);
+	user->setGigaIn(bytesin >> 32);
+	user->setGigaOut(bytesout >> 32);
 	
 	if (DEBUG (context->getVerbosity()))
 	    cerr << "RADIUS-PLUGIN: BACKGROUND-ACCT: Got accouting data from file, CN: " << user->getCommonname() << " in: " << user->getBytesIn() << " out: " << user->getBytesOut() << ".\n";
@@ -142,7 +144,7 @@ void AcctScheduler::doAccounting(PluginContext * context)
 {	
 	time_t t;
 		
-	int bytesin=0, bytesout=0;
+	uint64_t bytesin=0, bytesout=0;
 	map<string, UserAcct>::iterator iter1, iter2;
 	
 	
@@ -161,8 +163,10 @@ void AcctScheduler::doAccounting(PluginContext * context)
 		    cerr << "RADIUS-PLUGIN: BACKGROUND-ACCT: Scheduler: Update for User " << iter1->second.getUsername() << ".\n";
 					
 			this->parseStatusFile(context, &bytesin, &bytesout,iter1->second.getKey().c_str()); 
-			iter1->second.setBytesIn(bytesin);
-			iter1->second.setBytesOut(bytesout);
+			iter1->second.setBytesIn(bytesin & 0xFFFFFFFF);
+			iter1->second.setBytesOut(bytesout & 0xFFFFFFFF);
+			iter1->second.setGigaIn(bytesin >> 32);
+			iter1->second.setGigaOut(bytesout >> 32);
 			iter1->second.sendUpdatePacket(context);
 			
 			if (DEBUG (context->getVerbosity()))
@@ -184,7 +188,7 @@ void AcctScheduler::doAccounting(PluginContext * context)
  * @param bytesout An int pointer for the sent bytes.
  * @param key  A key which identifies the row in the statusfile, it looks like: "commonname,ip:port".
  */
-void AcctScheduler::parseStatusFile(PluginContext *context, int *bytesin, int *bytesout, string key)
+void AcctScheduler::parseStatusFile(PluginContext *context, uint64_t *bytesin, uint64_t *bytesout, string key)
 {
 	char line[512], newline[512];
 	memset(newline, 0, 512);
@@ -214,8 +218,8 @@ void AcctScheduler::parseStatusFile(PluginContext *context, int *bytesin, int *b
 		if (line!=NULL && strncmp(line,key.c_str(),key.length())==0)
 		{
 			memcpy(newline, line+key.length(), strlen(line)-key.length()+1);
-			*bytesin=atol(strtok(newline,","));
-			*bytesout=atol(strtok(NULL,","));
+			*bytesin=strtoull(strtok(newline,","),NULL,10);
+			*bytesout=strtoull(strtok(NULL,","),NULL,10);
 		}
 		else
 		{

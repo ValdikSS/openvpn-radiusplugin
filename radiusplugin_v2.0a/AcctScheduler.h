@@ -34,8 +34,6 @@
 
 using std::map;
 
-//#define DEBUG(verb) ((verb) >= 7)
-
 /**The class is a scheduler for accounting radius users. It calculates the 
  * accounting interval if the ACCT-INTERIM-INTERVAL was present in the
  * authentication response from the radius server. 
@@ -65,6 +63,6 @@ public:
 	 
 	void doAccounting(PluginContext *);
 	
-	void parseStatusFile(PluginContext *, int *, int *,string);
+	void parseStatusFile(PluginContext *, uint64_t *, uint64_t *,string);
 };
 #endif //_ACCT_SCHEDULER_H_

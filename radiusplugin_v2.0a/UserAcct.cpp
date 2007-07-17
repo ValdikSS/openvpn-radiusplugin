@@ -26,6 +26,8 @@
  * sessionid, bytesin, bytesout, nextupdate and starttime are set to 0.*/
 UserAcct::UserAcct():User()
 {
+	gigain=0;
+	gigaout=0;
 	bytesin=0;
 	bytesout=0;
 	nextupdate=0;
@@ -54,7 +56,9 @@ UserAcct::~UserAcct()
  * - Framed_Protocol,
  * - Acct_Input_Octets,
  * - Acct_Output_Octets,
- * - Acct_Session_Time
+ * - Acct_Session_Time,
+ * - Acct_Input_Gigawords,
+ * - Acct_Output_Gigawords
  * @param context The context of the plugin.
  * @return An integer, 0 is everything is ok, else 1.*/
 int UserAcct::sendUpdatePacket(PluginContext *context)
@@ -65,19 +69,21 @@ int UserAcct::sendUpdatePacket(PluginContext *context)
 	
 	RadiusPacket		packet(ACCOUNTING_REQUEST);
 	RadiusAttribute		ra1(ATTRIB_User_Name,this->getUsername()),
-						ra2(ATTRIB_Framed_IP_Address,this->getFramedIp()),
-						ra3(ATTRIB_NAS_Port,this->getPortnumber()),
-						ra4(ATTRIB_Calling_Station_Id,this->getCallingStationId()),
-						ra5(ATTRIB_NAS_Identifier),
-						ra6(ATTRIB_NAS_IP_Address),
-						ra7(ATTRIB_NAS_Port_Type),
-						ra8(ATTRIB_Service_Type),
-						ra9(ATTRIB_Acct_Session_ID, this->getSessionId()),
-						ra10(ATTRIB_Acct_Status_Type,"3"),
-						ra11(ATTRIB_Framed_Protocol),
-						ra12(ATTRIB_Acct_Input_Octets, this->bytesin),
-						ra13(ATTRIB_Acct_Output_Octets, this->bytesout),
-						ra14(ATTRIB_Acct_Session_Time);				
+				ra2(ATTRIB_Framed_IP_Address,this->getFramedIp()),
+				ra3(ATTRIB_NAS_Port,this->getPortnumber()),
+				ra4(ATTRIB_Calling_Station_Id,this->getCallingStationId()),
+				ra5(ATTRIB_NAS_Identifier),
+				ra6(ATTRIB_NAS_IP_Address),
+				ra7(ATTRIB_NAS_Port_Type),
+				ra8(ATTRIB_Service_Type),
+				ra9(ATTRIB_Acct_Session_ID, this->getSessionId()),
+				ra10(ATTRIB_Acct_Status_Type,"3"),
+				ra11(ATTRIB_Framed_Protocol),
+				ra12(ATTRIB_Acct_Input_Octets, this->bytesin),
+				ra13(ATTRIB_Acct_Output_Octets, this->bytesout),
+				ra14(ATTRIB_Acct_Session_Time),
+				ra15(ATTRIB_Acct_Input_Gigawords, this->gigain),
+				ra16(ATTRIB_Acct_Output_Gigawords, this->gigaout);				
 	
 	
 	
@@ -178,9 +184,16 @@ int UserAcct::sendUpdatePacket(PluginContext *context)
 	}
 	//calculate the session time
 	ra14.setValue((time(NULL)-this->starttime));
-	if (packet.addRadiusAttribute(&ra14))
-	{
+	if (packet.addRadiusAttribute(&ra14)) {
 		fprintf(stderr, "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_Time.\n");
+	}
+
+	if (packet.addRadiusAttribute(&ra15)) {
+		fprintf(stderr, "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Input_Gigawords.\n");
+	}
+
+	if (packet.addRadiusAttribute(&ra16)) {
+		fprintf(stderr, "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Output_Gigawords.\n");
 	}
 	
 	//send the packet to the server
@@ -313,13 +326,11 @@ int UserAcct::sendStartPacket(PluginContext * context)
 			}
 	}
 	
-	if (packet.addRadiusAttribute(&ra9))
-	{
+	if (packet.addRadiusAttribute(&ra9)) {
 		fprintf(stderr, "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_ID.\n");
 	}
 	
-	if (packet.addRadiusAttribute(&ra10))
-	{
+	if (packet.addRadiusAttribute(&ra10)) {
 		fprintf(stderr, "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_ID.\n");
 	}
 	
@@ -389,19 +400,21 @@ int UserAcct::sendStopPacket(PluginContext * context)
 	list<RadiusServer>::iterator server;
 	RadiusPacket		packet(ACCOUNTING_REQUEST);
 	RadiusAttribute		ra1(ATTRIB_User_Name,this->getUsername()),
-						ra2(ATTRIB_Framed_IP_Address,this->getFramedIp()),
-						ra3(ATTRIB_NAS_Port,this->portnumber),
-						ra4(ATTRIB_Calling_Station_Id,this->getCallingStationId()),
-						ra5(ATTRIB_NAS_Identifier),
-						ra6(ATTRIB_NAS_IP_Address),
-						ra7(ATTRIB_NAS_Port_Type),
-						ra8(ATTRIB_Service_Type),
-						ra9(ATTRIB_Acct_Session_ID, this->getSessionId()),
-						ra10(ATTRIB_Acct_Status_Type,"2"),
-						ra11(ATTRIB_Framed_Protocol),
-						ra12(ATTRIB_Acct_Input_Octets, this->bytesin),
-						ra13(ATTRIB_Acct_Output_Octets, this->bytesout),
-						ra14(ATTRIB_Acct_Session_Time);				
+				ra2(ATTRIB_Framed_IP_Address,this->getFramedIp()),
+				ra3(ATTRIB_NAS_Port,this->portnumber),
+				ra4(ATTRIB_Calling_Station_Id,this->getCallingStationId()),
+				ra5(ATTRIB_NAS_Identifier),
+				ra6(ATTRIB_NAS_IP_Address),
+				ra7(ATTRIB_NAS_Port_Type),
+				ra8(ATTRIB_Service_Type),
+				ra9(ATTRIB_Acct_Session_ID, this->getSessionId()),
+				ra10(ATTRIB_Acct_Status_Type,"2"),
+				ra11(ATTRIB_Framed_Protocol),
+				ra12(ATTRIB_Acct_Input_Octets, this->bytesin),
+				ra13(ATTRIB_Acct_Output_Octets, this->bytesout),
+				ra14(ATTRIB_Acct_Session_Time),
+				ra15(ATTRIB_Acct_Input_Gigawords, this->gigain),
+				ra16(ATTRIB_Acct_Output_Gigawords, this->gigaout);				
 	
 	
 		
@@ -500,9 +513,16 @@ int UserAcct::sendStopPacket(PluginContext * context)
 	
 	//calculate the session time
 	ra14.setValue(time(NULL)-this->starttime);
-	if (packet.addRadiusAttribute(&ra14))
-	{
+	if (packet.addRadiusAttribute(&ra14)) {
 		fprintf(stderr, "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_Time.\n");
+	}
+
+	if (packet.addRadiusAttribute(&ra15)) {
+		fprintf(stderr, "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Input_Gigawords.\n");
+	}
+
+	if (packet.addRadiusAttribute(&ra16)) {
+		fprintf(stderr, "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Output_Gigawords.\n");
 	}
 	
 	//send the packet
@@ -849,6 +869,8 @@ UserAcct & UserAcct::operator=(const UserAcct &u)
 		this->sessionid=u.sessionid;
 		//this->servicetype=u.servicetype;
 		
+		this->gigain=u.gigain;
+		this->gigaout=u.gigaout;
 		this->bytesin=u.bytesin;
 		this->bytesout=u.bytesout;
 		this->nextupdate=u.nextupdate;
@@ -868,6 +890,8 @@ UserAcct::UserAcct(const UserAcct &u):User(u)
 	this->sessionid=u.sessionid;
 	//this->servicetype=u.servicetype;
 	
+	this->gigain=u.gigain;
+	this->gigaout=u.gigaout;
 	this->bytesin=u.bytesin;
 	this->bytesout=u.bytesout;
 	this->nextupdate=u.nextupdate;
@@ -889,28 +913,54 @@ void UserAcct::setSessionId(string id)
 }
 
 
+/** The getter method for the gigain variable.
+ * @return The number of received giga.*/
+uint32_t UserAcct::getGigaIn(void)
+{
+	return this->gigain;
+}
+/**The setter method for the gigain variable.
+ * @param giga The received giga.*/
+void UserAcct::setGigaIn(uint32_t giga)
+{
+	this->gigain=giga;
+}
+
+/** The getter method for the gigaout variable.
+ * @return The number of sent giga.*/
+uint32_t UserAcct::getGigaOut(void)
+{
+	return this->gigaout;
+}
+/**The setter method for the gigaout variable.
+ * @param giga  The sended giga.*/
+void UserAcct::setGigaOut(uint32_t giga)
+{
+	this->gigaout=giga;
+}
+
 /** The getter method for the bytesin variable.
  * @return The number of received bytes.*/
-unsigned long int UserAcct::getBytesIn(void)
+uint32_t UserAcct::getBytesIn(void)
 {
 	return this->bytesin;
 }
 /**The setter method for the bytesin variable.
  * @param bytes The received bytes.*/
-void UserAcct::setBytesIn(unsigned long int bytes)
+void UserAcct::setBytesIn(uint32_t bytes)
 {
 	this->bytesin=bytes;
 }
 
 /** The getter method for the bytesout variable.
  * @return The number of sent bytes.*/
-unsigned long int UserAcct::getBytesOut(void)
+uint32_t UserAcct::getBytesOut(void)
 {
 	return this->bytesout;
 }
 /**The setter method for the bytesout variable.
  * @param bytes  The sended bytes.*/
-void UserAcct::setBytesOut(unsigned long int bytes)
+void UserAcct::setBytesOut(uint32_t bytes)
 {
 	this->bytesout=bytes;
 }

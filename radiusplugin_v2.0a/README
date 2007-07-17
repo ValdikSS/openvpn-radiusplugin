@@ -83,7 +83,9 @@ The Framed-Route attribute must in the format as shown above!
 COMPILE 
 --------
 (tested with Debian on x86, for other architectures see section TROUBLESHOOTING):
-g++ -Wall -shared -o radiusplugin.so AccountingProcess.cpp Exception.cpp PluginContext.cpp UserAuth.cpp AcctScheduler.cpp IpcSocket.cpp radiusplugin.cpp User.cpp AuthenticationProcess.cpp main.cpp UserAcct.cpp UserPlugin.cpp Config.cpp RadiusClass/RadiusAttribute.cpp RadiusClass/RadiusPacket.cpp RadiusClass/RadiusConfig.cpp RadiusClass/RadiusServer.cpp  RadiusClass/RadiusVendorSpecificAttribute.cpp -lgcrypt 
+>$ make
+or
+>$ g++ -Wall -shared -o radiusplugin.so AccountingProcess.cpp Exception.cpp PluginContext.cpp UserAuth.cpp AcctScheduler.cpp IpcSocket.cpp radiusplugin.cpp User.cpp AuthenticationProcess.cpp main.cpp UserAcct.cpp UserPlugin.cpp Config.cpp RadiusClass/RadiusAttribute.cpp RadiusClass/RadiusPacket.cpp RadiusClass/RadiusConfig.cpp RadiusClass/RadiusServer.cpp  RadiusClass/RadiusVendorSpecificAttribute.cpp -lgcrypt 
 
 
 RADIUS PACKETS and OpenVPN events (see http://openvpn.net/man.html SCRIPTING AND ENVIRONMENTAL VARIABLES)

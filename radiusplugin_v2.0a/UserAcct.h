@@ -37,11 +37,13 @@
 class UserAcct : public User
 {
 private:
-	string sessionid;				/**< The sessionid of the user.*/
-	unsigned long int bytesin;	/**< The received bytes.*/
-	unsigned long int bytesout;	/**< The sent bytes.*/
-	time_t nextupdate;			/**< The next update time.*/
-	time_t starttime;			/**< The start time of the connection.*/
+	string sessionid;		/**< The sessionid of the user.*/
+	uint32_t gigain;		/**< The received bytes.*/
+	uint32_t gigaout;		/**< The sent bytes.*/
+	uint32_t bytesin;		/**< The received bytes.*/
+	uint32_t bytesout;		/**< The sent bytes.*/
+	time_t nextupdate;		/**< The next update time.*/
+	time_t starttime;		/**< The start time of the connection.*/
 	
 public:
 	
@@ -56,11 +58,17 @@ public:
 	int getServiceType(void);
 	void setServiceType(int);
 	
-	unsigned long int getBytesIn(void);
-	void setBytesIn(unsigned long int);
+	uint32_t getGigaIn(void);
+	void setGigaIn(uint32_t);
 	
-	unsigned long int getBytesOut(void);
-	void setBytesOut(unsigned long int);
+	uint32_t getGigaOut(void);
+	void setGigaOut(uint32_t);
+	
+	uint32_t getBytesIn(void);
+	void setBytesIn(uint32_t);
+	
+	uint32_t getBytesOut(void);
+	void setBytesOut(uint32_t);
 	
 	time_t getStarttime(void);
 	void setStarttime(time_t);

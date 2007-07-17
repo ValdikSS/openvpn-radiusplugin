@@ -43,7 +43,7 @@ public:
 					RadiusAttribute(Octet);
 					RadiusAttribute(Octet, char * );
 					RadiusAttribute(Octet, string);
-					RadiusAttribute(Octet, int);
+					RadiusAttribute(Octet, uint32_t);
 					~RadiusAttribute(void);
 					
 					RadiusAttribute & operator=(const RadiusAttribute &);
@@ -61,7 +61,7 @@ public:
 	Octet *			getValue(void);
 	int			    setValue(char *);
 	int			    setValue(string);
-	int			    setValue(int);
+	int			    setValue(uint32_t);
 		
 	int 			setRecvValue(char *value);
 	

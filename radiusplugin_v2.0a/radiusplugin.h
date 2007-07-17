@@ -103,8 +103,4 @@ void close_fds_except (int keep);
 void set_signals (void);
 string createSessionId (UserPlugin *);
 
-
 #endif //_PLUGIN_H_
-
-
-

@@ -54,3 +54,8 @@ radiusplugin_2.0:
 radiusplugin_2.0a:
 - fix error in IpcSocket.h, 
   bad function name: void IpcSocket::recvBuf(User *) -> void recvBuf(User *);
+
+radiusplugin_2.0b:
+- fixed datatypes from int to uint32_t/uint64_t to prevent overflows above 2^31
+- added support for gigawords
+- added a Makefile

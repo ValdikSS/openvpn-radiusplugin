@@ -77,7 +77,7 @@ RadiusAttribute::RadiusAttribute(Octet typ, string str)
  * @param Octet type : The type of the packet.
  * @param int value : The value as an integer.
  */
-RadiusAttribute::RadiusAttribute(Octet typ, int value)
+RadiusAttribute::RadiusAttribute(Octet typ, uint32_t value)
 {
 	this->type=typ;
 	this->value=NULL;
@@ -398,7 +398,7 @@ int RadiusAttribute::setValue(char *value)
 				return ALLOC_ERROR;
 			}
 			//transform the integer in the right network byte order
-			q=htonl(atoi(value));
+			q=htonl(strtoul(value,NULL,10));
 			memcpy(this->value,&q,4);
 			this->length=4;
 			
@@ -503,11 +503,11 @@ int RadiusAttribute::setValue(string s)
  * @param value The value as an integer.
  * @return An integer, 0 if everything is ok, else !=0.
  */
-int RadiusAttribute::setValue(int value)
+int RadiusAttribute::setValue(uint32_t value)
 {
 	char num[11];
 	memset(num,0,11);
-	sprintf(num,"%i",value);
+	sprintf(num,"%u",value);
 	return setValue(num);
 }
 
