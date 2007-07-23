@@ -42,4 +42,4 @@ $(PLUGIN): $(OBJECTS)
 	@$(CC) $(INCL) $(CFLAGS) -o $@ -c $<
 
 clean:
-	-rm $(PLUGIN) *.o
+	-rm $(PLUGIN) *.o */*.o
