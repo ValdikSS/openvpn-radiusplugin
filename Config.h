@@ -48,6 +48,7 @@ private:
 	bool usernameascommonname;		/**<Use the username as commonname in the plugin (for OpenVPN option username-as-common-name (no commonname in the enviroment!)).*/
 	bool clientcertnotrequired;		/**<For OpenVPN option client_cert_not_required, commonname = UNDEF.*/
 	string openvpnconfig;			/**<Path to OpenVPN config.*/
+	bool overwriteccfiles; 			/**<If true the plugin overwrites the client config files.*/
 	
 	void deletechars(string * );
 	
@@ -85,6 +86,9 @@ public:
 	
 	bool getClientCertNotRequired(void);
 	void setClientCertNotRequired(bool);
+	
+	bool getOverWriteCCFiles(void);
+	void setOverWriteCCFiles(bool);
 	
 	string getOpenVPNConfig(void);
 	void setOpenVPNConfig(string);

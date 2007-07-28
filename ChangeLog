@@ -60,3 +60,6 @@ radiusplugin_2.0b:
 - added support for gigawords
 - added a Makefile
 - correct bug in parsing config files
+- add new config variable overwriteccfiles, allows the plugin to overwrite client config files if set to true
+- update some documentation
+- correct parsing of ip address in RadiusAttribute.cpp in setValue for data type IPADDRESS

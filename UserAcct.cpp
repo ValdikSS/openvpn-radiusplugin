@@ -995,6 +995,13 @@ int UserAcct::deleteCcdFile(PluginContext * context)
 {
 	string filename;
 	filename = context->conf.getCcdPath()+ this->getCommonname();
-	remove(filename.c_str());
+	if(context->conf.getOverWriteCCFiles()==true)
+	{
+		remove(filename.c_str());
+	}
+	else
+	{
+		cerr << "RADIUS-PLUGIN: Client config file was not deleted, overwriteccfiles is false \n.";
+	}
 	return 0;
 }

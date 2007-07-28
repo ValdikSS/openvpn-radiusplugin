@@ -43,7 +43,7 @@
  * 
  *
  * \section Installation
- * - Requirements: ssl library
+ * - Requirements: gcrypt library
  * - Configure the configfile for the library or set the parameters otherwise (see ./exampleconfig).
  * - Comments not allowed in configfile at the moment!
  * - For testing compile files with:

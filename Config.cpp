@@ -31,6 +31,7 @@ Config::Config(void)
 	
 	this->usernameascommonname=false;
 	this->clientcertnotrequired=false;
+	this->overwriteccfiles=true;
 	this->ccdPath="";
 	this->openvpnconfig="";
 	this->vsanamedpipe="";
@@ -55,6 +56,7 @@ Config::Config(char * configfile)
 	this->vsascript="";
 	this->usernameascommonname=false;
 	this->clientcertnotrequired=false;
+	this->overwriteccfiles=true;	
 	this->parseConfigFile(configfile);
 	
 }
@@ -118,6 +120,16 @@ int Config::parseConfigFile(const char * configfile)
 					this->getValue(line.c_str(), tmp);
 					this->openvpnconfig=tmp;
 				}
+				if (strncmp(line.c_str(),"overwriteccfiles=",14)==0)
+				{
+					this->getValue(line.c_str(), tmp);
+					string stmp=tmp;
+					deletechars(&stmp);
+					if(stmp == "true") this->overwriteccfiles=true;
+					else if (stmp =="false") this->overwriteccfiles=false;
+					else return BAD_FILE;
+						
+				}
 			}
 			
 		}
@@ -141,6 +153,10 @@ int Config::parseConfigFile(const char * configfile)
 					{
 						this->usernameascommonname=true;
 					}
+					if (line == "username-as-common-name")
+					{
+						this->usernameascommonname=true;
+					}	
 					if (string::size_type pos = line.find("client-config-dir") != string::npos)
 					{
 						line.erase(0, pos + 17);
@@ -388,4 +404,20 @@ string Config::getOpenVPNConfig(void)
 void Config::setOpenVPNConfig(string conf)
 {
 	this->openvpnconfig=conf;
+}
+
+/** Returns getter method for the overwriteccfiles variable.
+ * @return A bool of overwriteccfiles.
+ */
+bool Config::getOverWriteCCFiles(void)
+{
+	return this->overwriteccfiles;
+}
+
+/** The setter method for the overwriteccfiles varibale
+ * @param overwrite Set to true if the plugin is allowed to overwrite the client config files.
+ */
+void Config::setOverWriteCCFiles(bool overwrite)
+{
+	this->overwriteccfiles=overwrite;	
 }

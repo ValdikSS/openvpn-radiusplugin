@@ -1472,269 +1472,272 @@ int UserAuth::createCcdFile(PluginContext *context)
 	int j=0,k=0;
 	int len=0;
 	
-	
-	
-	
-	memset(ipstring,0,100);
-	memset(framedip,0,16);
-	memset(framedroutes,0,4096);
-	
-	
-	//create the filename, ccd-path + commonname
-	filename=context->conf.getCcdPath()+this->getCommonname();
-	
-	if (DEBUG (context->getVerbosity()))
-    	fprintf (stderr, "RADIUS-PLUGIN: BACKGROUND AUTH: Try to open ccd file.\n");
-	
-	//open the file
-	ccdfile.open(filename.c_str(),ios::out);
-	
-	if (DEBUG (context->getVerbosity()))
-    	fprintf (stderr, "RADIUS-PLUGIN: BACKGROUND AUTH: Opened ccd file.\n");
-	
-	
-	// copy in a temp-string, becaue strtok deletes the delimiter, if it used anywhere
-	strncpy(framedroutes,this->getFramedRoutes().c_str(),4095);
-	
-	
-	if (ccdfile.is_open())
+	if(context->conf.getOverWriteCCFiles()==true)
 	{
+		memset(ipstring,0,100);
+		memset(framedip,0,16);
+		memset(framedroutes,0,4096);
+			
+		//create the filename, ccd-path + commonname
+		filename=context->conf.getCcdPath()+this->getCommonname();
 		
-		//set the ip address in the file
-		if (this->framedip[0]!='\0')
+		if (DEBUG (context->getVerbosity()))
+	    	fprintf (stderr, "RADIUS-PLUGIN: BACKGROUND AUTH: Try to open ccd file.\n");
+		
+		//open the file
+		ccdfile.open(filename.c_str(),ios::out);
+		
+		if (DEBUG (context->getVerbosity()))
+	    	fprintf (stderr, "RADIUS-PLUGIN: BACKGROUND AUTH: Opened ccd file.\n");
+		
+		
+		// copy in a temp-string, becaue strtok deletes the delimiter, if it used anywhere
+		strncpy(framedroutes,this->getFramedRoutes().c_str(),4095);
+		
+		
+		if (ccdfile.is_open())
 		{
-			if (DEBUG (context->getVerbosity()))
-				fprintf (stderr, "RADIUS-PLUGIN: BACKGORUND AUTH: Write framed ip to ccd-file.\n");
-		
-			//build the ifconfig
-			strncat(ipstring, "ifconfig-push ",14);
-			strncat(ipstring, this->getFramedIp().c_str() , 15);
-			strncat(ipstring, " ", 1);
 			
-			
-			if(context->conf.getSubnet()[0]!='\0')
+			//set the ip address in the file
+			if (this->framedip[0]!='\0')
 			{
-				strncat(ipstring, context->conf.getSubnet() , 15);
 				if (DEBUG (context->getVerbosity()))
-					fprintf (stderr, "RADIUS-PLUGIN: BACKGORUND AUTH: Create ifconfig-push for topology subnet.\n");
-		
-			}
-			else if(context->conf.getP2p()[0]!='\0')
-			{
-				strncat(ipstring, context->conf.getP2p() , 15);
-				if (DEBUG (context->getVerbosity()))
-					fprintf (stderr, "RADIUS-PLUGIN: BACKGORUND AUTH: Create ifconfig-push for topology p2p.\n");
-		
-			}
-			else
-			{
-				//increment the last byte of the ip address
-				//in interface needs two addresses because it is a 
-				//convert from string to integer in network byte order
-				ip2=inet_addr(this->getFramedIp().c_str());
-				//convert from network byte order to host byte order
-				ip2=ntohl(ip2);
-				//increment
-				ip2++;
-				//convert from host byte order to network byte order
-				ip2=htonl(ip2);
-				//copy from one unsigned int to another (casting don't work with these struct!?)
-				memcpy(&ip3, &ip2, 4);
-				// append the new ip address to the string
-				strncat(ipstring, inet_ntoa(ip3), 15);
-				if (DEBUG (context->getVerbosity()))
-					fprintf (stderr, "RADIUS-PLUGIN: BACKGORUND AUTH: Create ifconfig-push for topology net30.\n");
-		
-			}
-			if (DEBUG (context->getVerbosity()))
-				fprintf (stderr, "RADIUS-PLUGIN: Write %s ccd-file.\n",ipstring);
+					fprintf (stderr, "RADIUS-PLUGIN: BACKGORUND AUTH: Write framed ip to ccd-file.\n");
 			
-			
-			ccdfile << ipstring <<"\n";
-		}
-		
-		//set the framed routes in the file for the openvpn process
-		if (framedroutes[0]!='\0')
-		{
-			if (DEBUG (context->getVerbosity()))
-				fprintf (stderr, "RADIUS-PLUGIN: BACKGORUND AUTH: Write framed routes to ccd-file.\n");
-		
-			route=strtok(framedroutes,";");
-			len=strlen(route);
-			if (len > 50) //this is to big!! but the length is variable
-			{
-				fprintf(stderr,"RADIUS-PLUGIN: Argument for Framed Route is to long (>100 Characters).\n");
-				return 1;
-			}
-			else
-			{
-				while (route!=NULL)
+				//build the ifconfig
+				strncat(ipstring, "ifconfig-push ",14);
+				strncat(ipstring, this->getFramedIp().c_str() , 15);
+				strncat(ipstring, " ", 1);
+				
+				
+				if(context->conf.getSubnet()[0]!='\0')
 				{
-					j=0;k=0;
-					//set everything back for the next route entry
-					memset(mask_part,0,6);
-					memset(framednetmask_cidr,0,3);
-					memset(framedip,0,16);
-					memset(framednetmask,0,16);
-					memset(framedgw,0,16);
-					memset(framedmetric,0,5);
-					
-					//add ip address to string
-					while(route[j]!='/' && j<len)
-						{
-							if (route[j]!=' ')
-							{
-								framedip[k]=route[j];
-								k++;
-							}
-							j++;
-						}
-						k=0;
-						j++;
-						//add netmask
-						while(route[j]!=' ' && j<=len)
-						{
-							framednetmask_cidr[k]=route[j];
-							k++;
-							j++;
-						}
-						k=0;
-						//jump spaces
-						while(route[j]==' ' && j<len)
-						{
-							j++;
-						}
-						//find gateway
+					strncat(ipstring, context->conf.getSubnet() , 15);
+					if (DEBUG (context->getVerbosity()))
+						fprintf (stderr, "RADIUS-PLUGIN: BACKGORUND AUTH: Create ifconfig-push for topology subnet.\n");
+			
+				}
+				else if(context->conf.getP2p()[0]!='\0')
+				{
+					strncat(ipstring, context->conf.getP2p() , 15);
+					if (DEBUG (context->getVerbosity()))
+						fprintf (stderr, "RADIUS-PLUGIN: BACKGORUND AUTH: Create ifconfig-push for topology p2p.\n");
+			
+				}
+				else
+				{
+					//increment the last byte of the ip address
+					//in interface needs two addresses because it is a 
+					//convert from string to integer in network byte order
+					ip2=inet_addr(this->getFramedIp().c_str());
+					//convert from network byte order to host byte order
+					ip2=ntohl(ip2);
+					//increment
+					ip2++;
+					//convert from host byte order to network byte order
+					ip2=htonl(ip2);
+					//copy from one unsigned int to another (casting don't work with these struct!?)
+					memcpy(&ip3, &ip2, 4);
+					// append the new ip address to the string
+					strncat(ipstring, inet_ntoa(ip3), 15);
+					if (DEBUG (context->getVerbosity()))
+						fprintf (stderr, "RADIUS-PLUGIN: BACKGORUND AUTH: Create ifconfig-push for topology net30.\n");
+			
+				}
+				if (DEBUG (context->getVerbosity()))
+					fprintf (stderr, "RADIUS-PLUGIN: Write %s ccd-file.\n",ipstring);
+				
+				
+				ccdfile << ipstring <<"\n";
+			}
+			
+			//set the framed routes in the file for the openvpn process
+			if (framedroutes[0]!='\0')
+			{
+				if (DEBUG (context->getVerbosity()))
+					fprintf (stderr, "RADIUS-PLUGIN: BACKGORUND AUTH: Write framed routes to ccd-file.\n");
+			
+				route=strtok(framedroutes,";");
+				len=strlen(route);
+				if (len > 50) //this is to big!! but the length is variable
+				{
+					fprintf(stderr,"RADIUS-PLUGIN: Argument for Framed Route is to long (>100 Characters).\n");
+					return 1;
+				}
+				else
+				{
+					while (route!=NULL)
+					{
+						j=0;k=0;
+						//set everything back for the next route entry
+						memset(mask_part,0,6);
+						memset(framednetmask_cidr,0,3);
+						memset(framedip,0,16);
+						memset(framednetmask,0,16);
+						memset(framedgw,0,16);
+						memset(framedmetric,0,5);
+						
+						//add ip address to string
 						while(route[j]!='/' && j<len)
-						{
-							if (route[j]!=' ')
 							{
-								framedgw[k]=route[j];
-								k++;
+								if (route[j]!=' ')
+								{
+									framedip[k]=route[j];
+									k++;
+								}
+								j++;
 							}
-							j++;
-						}
-						j++;
-						
-						//find gateway netmask (this isn't used
-						//at the command route under linux)
-						while(route[j]!=' ' && j<len)
-						{
-							j++;
-						}
-						//jump spaces
-						
-						while(route[j]==' ' && j<len )
-						{
-							j++;
-						}
-						k=0;
-						if (j<=len)
-						{
-						
 							k=0;
-							//find the metric
-							while(route[j]!=' ' && j<len)
+							j++;
+							//add netmask
+							while(route[j]!=' ' && j<=len)
 							{
-								framedmetric[k]=route[j];
+								framednetmask_cidr[k]=route[j];
 								k++;
 								j++;
 							}
-						}
-																							
-						//create string for client config file
-						//transform framednetmask_cidr
-						d2=7;
-						d1=0;
-						memset(framednetmask,0,16);
-						if (atoi(framednetmask_cidr)>32)
-						{
-							fprintf(stderr, "RADIUS-PLUGIN: Bad net CIDR netmask.\n");
-						}
-						else
-						{
-							for (k=1; k<=atoi(framednetmask_cidr); k++)
+							k=0;
+							//jump spaces
+							while(route[j]==' ' && j<len)
 							{
-								d1=d1+pow(2,d2);
-								d2--;
+								j++;
+							}
+							//find gateway
+							while(route[j]!='/' && j<len)
+							{
+								if (route[j]!=' ')
+								{
+									framedgw[k]=route[j];
+									k++;
+								}
+								j++;
+							}
+							j++;
+							
+							//find gateway netmask (this isn't used
+							//at the command route under linux)
+							while(route[j]!=' ' && j<len)
+							{
+								j++;
+							}
+							//jump spaces
+							
+							while(route[j]==' ' && j<len )
+							{
+								j++;
+							}
+							k=0;
+							if (j<=len)
+							{
+							
+								k=0;
+								//find the metric
+								while(route[j]!=' ' && j<len)
+								{
+									framedmetric[k]=route[j];
+									k++;
+									j++;
+								}
+							}
+																								
+							//create string for client config file
+							//transform framednetmask_cidr
+							d2=7;
+							d1=0;
+							memset(framednetmask,0,16);
+							if (atoi(framednetmask_cidr)>32)
+							{
+								fprintf(stderr, "RADIUS-PLUGIN: Bad net CIDR netmask.\n");
+							}
+							else
+							{
+								for (k=1; k<=atoi(framednetmask_cidr); k++)
+								{
+									d1=d1+pow(2,d2);
+									d2--;
+									
+									if (k==8)
+									{
+										sprintf(mask_part,"%.0lf.", d1);
+										d1=0;
+										d2=7;
+										strncat(framednetmask, mask_part, 4);
+										memset(mask_part,0,6);
+									}
+									if(k==16)
+									{
+										sprintf(mask_part,"%.0lf.", d1);
+										d1=0;
+										d2=7;
+										strncat(framednetmask, mask_part, 4);
+										memset(mask_part,0,6);
+									}
+									if(k==24)
+									{
+										sprintf(mask_part,"%.0lf.", d1);
+										d1=0;
+										d2=7;
+										strncat(framednetmask, mask_part, 4);
+										memset(mask_part,0,6);
+									}
+								}
+								if (j<8)
+								{
+										sprintf(mask_part,"%.0lf.", d1);
+										d1=0;
+										strncat(framednetmask, mask_part, 4);
+										strncat(framednetmask, "0.0.0", 5);
+										memset(mask_part,0,6);
+								}
+								else if (j<16)
+								{
+										sprintf(mask_part,"%.0lf.", d1);
+										d1=0;
+										strncat(framednetmask, mask_part, 4);
+										strncat(framednetmask, "0.0", 3);
+										memset(mask_part,0,6);
+								}
+								else if (j<24)
+								{
+										sprintf(mask_part,"%.0lf.", d1);
+										d1=0;
+										strncat(framednetmask, mask_part, 4);
+										strncat(framednetmask, "0", 1);
+										memset(mask_part,0,6);
+								}
+								else if (j>24)
+								{
+										sprintf(mask_part,"%.0lf", d1);
+										d1=0;
+										strncat(framednetmask, mask_part, 4);
+										memset(mask_part,0,6);
+								}
 								
-								if (k==8)
-								{
-									sprintf(mask_part,"%.0lf.", d1);
-									d1=0;
-									d2=7;
-									strncat(framednetmask, mask_part, 4);
-									memset(mask_part,0,6);
-								}
-								if(k==16)
-								{
-									sprintf(mask_part,"%.0lf.", d1);
-									d1=0;
-									d2=7;
-									strncat(framednetmask, mask_part, 4);
-									memset(mask_part,0,6);
-								}
-								if(k==24)
-								{
-									sprintf(mask_part,"%.0lf.", d1);
-									d1=0;
-									d2=7;
-									strncat(framednetmask, mask_part, 4);
-									memset(mask_part,0,6);
-								}
-							}
-							if (j<8)
-							{
-									sprintf(mask_part,"%.0lf.", d1);
-									d1=0;
-									strncat(framednetmask, mask_part, 4);
-									strncat(framednetmask, "0.0.0", 5);
-									memset(mask_part,0,6);
-							}
-							else if (j<16)
-							{
-									sprintf(mask_part,"%.0lf.", d1);
-									d1=0;
-									strncat(framednetmask, mask_part, 4);
-									strncat(framednetmask, "0.0", 3);
-									memset(mask_part,0,6);
-							}
-							else if (j<24)
-							{
-									sprintf(mask_part,"%.0lf.", d1);
-									d1=0;
-									strncat(framednetmask, mask_part, 4);
-									strncat(framednetmask, "0", 1);
-									memset(mask_part,0,6);
-							}
-							else if (j>24)
-							{
-									sprintf(mask_part,"%.0lf", d1);
-									d1=0;
-									strncat(framednetmask, mask_part, 4);
-									memset(mask_part,0,6);
+								
 							}
 							
-							
-						}
+							if (DEBUG (context->getVerbosity()))
+		    						fprintf (stderr, "RADIUS-PLUGIN: Write route string: %s %s %s to ccd-file.\n","iroute " ,framedip, framednetmask);
+			
+							//write iroute to client file
+							ccdfile << "iroute " << framedip << " "<< framednetmask << "\n";
 						
-						if (DEBUG (context->getVerbosity()))
-	    						fprintf (stderr, "RADIUS-PLUGIN: Write route string: %s %s %s to ccd-file.\n","iroute " ,framedip, framednetmask);
-		
-						//write iroute to client file
-						ccdfile << "iroute " << framedip << " "<< framednetmask << "\n";
-					
-						route=strtok(NULL,";");
+							route=strtok(NULL,";");
+					}
 				}
 			}
+		
+		ccdfile.close();
 		}
-	
-	ccdfile.close();
+		else
+		{
+			cerr << "RADIUS-PLUGIN: Could not open file "<< filename << "\n.";
+			return 1;
+		}
 	}
 	else
 	{
-		cerr << "RADIUS-PLUGIN: Could not open file "<< filename << "\n.";
-		return 1;
+		cerr << "RADIUS-PLUGIN: Client config file was not written, overwriteccfiles is false \n.";
 	}
 	
 	return 0;

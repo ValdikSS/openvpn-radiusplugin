@@ -31,6 +31,9 @@ OpenVPNConfig=/etc/openvpn/server.conf
 # p2p=10.8.0.1
 
 
+# Allows the plugin to overwrite the client config in client config file directory,
+# default is true
+overwriteccfiles=true
 
 # Path to a script for vendor specific attributes.
 # Leave it out if you don't use an own script.

@@ -317,7 +317,7 @@ int RadiusAttribute::setValue(char *value)
 			this->value[2]=(unsigned char)atoi(tmpStr);
 
 			j=0;i++;
-			while(value[i] && i<14)
+			while(value[i] && i<15)
 				tmpStr[j++]=value[i++];
 			tmpStr[j]=0;
 			this->value[3]=(unsigned char)atoi(tmpStr);
