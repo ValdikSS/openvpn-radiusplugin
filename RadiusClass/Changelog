@@ -22,4 +22,5 @@ RadiusClass_v2.0:
 RadiusClass_v2.0b:
 21.07.07:	Support for gigawords
 		Improve parsing of config file..
+		Correct parsing of IPADDRESS in RadiusAttribute.cpp in setValue() for data type IPADDRESS
 			

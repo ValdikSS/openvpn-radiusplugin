@@ -120,7 +120,7 @@ int Config::parseConfigFile(const char * configfile)
 					this->getValue(line.c_str(), tmp);
 					this->openvpnconfig=tmp;
 				}
-				if (strncmp(line.c_str(),"overwriteccfiles=",14)==0)
+				if (strncmp(line.c_str(),"overwriteccfiles=",17)==0)
 				{
 					this->getValue(line.c_str(), tmp);
 					string stmp=tmp;
@@ -142,34 +142,52 @@ int Config::parseConfigFile(const char * configfile)
 			while(file2.eof()==false)
 			{
 				getline(file2,line);
-				this->deletechars(&line);
 				if(line.empty()==false)
 				{
-					if (line == "client-cert-not-required")
+					if (line.find("client-cert-not-required") != string::npos)
 					{
-						this->clientcertnotrequired=true;
-					}
-					if (line == "username-as-common-name")
-					{
-						this->usernameascommonname=true;
-					}
-					if (line == "username-as-common-name")
-					{
-						this->usernameascommonname=true;
-					}	
-					if (string::size_type pos = line.find("client-config-dir") != string::npos)
-					{
-						line.erase(0, pos + 17);
 						this->deletechars(&line);
+						if (line == "client-cert-not-required")
+						{
+							this->clientcertnotrequired=true;
+						}
+					}
+					if (line.find("username-as-common-name") != string::npos)
+					{
+						this->deletechars(&line);
+						if (line == "username-as-common-name")
+						{
+							this->usernameascommonname=true;
+						}
+					}
+					if (line.find("client-config-dir") != string::npos)
+					{
+						this->deletechars(&line);
+						line.erase(0, 17);
 						this->setCcdPath(line);
 					}
 					if (string::size_type pos = line.find("status") != string::npos)
 					{
-						line.erase(0, pos + 6);
-						this->deletechars(&line);
-						pos = line.find(" ");
+						
+						pos  = line.find_first_of("#");
+						if (pos != string::npos) 
+						{
+							line.erase(pos);
+						}
+						// trim leading whitespace
+						char const* delims = " \t\r\n\0";
+   						pos = line.find_first_not_of(delims);
+   						if (pos != string::npos) line.erase(0,pos );
+						line.erase(0, 6);
+						//delete the trailing version of status if there
+						pos = line.find_last_of(" ");
 						if (pos != string::npos) line.erase(pos);
-						this->statusfile=line;
+						this->deletechars(&line);
+						
+						if(!line.empty())
+						{
+							this->statusfile=line;
+						}
 					}	
 				}
 			}
@@ -200,17 +218,15 @@ void Config::deletechars(string * line)
    // trim leading whitespace
    string::size_type  pos = line->find_first_not_of(delims);
    if (pos != string::npos) line->erase(0,pos );
-
    // trim trailing whitespace
    pos  = line->find_last_not_of(delims); 
    if (pos != string::npos)  line->erase(pos+1);
-   
-   
+    
    //trim whitespaces in line
    pos  = line->find_first_of(delims);
    while (pos != string::npos) 
    {
-   	 line->erase(pos);
+   	 line->erase(pos,1);
    	 pos  = line->find_first_of(delims);
    }
    
@@ -220,6 +236,7 @@ void Config::deletechars(string * line)
    {
    	line->erase(pos);
    }
+   
 }
 
 

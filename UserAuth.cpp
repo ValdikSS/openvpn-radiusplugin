@@ -1472,6 +1472,7 @@ int UserAuth::createCcdFile(PluginContext *context)
 	int j=0,k=0;
 	int len=0;
 	
+	
 	if(context->conf.getOverWriteCCFiles()==true)
 	{
 		memset(ipstring,0,100);
@@ -1481,6 +1482,7 @@ int UserAuth::createCcdFile(PluginContext *context)
 		//create the filename, ccd-path + commonname
 		filename=context->conf.getCcdPath()+this->getCommonname();
 		
+				
 		if (DEBUG (context->getVerbosity()))
 	    	fprintf (stderr, "RADIUS-PLUGIN: BACKGROUND AUTH: Try to open ccd file.\n");
 		
