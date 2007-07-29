@@ -168,7 +168,7 @@ int Config::parseConfigFile(const char * configfile)
 					}
 					if (string::size_type pos = line.find("status") != string::npos)
 					{
-						
+						//method deletechars don't work, entry has formet: status <file> [version]
 						pos  = line.find_first_of("#");
 						if (pos != string::npos) 
 						{
