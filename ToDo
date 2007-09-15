@@ -9,7 +9,6 @@ TODO (general):
 ----------------
 - integrate system dependent code for system call route ...
 - debug - class;
-- improve the parsing of the configfile (caseinsensitive, comments, ...), datatype string for config
 - create a method which returns a representation of the buffer dependent on the type (enum, ipaddr, string, integer)
 - get the NAS ip address automatically from the system
 	-> help: find the right interface which knows the route to the radius server!
@@ -21,9 +20,6 @@ TODO (general):
 - create a routing and ip class with correctness checking
 - read config options from OpenVPN: 
 	- topology option
-	- username as common name
-	- client-cert-not-required
-	- path to ccd dir
 	- get to know if no certificates are used
 	- check if preconditions are ok
 - different status file version 

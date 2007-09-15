@@ -63,3 +63,7 @@ radiusplugin_2.0b:
 - add new config variable overwriteccfiles, allows the plugin to overwrite client config files if set to true
 - update some documentation
 - correct parsing of ip address in RadiusAttribute.cpp in setValue for data type IPADDRESS
+- update example config file
+- use string for config parsing
+- correct bug in Config.cpp: parameter status was detected wrong if parameter status-version parameter is used in OpenVPN config
+

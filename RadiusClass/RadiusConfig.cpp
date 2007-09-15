@@ -78,8 +78,7 @@ list<RadiusServer> * RadiusConfig::getRadiusServer(void)
 int RadiusConfig::parseConfigFile(const char * configfile)
 {
 	string line;
-	char tmp[50];
-
+	
 	RadiusServer *tmpServer=NULL;
 	ifstream file;
 	file.open(configfile, ios::in);
@@ -91,28 +90,43 @@ int RadiusConfig::parseConfigFile(const char * configfile)
 			this->deletechars(&line);
 			if (strncmp(line.c_str(),"Framed-Protocol=",16)==0)
 			{
-				this->getValue(line.c_str(), tmp);
-				strncpy(this->framedProtocol,tmp,2);
+				if((line.size()-16)>2)
+				{
+					return BAD_FILE;
+				}
+				line.copy(this->framedProtocol,line.size()-16,16);
 			}
 			if (strncmp(line.c_str(),"NAS-Port-Type=",14)==0)
 			{
-				this->getValue(line.c_str(), tmp);
-				strncpy(this->nasPortType,tmp,2);	
+				if((line.size()-14)>1)
+				{
+					return BAD_FILE;
+				}
+				line.copy(this->nasPortType,line.size()-14,14);
 			}
 			if (strncmp(line.c_str(),"Service-Type=",13)==0)
 			{
-				this->getValue(line.c_str(), tmp);
-				strncpy(this->serviceType,tmp,2);
+				if((line.size()-13)>1)
+				{
+					return BAD_FILE;
+				}
+				line.copy(this->serviceType,line.size()-13,13);
 			}
 			if (strncmp(line.c_str(),"NAS-Identifier=",15)==0)
 			{
-				this->getValue(line.c_str(), tmp);
-				strncpy(this->nasIdentifier,tmp,128);
+				if((line.size()-15)>127)
+				{
+					return BAD_FILE;
+				}
+				line.copy(this->nasIdentifier,line.size()-15,15);
 			}
 			if (strncmp(line.c_str(),"NAS-IP-Address=",15)==0)
 			{
-				this->getValue(line.c_str(), tmp);
-				strncpy(this->nasIpAddress,tmp,16);
+				if((line.size()-15)>15)
+				{
+					return BAD_FILE;
+				}
+				line.copy(this->nasIpAddress,line.size()-15,15);
 			}
 			if(strncmp(line.c_str(),"server",6)==0)
 			{
@@ -135,36 +149,29 @@ int RadiusConfig::parseConfigFile(const char * configfile)
 						
 					if (strncmp(line.c_str(),"authport=",9)==0) 
 					{
-						getValue(line.c_str(), tmp);
-						tmpServer->setAuthPort(atoi(tmp));
+						tmpServer->setAuthPort(atoi(line.substr(9,4).c_str()));
 					}
 					if (strncmp(line.c_str(),"acctport=",9)==0)
 					{
-						getValue(line.c_str(), tmp);
-						tmpServer->setAcctPort(atoi(tmp));
+						tmpServer->setAcctPort(atoi(line.substr(9,4).c_str()));
 					}
 					if (strncmp(line.c_str(),"name=",5)==0)
 					{
-						getValue(line.c_str(), tmp);
-						tmpServer->setName(tmp);
+						tmpServer->setName(line.substr(5));
 					}
 					if (strncmp(line.c_str(),"retry=",6)==0)
 					{
-						getValue(line.c_str(), tmp);
-						tmpServer->setRetry(atoi(tmp));
+						tmpServer->setRetry(atoi(line.substr(6).c_str()));
 					}
 					if (strncmp(line.c_str(),"sharedsecret=",13)==0)
 					{
-						getValue(line.c_str(), tmp);
-						tmpServer->setSharedSecret(tmp);
+						tmpServer->setSharedSecret(line.substr(13));
 					}
 					if (strncmp(line.c_str(),"wait=",5)==0)
 					{
-						getValue(line.c_str(), tmp);
-						tmpServer->setWait(atoi(tmp));
+						tmpServer->setWait(atoi(line.substr(5).c_str()));
 					}
 				}
-					
 				if(strstr(line.c_str(),"}"))
 				{
 					this->server.push_back(*tmpServer);

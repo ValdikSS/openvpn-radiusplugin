@@ -50,7 +50,7 @@ public:
 	void setWait(int);
 	int getWait(void);
 	
-	void setSharedSecret(char *);
+	void setSharedSecret(string);
 	string getSharedSecret(void);
 	
 	int getAuthPort();
@@ -60,7 +60,7 @@ public:
 	void setAcctPort(short int);
 	
 	string getName();
-	void setName(char *);
+	void setName(string);
 	
 	friend ostream& operator << (ostream& os, RadiusServer& server);
 };

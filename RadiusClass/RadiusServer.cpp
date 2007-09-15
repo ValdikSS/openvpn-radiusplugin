@@ -107,7 +107,7 @@ int RadiusServer::getAcctPort()
  * There is no correctness checking. The name could be a name or an ip address.
  * @param name : The name or ip address of the radius server.
  */
-void RadiusServer::setName(char *name)
+void RadiusServer::setName(string name)
 {
 	this->name=name;
 }
@@ -148,7 +148,7 @@ int RadiusServer::getRetry()
 /** The setter method for the sharedsecret
  * @param secret The sharedsecret in plaintext.
  */
-void RadiusServer::setSharedSecret(char *secret)
+void RadiusServer::setSharedSecret(string secret)
 {
 	this->sharedsecret=secret;
 }

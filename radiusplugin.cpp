@@ -850,7 +850,7 @@ OPENVPN_EXPORT void openvpn_plugin_close_v1 (openvpn_plugin_handle_t handle)
     }
   	
   	//free the context
-  	delete (context);
+  	delete context;
 }
 
 

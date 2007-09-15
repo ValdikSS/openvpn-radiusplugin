@@ -15,7 +15,7 @@ NAS-IP-Address=127.0.0.1
 
 # Path to the OpenVPN configfile. The plugin searches there for
 # client-config-dir PATH   (searches for the path)
-# status FILE VERSION      (searches for the file, version must be 1)
+# status FILE     		   (searches for the file, version must be 1)
 # client-cert-not-required (if the option is used or not)
 # username-as-common-name  (if the option is used or not)
 
@@ -26,22 +26,22 @@ OpenVPNConfig=/etc/openvpn/server.conf
 # If you don't specify anything, option "net30" (default in OpenVPN) is used. 
 # You can only use one of the options at the same time.
 # If you use topology option "subnet", fill in the right netmask, e.g. from OpenVPN option "--server NETWORK NETMASK"  
-# subnet=255.255.255.0
+subnet=255.255.255.0
 # If you use topology option "p2p", fill in the right network, e.g. from OpenVPN option "--server NETWORK NETMASK"
 # p2p=10.8.0.1
 
 
 # Allows the plugin to overwrite the client config in client config file directory,
 # default is true
-overwriteccfiles=false
+overwriteccfiles=true
 
 # Path to a script for vendor specific attributes.
 # Leave it out if you don't use an own script.
-vsascript=/root/workspace/radiusplugin_v2.0.5_beta/vsascript.pl
+# vsascript=/root/workspace/radiusplugin_v2.0.5_beta/vsascript.pl
 
 # Path to the pipe for communication with the vsascript.
 # Leave it out if you don't use an own script.
-vsanamedpipe=/tmp/vsapipe
+# vsanamedpipe=/tmp/vsapipe
 
 # A radius server definition, there could be more than one.
 # The priority of the server depends on the order in this file. The first one has the highest priority.

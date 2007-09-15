@@ -153,7 +153,7 @@ char * RadiusAttribute::makePasswordHash(const char *password,char * hpassword, 
 {
 	
 	unsigned char digest[MD5_DIGEST_LENGTH]; 	//The digest.
-	gcry_md_hd_t	context;					//the hash context
+	gcry_md_hd_t context;					//the hash context
 	int i,k,j,l,								//Some counters.
 		passwordlen;							//The password length.
 	
@@ -161,16 +161,14 @@ char * RadiusAttribute::makePasswordHash(const char *password,char * hpassword, 
 		
 	//build the hash	
 		
-	gcry_md_open (&context, GCRY_MD_MD5, 0);
+	gcry_md_open(&context, GCRY_MD_MD5, 0);
 	gcry_md_write(context, sharedSecret, strlen(sharedSecret));
-	gcry_md_write(context, authenticator, 16);
-	memcpy(digest, gcry_md_read(context, GCRY_MD_MD5), 16);
-	if (this->length<16)
+	gcry_md_write(context, authenticator, MD5_DIGEST_LENGTH);
+	memcpy(digest, gcry_md_read(context, GCRY_MD_MD5), MD5_DIGEST_LENGTH);
+	if (this->length<MD5_DIGEST_LENGTH)
 	{
-		
 		//XOR the password and the digest
-		for(i=0;i<16;i++)
-			hpassword[i]=password[i]^digest[i];
+		for(i=0;i<MD5_DIGEST_LENGTH;i++) hpassword[i]=password[i]^digest[i];
 	}
 	else
 	{
@@ -178,12 +176,12 @@ char * RadiusAttribute::makePasswordHash(const char *password,char * hpassword, 
 		
 		//XOR the password and the digest
 		//build the first xOR-hash
-		for(i=0;i<16;i++)
+		for(i=0;i<MD5_DIGEST_LENGTH;i++)
 		{
 			hpassword[i]=password[i]^digest[i];
 			
 		}	
-		passwordlen=passwordlen-16;	//the next 16 charakters
+		passwordlen=passwordlen-MD5_DIGEST_LENGTH;	//the next 16 charakters
 		k=0;						//the first loop
 		while (passwordlen>0)
 		{
@@ -193,25 +191,24 @@ char * RadiusAttribute::makePasswordHash(const char *password,char * hpassword, 
 			//put the hash of the last XOR in the digest
 			gcry_md_open (&context, GCRY_MD_MD5, 0);
 			gcry_md_write(context, sharedSecret, strlen(sharedSecret));
-			gcry_md_write(context, hpassword+(k*16), 16);
-			memcpy(digest, gcry_md_read(context, GCRY_MD_MD5), 16);
+			gcry_md_write(context, hpassword+(k*MD5_DIGEST_LENGTH), MD5_DIGEST_LENGTH);
+			memcpy(digest, gcry_md_read(context, GCRY_MD_MD5), MD5_DIGEST_LENGTH);
 			
 			
 			j=0;
-			l=i+16;
+			l=i+MD5_DIGEST_LENGTH;
 			for(;i<l;i++)
 			{
 				hpassword[i]=password[i]^digest[j];
 				j++;
 			
 			}
-			passwordlen=passwordlen-16;		//and the next 16 characters
+			passwordlen=passwordlen-MD5_DIGEST_LENGTH;		//and the next 16 characters
 			k++;							//and the next loop
 			
 		}
 		
 	}
-	//delete [] passwd;
 	gcry_md_close(context);
 	return hpassword;
 

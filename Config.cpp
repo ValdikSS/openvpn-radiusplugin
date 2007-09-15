@@ -80,9 +80,7 @@ Config::~Config(void)
 int Config::parseConfigFile(const char * configfile)
 {
 	string line;
-	char tmp[50];
-
-	
+		
 	ifstream file;
 	file.open(configfile, ios::in);
 	if (file.is_open())
@@ -93,37 +91,40 @@ int Config::parseConfigFile(const char * configfile)
 			this->deletechars(&line);
 			if(line.empty()==false)
 			{
-			
 				if (strncmp(line.c_str(),"subnet=",7)==0)
 				{
-					this->getValue(line.c_str(), tmp);
-					strncpy(this->subnet,tmp,16);
+					if((line.size()-7)>15)
+					{
+						return BAD_FILE;
+					}
+					line.copy(this->subnet,line.size()-7,7);
+					
 				}
 				if (strncmp(line.c_str(),"p2p=",4)==0)
 				{
-					this->getValue(line.c_str(), tmp);
-					strncpy(this->p2p,tmp,16);
+					if((line.size()-4)>15)
+					{
+						return BAD_FILE;
+					}
+					line.copy(this->p2p,line.size()-4,4);
 				}
 				if (strncmp(line.c_str(),"vsascript=",10)==0)
 				{
-					this->getValue(line.c_str(), tmp);
-					this->vsascript=tmp;
+					this->vsascript=line.substr(10,line.size()-10);
 				}
 				if (strncmp(line.c_str(),"vsanamedpipe=",13)==0)
 				{
-					this->getValue(line.c_str(), tmp);
-					this->vsanamedpipe=tmp;
+					this->vsanamedpipe=line.substr(13,line.size()-13);
 				}
 							
 				if (strncmp(line.c_str(),"OpenVPNConfig=",14)==0)
 				{
-					this->getValue(line.c_str(), tmp);
-					this->openvpnconfig=tmp;
+					this->openvpnconfig=line.substr(14,line.size()-14);
 				}
 				if (strncmp(line.c_str(),"overwriteccfiles=",17)==0)
 				{
-					this->getValue(line.c_str(), tmp);
-					string stmp=tmp;
+					
+					string stmp=line.substr(17,line.size()-17);
 					deletechars(&stmp);
 					if(stmp == "true") this->overwriteccfiles=true;
 					else if (stmp =="false") this->overwriteccfiles=false;
@@ -142,9 +143,16 @@ int Config::parseConfigFile(const char * configfile)
 			while(file2.eof()==false)
 			{
 				getline(file2,line);
+				
 				if(line.empty()==false)
 				{
-					if (line.find("client-cert-not-required") != string::npos)
+					string param=line;
+					// trim leading whitespace
+   					string::size_type  pos = param.find_first_not_of(" \t\r\n\0");
+   					if (pos != string::npos) param.erase(0,pos );
+   					pos=param.find_first_of(" \t\n\0");
+					if (pos != string::npos) param.erase(pos);
+					if (param == "client-cert-not-required")
 					{
 						this->deletechars(&line);
 						if (line == "client-cert-not-required")
@@ -152,7 +160,7 @@ int Config::parseConfigFile(const char * configfile)
 							this->clientcertnotrequired=true;
 						}
 					}
-					if (line.find("username-as-common-name") != string::npos)
+					if (param == "username-as-common-name")
 					{
 						this->deletechars(&line);
 						if (line == "username-as-common-name")
@@ -160,15 +168,15 @@ int Config::parseConfigFile(const char * configfile)
 							this->usernameascommonname=true;
 						}
 					}
-					if (line.find("client-config-dir") != string::npos)
+					if (param == "client-config-dir")
 					{
 						this->deletechars(&line);
 						line.erase(0, 17);
 						this->setCcdPath(line);
 					}
-					if (string::size_type pos = line.find("status") != string::npos)
+					if (param == "status")
 					{
-						//method deletechars don't work, entry has formet: status <file> [version]
+						//method deletechars don't work, entry has formet: status <file> [time]
 						pos  = line.find_first_of("#");
 						if (pos != string::npos) 
 						{
@@ -177,10 +185,14 @@ int Config::parseConfigFile(const char * configfile)
 						// trim leading whitespace
 						char const* delims = " \t\r\n\0";
    						pos = line.find_first_not_of(delims);
-   						if (pos != string::npos) line.erase(0,pos );
+   						if (pos != string::npos) line.erase(0,pos);
 						line.erase(0, 6);
+						// trim leading whitespace again
+						pos = line.find_first_not_of(" \t");
+   						if (pos != string::npos) line.erase(0,pos);
+						
 						//delete the trailing version of status if there
-						pos = line.find_last_of(" ");
+						pos = line.find_first_of(" \t\n\r\0");
 						if (pos != string::npos) line.erase(pos);
 						this->deletechars(&line);
 						
@@ -246,7 +258,6 @@ void Config::deletechars(string * line)
  * @param value The value where to put the part of the string. */
 void Config::getValue(const char * text, char * value)
 {
-	
 	int i=0,j=0;
 	while (text[i]!='=' && text[i]!='\0')
 	{
