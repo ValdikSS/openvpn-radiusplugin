@@ -124,7 +124,8 @@ void AccountingProcess::Accounting(PluginContext * context)
 							
 						//set the system routes
 						user->addSystemRoutes(context);
-					    
+						
+						
 					    string script = context->conf.getVsaScript();
 					    //execute vendor specific attribute script
 					    if(script.length() > 0)
@@ -146,7 +147,7 @@ void AccountingProcess::Accounting(PluginContext * context)
 					else
 					{
 						//delete the ccd file which was created at authentication
-						user->deleteCcdFile(context);
+						//user->deleteCcdFile(context);
 						//tell the parent parent process something is wrong
 						throw Exception("Start packet couldn't send.\n");
 						
@@ -210,7 +211,7 @@ void AccountingProcess::Accounting(PluginContext * context)
 					user->delSystemRoutes(context);
 					
 					//delete the ccd file which was created at authentication
-					user->deleteCcdFile(context);
+					//user->deleteCcdFile(context);
 					
 					string script = context->conf.getVsaScript();
 					//execute vendor specific attribute script

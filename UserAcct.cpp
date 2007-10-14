@@ -1005,3 +1005,4 @@ int UserAcct::deleteCcdFile(PluginContext * context)
 	}
 	return 0;
 }
+

@@ -85,7 +85,7 @@ public:
 	int sendStartPacket(PluginContext *);
 	int sendStopPacket(PluginContext *);
 	void addSystemRoutes(PluginContext * );
-	void delSystemRoutes(PluginContext * context);
+	void delSystemRoutes(PluginContext * context);	
 	int deleteCcdFile(PluginContext *);
 };
 
