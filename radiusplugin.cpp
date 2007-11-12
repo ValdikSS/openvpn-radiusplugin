@@ -24,10 +24,6 @@
 #include "radiusplugin.h"
 
 
-
-
-
-
 //define extern "C", so the c++ compiler generate a shared library 
 //which is compatible with c programms
 extern "C"
@@ -652,13 +648,12 @@ openvpn_plugin_func_v1 (openvpn_plugin_handle_t handle, const int type, const ch
 				{
 					//free the nasport
 					context->delNasPort(newuser->getPortnumber());
-						
-					//delete user from context
-					context->delUser(newuser->getKey());
 					string error;
 					error="RADIUS-PLUGIN: FOREGROUND: Accounting failed for user:";
 					error+=newuser->getUsername();
 					error+="!\n";
+					//delete user from context
+					context->delUser(newuser->getKey());
 					throw Exception(error);
 				}
 			}
