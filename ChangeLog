@@ -67,3 +67,4 @@ radiusplugin_2.0b:
 - use string for config parsing
 - correct bug in Config.cpp: parameter status was detected wrong if parameter status-version parameter is used in OpenVPN config
 - don't delete client config file at CLIENT-DISCONNECT it could already a new file from a new AUTH-USER-PASS-VERIFY
+- Fix segmentation fault in radiusplugin.cpp. The error occurs if an accounting request fails after a successful authentication.

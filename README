@@ -63,6 +63,13 @@ INSTALL:
 	- auth-user-pass [/etc/openvpn/passwd]  # Set this for sending a username and password to the server, this values are the username and password for the radius authentication.
 7. Maybe write your own script for vendor specific attributes (see section VENDOR SPECIFIC ATTRIBUTES).
 
+
+OTHER DOCUMENTATION
+-------------------
+A "OpenVPN - RADIUS - MySQL Howto" in german can be found at:
+http://www.roessner-net.com/
+
+
 FREERADIUS EXAMPLE
 -------------------
 user1   Auth-Type := Local, User-Password == "testing"
