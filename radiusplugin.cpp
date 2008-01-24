@@ -325,7 +325,7 @@ openvpn_plugin_func_v1 (openvpn_plugin_handle_t handle, const int type, const ch
 	UserPlugin 	*newuser=NULL; 	/**< A context for an new user.*/
 	UserPlugin	*olduser=NULL;	/**<A context for an already known user.*/
 	string common_name;			/**<A string for the common_name from the enviroment.*/
-	
+	string untrusted_ip;			/** untrusted_ip for ipv6 support **/
 	
 	
 	///////////// OPENVPN_PLUGIN_AUTH_USER_PASS_VERIFY
@@ -349,9 +349,9 @@ openvpn_plugin_func_v1 (openvpn_plugin_handle_t handle, const int type, const ch
 	    	{
 	    		throw Exception( "RADIUS-PLUGIN: FOREGROUND: password is not defined\n");
 	    	}
-	    	else if (get_env ("untrusted_ip", envp)==NULL)
+	    	else if (get_env ("untrusted_ip", envp)==NULL && get_env ("untrusted_ip6", envp)==NULL)
 	    	{
-	    		throw Exception( "RADIUS-PLUGIN: FOREGROUND: untrusted_ip is not defined\n");
+			throw Exception( "RADIUS-PLUGIN: FOREGROUND: untrusted_ip and untrusted_ip6 is not defined\n");
 	    	}
 	    	else if (get_env ("common_name", envp)==NULL)
 	    	{
@@ -369,25 +369,37 @@ openvpn_plugin_func_v1 (openvpn_plugin_handle_t handle, const int type, const ch
 	      	// get username, password, unrusted_ip and common_name from envp string array 
 	    	newuser->setUsername(get_env ("username", envp));
 	      	newuser->setPassword(get_env ("password", envp));
-	      	newuser->setCallingStationId(get_env ("untrusted_ip", envp));
+		
+		// it's ipv4
+		if(get_env ("untrusted_ip", envp)!=NULL)
+		{
+			untrusted_ip = get_env ("untrusted_ip", envp); 
+		}
+                // it's ipv6
+		else
+		{
+			untrusted_ip = get_env ("untrusted_ip6", envp); 
+		}
+		newuser->setCallingStationId(untrusted_ip);
 	      	//for OpenVPN option client cert not required, common_name is "UNDEF", see status.log
 	      	
 	      	if (get_env ("common_name", envp)!=NULL)
 		    {
 		    	newuser->setCommonname(get_env ("common_name", envp));
 		    }
-		    else
-		    {
-		    	newuser->setCommonname("UNDEF");
-		    }
 		    //rewrite the username if OpenVPN use the option username-as-comon-name
-		    if(context->conf.getUsernameAsCommonname() == true)
+		    
+
+                    if(context->conf.getUsernameAsCommonname() == true)
 		    {
-		    	newuser->setCommonname(get_env ("username", envp));
+		    	if (DEBUG (context->getVerbosity())) cerr << "RADIUS-PLUGIN: FOREGROUND: Commonname set to Username\n";
+                        newuser->setCommonname(get_env ("username", envp));
 		    }
+                    
 				    
-		    newuser->setUntrustedPort(get_env("untrusted_port", envp));
-			newuser->setKey(newuser->getCommonname() +string(",") + get_env ("untrusted_ip", envp) + string(":") + get_env ("untrusted_port", envp));
+		        newuser->setUntrustedPort(get_env("untrusted_port", envp));
+			newuser->setKey(newuser->getCommonname() +string(",") + untrusted_ip + string(":") + get_env ("untrusted_port", envp));
+			
 			//is the user already known?
 			olduser=context->findUser(newuser->getKey());
 		
@@ -535,7 +547,7 @@ openvpn_plugin_func_v1 (openvpn_plugin_handle_t handle, const int type, const ch
 					throw Exception("RADIUS-PLUGIN: FOREGROUND: Error receiving auth confirmation from background process.\n");
 	    	}
  		}
- 			catch(const Exception &e)
+ 		catch(const Exception &e)
 	    	{
 	      		cerr << e;
 	    		
@@ -561,9 +573,9 @@ openvpn_plugin_func_v1 (openvpn_plugin_handle_t handle, const int type, const ch
 		}
 		
 		try{			      	
-	      	if (get_env ("untrusted_ip", envp)==NULL)
+	      	if (get_env ("untrusted_ip", envp)==NULL &&  get_env("untrusted_ip6", envp)==NULL)
 	    	{
-	    		throw Exception( "RADIUS-PLUGIN: FOREGROUND: untrusted_ip is not defined\n");
+			throw Exception( "RADIUS-PLUGIN: FOREGROUND: untrusted_ip and untrusted_ip6 is not defined\n");
 	    	}
 	    	else if (get_env ("common_name", envp)==NULL)
 	    	{
@@ -580,11 +592,19 @@ openvpn_plugin_func_v1 (openvpn_plugin_handle_t handle, const int type, const ch
 	    	{
 	    		throw Exception( "RADIUS-PLUGIN: FOREGROUND: ifconfig_pool_remote_ip is not defined\n");
 	    	}
-	    
-		
 		//get username, password and trusted_ip from envp string array 
 		//for OpenVPN option client cert not required, common_name is "UNDEF", see status.log
-      	if (get_env ("common_name", envp)!=NULL)
+	    
+		if(get_env ("untrusted_ip", envp)!=NULL)
+		{
+			untrusted_ip = get_env ("untrusted_ip", envp); 
+		}
+		else
+		{
+			untrusted_ip = get_env ("untrusted_ip6", envp); 
+		}
+	    
+	    if (get_env ("common_name", envp)!=NULL)
 	    {
 	    	common_name=get_env ("common_name", envp);
 	    }
@@ -601,16 +621,13 @@ openvpn_plugin_func_v1 (openvpn_plugin_handle_t handle, const int type, const ch
 		
 		const char *ifconfig_pool_remote_ip=get_env ("ifconfig_pool_remote_ip", envp);	
 		//find the user in the context, he was added at the OPENVPN_PLUGIN_AUTH_USER_PASS_VERIFY
-		string key=common_name + string(",") + string(get_env ("untrusted_ip", envp)) + string(":") + string(get_env ("untrusted_port", envp));
+		string key=common_name + string(",") +untrusted_ip+string(":") + string(get_env ("untrusted_port", envp));
 		
 		newuser=context->findUser(key);	
 		//set the assigned ip as Framed-IP-Attribute of the user (see RFC2866, chapter 4.1 for more information)
 		newuser->setFramedIp(string(ifconfig_pool_remote_ip));
 		if (DEBUG (context->getVerbosity()))
 			cerr << "RADIUS-PLUGIN: FOREGROUND: Set FramedIP to the IP (" << newuser->getFramedIp() << ") OpenVPN assigned to the user " << newuser->getUsername() << "\n";
-		
-		
-		
 			//the user must be there and must be authenticated but not accounted
 			// isAccounted and isAuthenticated is true it is client connect for renegotiation, the user is already in the accounting process 
 			if (newuser!=NULL && newuser->isAccounted()==false && newuser->isAuthenticated()==true)
@@ -691,9 +708,9 @@ openvpn_plugin_func_v1 (openvpn_plugin_handle_t handle, const int type, const ch
     		cerr << "\n\nRADIUS-PLUGIN: FOREGROUND: OPENVPN_PLUGIN_CLIENT_DISCONNECT is called.\n";
 		}
     	try{			      	
-	      	if (get_env ("untrusted_ip", envp)==NULL)
+	      	if (get_env ("untrusted_ip", envp)==NULL && get_env ("untrusted_ip6", envp)==NULL)
 	    	{
-	    		throw Exception( "RADIUS-PLUGIN: FOREGROUND: untrusted_ip is not defined\n");
+			throw Exception( "RADIUS-PLUGIN: FOREGROUND: untrusted_ip and untrusted_ip6 is not defined\n");
 	    	}
 	    	else if (get_env ("common_name", envp)==NULL)
 	    	{
@@ -706,10 +723,21 @@ openvpn_plugin_func_v1 (openvpn_plugin_handle_t handle, const int type, const ch
 	    	{
 	    		throw Exception( "RADIUS-PLUGIN: FOREGROUND: untrusted_port is not defined\n");
 	    	}
-	    	
+		
+		if(get_env ("untrusted_ip", envp)!=NULL)
+		{
+			untrusted_ip = get_env ("untrusted_ip", envp); 
+		}
+		else
+		{
+			untrusted_ip = get_env ("untrusted_ip6", envp); 
+		}
+		
+		
+		
     	// get common_name from envp string array, if you don't use certificates it is "UNDEF" 
     	// get username, password and trusted_ip from envp string array 
-		//for OpenVPN option client cert not required, common_name is "UNDEF", see status.log
+	//for OpenVPN option client cert not required, common_name is "UNDEF", see status.log
       	if (get_env ("common_name", envp)!=NULL)
 	    {
 	    	common_name=get_env ("common_name", envp);
@@ -725,7 +753,7 @@ openvpn_plugin_func_v1 (openvpn_plugin_handle_t handle, const int type, const ch
 	    }
 		
 		//find the user in the context
-		newuser=context->findUser(common_name + string(",") + string(get_env ("untrusted_ip", envp)) + string(":") + string(get_env ("untrusted_port", envp)));
+		newuser=context->findUser(common_name + string(",") + untrusted_ip + string(":") + string(get_env ("untrusted_port", envp)));
 		
 		
 			if (newuser!=NULL)

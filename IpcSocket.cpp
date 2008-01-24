@@ -75,22 +75,23 @@ int IpcSocket::getSocket(void)
  */
 void IpcSocket::send(string str)
 {
-	const int len = str.size();
-  	ssize_t size;
+	ssize_t len = str.size();
+  	ssize_t size=0;
   	//send the length of the string
-  	size = write (this->socket, &len, sizeof(int));
-  	if (size != sizeof(int))
+        size = write(this->socket, &len, sizeof(ssize_t));
+  	if (size != sizeof(ssize_t))
   	{
   		throw Exception(Exception::SOCKETSEND);
   	}
-  	//send the string
-  	size = write (this->socket, str.c_str(), len);
-  	if (size != len)
-  	{
-  		throw Exception(Exception::SOCKETSEND);
-  	}
-	
-	
+        if(len > 0)
+        {
+          //send the string
+          size = write(this->socket, str.c_str(), len);
+          if (size != len)
+          {
+            throw Exception(Exception::SOCKETSEND);
+          }
+        }
 }
 
 /**The method sends a buffer via the
@@ -100,26 +101,24 @@ void IpcSocket::send(string str)
  * @throws Exception::SOCKETSEND if the length or the buffer could not send
  * correctly.
  */
-void IpcSocket::send(Octet * value, unsigned int len)
+void IpcSocket::send(Octet * value, ssize_t len)
 {
-	ssize_t size;
+	ssize_t size=0;
   	//send the length of the string
-  	size = write (this->socket, &len, sizeof(unsigned int));
-  	if (size != sizeof(unsigned int))
+  	size = write (this->socket, &len, sizeof(ssize_t));
+  	if (size != sizeof(ssize_t))
   	{
   		throw Exception(Exception::SOCKETSEND);
   	}
-  	if (len > 0)
+        if (len > 0)
   	{
 	  	//send the buffer
 	  	size = write (this->socket, value, len);
-	  	if (size != int(len))
+	  	if (size != len)
 	  	{
 	  		throw Exception(Exception::SOCKETSEND);
 	  	}
   	}
-	
-	
 }
 
 /**The method sends an integer via
@@ -131,12 +130,11 @@ void IpcSocket::send(Octet * value, unsigned int len)
 void IpcSocket::send(int num)
 {
 	
-  	const ssize_t size = write (this->socket, &num, sizeof (int));
-  	if (size != sizeof (int))
+  	const ssize_t size = write (this->socket, &num, sizeof(int));
+  	if (size != sizeof(int))
   	{
   		throw Exception(Exception::SOCKETSEND);
   	}
-    	
 }
 
 
@@ -149,10 +147,12 @@ void IpcSocket::send(int num)
 int IpcSocket::recvInt(void)
 {
 	int num;
-	const ssize_t size = read (this->socket, &num, sizeof (int));
-  	if (size != sizeof (int))
+	ssize_t size; 
+        size = read(this->socket, &num, sizeof(int));
+  	if (size != sizeof(int))
   	{
-  		throw Exception(Exception::SOCKETRECV);
+  	    
+            throw Exception(Exception::SOCKETRECV);
   	}
   	return num;
 }
@@ -170,24 +170,27 @@ int IpcSocket::recvInt(void)
  */
 string IpcSocket::recvStr(void)
 {
-	int len;
+	ssize_t len;
 	char * buffer;
 	ssize_t size;
 	string str;
-	size = read (this->socket,&len,sizeof(int));
-	if (size!=sizeof(int))
+	size = read(this->socket,&len,sizeof(ssize_t));
+	if (size!=sizeof(ssize_t))
 	{
-		throw Exception(Exception::SOCKETRECV);
+	  throw Exception(Exception::SOCKETRECV);
 	}
-	buffer=new char[len+1];
-    memset (buffer, 0, len+1);
-    size = read (this->socket, buffer, len);
-    if (size!=len)
-	{
-		throw Exception(Exception::SOCKETRECV);
-	}
-    str=buffer;
-    delete [] buffer;
+        if(len > 0)
+        {
+          buffer=new char[len+1];
+          memset (buffer, 0, len+1);
+          size = read (this->socket, buffer, len);
+          if (size!=len)
+          {
+            throw Exception(Exception::SOCKETRECV);
+          }
+          str=buffer;
+          delete [] buffer;
+        }
     return str;
 }
 
@@ -201,21 +204,22 @@ string IpcSocket::recvStr(void)
  */
 void IpcSocket::recvBuf(User * user)
 {
-	unsigned int len;
-	ssize_t size;
-	size = read (this->socket,&len,sizeof(unsigned int));
-	if (size!=sizeof(unsigned int))
+	ssize_t len;
+        ssize_t size;
+	size = read (this->socket,&len,sizeof(ssize_t));
+	if (size!=sizeof(ssize_t))
 	{
-		throw Exception(Exception::SOCKETRECV);
+	    throw Exception(Exception::SOCKETRECV);
 	}
 	user->setVsaBufLen(len);
 	if (len > 0)
 	{
-		user->setVsaBuf(new Octet[len]);
+	    user->setVsaBuf(new Octet[len]);
 	    size = read (this->socket, user->getVsaBuf(), len);
-	    if (size != int(len))
+	    if (size != len)
 		{
-			throw Exception(Exception::SOCKETRECV);
+		  
+                  throw Exception(Exception::SOCKETRECV);
 		}
 	}
     

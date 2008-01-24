@@ -57,7 +57,7 @@ public:
 	
 	void send(int);
 	
-	void send(Octet *, unsigned int);
+	void send(Octet *, ssize_t);
 	
 	int recvInt(void);
 	
