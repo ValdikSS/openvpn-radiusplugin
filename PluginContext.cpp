@@ -84,7 +84,6 @@ int PluginContext::addNasPort(void)
 		}
 		this->nasportlist.insert(j, newport);
 	}
-	
 	return newport;
 }
 

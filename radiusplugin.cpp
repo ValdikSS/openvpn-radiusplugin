@@ -340,7 +340,8 @@ openvpn_plugin_func_v1 (openvpn_plugin_handle_t handle, const int type, const ch
  		newuser=new UserPlugin();
  		
  		//allocate the memory, don't care about the value
- 		try{			      	
+ 		try
+ 		{			      	
 	      	if (get_env ("username", envp)==NULL)
 	    	{
 	    		throw Exception( "RADIUS-PLUGIN: FOREGROUND: username is not defined\n");
@@ -370,17 +371,17 @@ openvpn_plugin_func_v1 (openvpn_plugin_handle_t handle, const int type, const ch
 	    	newuser->setUsername(get_env ("username", envp));
 	      	newuser->setPassword(get_env ("password", envp));
 		
-		// it's ipv4
-		if(get_env ("untrusted_ip", envp)!=NULL)
-		{
-			untrusted_ip = get_env ("untrusted_ip", envp); 
-		}
+			// it's ipv4
+			if(get_env ("untrusted_ip", envp)!=NULL)
+			{
+				untrusted_ip = get_env ("untrusted_ip", envp); 
+			}
                 // it's ipv6
-		else
-		{
-			untrusted_ip = get_env ("untrusted_ip6", envp); 
-		}
-		newuser->setCallingStationId(untrusted_ip);
+			else
+			{
+				untrusted_ip = get_env ("untrusted_ip6", envp); 
+			}
+			newuser->setCallingStationId(untrusted_ip);
 	      	//for OpenVPN option client cert not required, common_name is "UNDEF", see status.log
 	      	
 	      	if (get_env ("common_name", envp)!=NULL)
@@ -390,14 +391,14 @@ openvpn_plugin_func_v1 (openvpn_plugin_handle_t handle, const int type, const ch
 		    //rewrite the username if OpenVPN use the option username-as-comon-name
 		    
 
-                    if(context->conf.getUsernameAsCommonname() == true)
+            if(context->conf.getUsernameAsCommonname() == true)
 		    {
 		    	if (DEBUG (context->getVerbosity())) cerr << "RADIUS-PLUGIN: FOREGROUND: Commonname set to Username\n";
                         newuser->setCommonname(get_env ("username", envp));
 		    }
                     
 				    
-		        newuser->setUntrustedPort(get_env("untrusted_port", envp));
+		    newuser->setUntrustedPort(get_env("untrusted_port", envp));
 			newuser->setKey(newuser->getCommonname() +string(",") + untrusted_ip + string(":") + get_env ("untrusted_port", envp));
 			
 			//is the user already known?
@@ -510,10 +511,9 @@ openvpn_plugin_func_v1 (openvpn_plugin_handle_t handle, const int type, const ch
 					}
 			
 				}
-			}	
-	      		else
+	      		else //AUTH failed
 	      		{
-					if(newuser->isAuthenticated()==true && olduser!=NULL)
+					if(newuser->isAuthenticated()==true && olduser!=NULL) //user is already known, delete him from the accounting
 					{
 						cerr << "RADIUS-PLUGIN: FOREGROUND: Error ar rekeying!\n";
 						//error on authenticate user at rekeying -> delete the user!
@@ -527,38 +527,36 @@ openvpn_plugin_func_v1 (openvpn_plugin_handle_t handle, const int type, const ch
 			      		{
 							if (DEBUG (context->getVerbosity()))
 		    					cerr << "RADIUS-PLUGIN: FOREGROUND: Accouting for user with key" << newuser->getKey()  << " stopped!\n";
-																
-							
-			      		}
+						}
 			      		else
 			      		{
 			      			cerr << "RADIUS-PLUGIN: FOREGROUND: Error in ACCT Background Process!\n";
 							cerr << "RADIUS-PLUGIN: FOREGROUND: User is deleted from the user map!\n";
 			      		}
-			      		
-                                        
-					}
-					if (olduser !=NULL)
-					{
-						context->delNasPort(newuser->getPortnumber());
-	    				context->delUser(newuser->getKey());	
-					}
-					if (olduser == NULL) delete newuser;
+			      	}
 					throw Exception("RADIUS-PLUGIN: FOREGROUND: Error receiving auth confirmation from background process.\n");
-	    	}
+	    		}
+			}
  		}
  		catch(const Exception &e)
-	    	{
-	      		cerr << e;
+	    {
+	    	cerr << e;
 	    		
-	    	}
-	    	catch (...)
-	    	{
-	    		cerr << "Unknown Exception!";
-	    		
-	    		
-	    	}
-	    if (olduser == NULL) delete newuser;
+	    }
+	    catch (...)
+	    {
+	    	cerr << "Unknown Exception!";
+	    }
+	    //remove the nas port number
+	    context->delNasPort(newuser->getPortnumber());
+	    if (olduser == NULL) //the wasn't added to the context 
+	    {
+	    	delete newuser;
+	    }
+	    else //the user is in the context
+	    {
+	    	context->delUser(newuser->getKey());
+	    }
         return OPENVPN_PLUGIN_FUNC_ERROR; 
     }
 	/////////////////////////// CLIENT_CONNECT

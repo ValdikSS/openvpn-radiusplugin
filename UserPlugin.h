@@ -36,7 +36,7 @@ class UserPlugin : public User
 {
 private:
 	string password;	/**<The user password.*/
-	string sessionid;		/**<The user sessionid.*/
+	string sessionid;	/**<The user sessionid.*/
 	bool authenticated; /**<Indicates if a user is authenticated.*/
 	bool accounted;		/**<Indicates if a user is accounted.*/
 	

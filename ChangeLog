@@ -72,5 +72,6 @@ radiusplugin_2.0b:
 radiusplugin_2.0c:
 - add IPv6 support (IPv6 patch for OpenVPN openvpn-2.1-udp6.patch)
 - check if string/buffer length is zero in IpcSocket
+- delete NAS port if authentication fails
  
  

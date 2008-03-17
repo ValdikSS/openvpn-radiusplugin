@@ -160,7 +160,7 @@ int main (void)
 		success12=openvpn_plugin_func_v1(context, 7, (const char **) argv, (const char **)env4);
 	}
 	
-	openvpn_plugin_close_v1 (context);
+	openvpn_plugin_close_v1(context);
 	if (success1==0 && success2==0 && success3==0 && success4==0 && success5==0 && success6==0 && success7==0 && success8==0 && success9==0 && success10==0 && success11==0 && success12==0 )
 	{
 		fprintf(stderr,"AUTH_OK");
