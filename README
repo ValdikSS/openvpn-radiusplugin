@@ -149,7 +149,11 @@ TROUBLESHOOTING
 - OpenBSD(BSD):
 	- RADIUS attributes FramedIP and FramedRoutes mandatory
 	- RADIUS attribute FramedIP is ignored
-	- compile:
+	- Use gmake for compilation
+	- (maybe) add include and lib path for gcrypt to the Makefile
+		LDFLAGS=-L/usr/local/lib
+		CFLAGS=-Wall -shared -I/usr/local/include
+	- or compile manually:
 		g++ -Wall -I/usr/local/include -L/usr/local/lib -shared -o
 		radiusplugin.so AccountingProcess.cpp Exception.cpp PluginContext.cpp
 		UserAuth.cpp AcctScheduler.cpp IpcSocket.cpp radiusplugin.cpp User.cpp 
