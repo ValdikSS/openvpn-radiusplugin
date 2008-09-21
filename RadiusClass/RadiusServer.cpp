@@ -31,7 +31,7 @@
 	 * @param int retry : How many times the client should try to send a packet if he doesn't get an answer.
 	 * @param int wait : The time (in seconds) to wait on a response of the radius server.
 	 */
-RadiusServer::RadiusServer(char * name, char * secret,
+RadiusServer::RadiusServer(string name, string secret,
 	int authport,  int acctport, int retry, int wait)
 {
 	this->acctport=acctport;

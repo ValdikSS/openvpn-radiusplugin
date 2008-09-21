@@ -40,7 +40,7 @@ RadiusAttribute::RadiusAttribute(void)
  * @param Octet type : The type of the attribute.
  * @param char *value : A pointer to a value for the attribut.
  */
-RadiusAttribute::RadiusAttribute(Octet ty, char *value)
+RadiusAttribute::RadiusAttribute(Octet ty, const char *value)
 {
 	this->type=ty;
 	this->value=NULL;

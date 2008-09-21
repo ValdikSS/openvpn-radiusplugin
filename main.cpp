@@ -38,13 +38,13 @@ int main (void)
 	unsigned int type_mask=0;
 
 
-	char *env1[9];
-	char *env2[9];
-	char *env3[9];
-	char *env4[9];
+	const char *env1[9];
+	const char *env2[9];
+	const char *env3[9];
+	const char *env4[9];
 
 	
-	char *argv[3];
+	const char *argv[3];
 	int type=5;
 
 	

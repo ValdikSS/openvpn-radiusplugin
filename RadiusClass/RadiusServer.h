@@ -40,7 +40,7 @@ private:
 public:
 	
 	
-	RadiusServer(char * name="127.0.0.1",char * secret = "", int authport=1812, int acctport=1813, int retry=3, int wait=1);
+	RadiusServer(string name="127.0.0.1",string secret = "", int authport=1812, int acctport=1813, int retry=3, int wait=1);
 	~RadiusServer();
 	RadiusServer &operator=(const RadiusServer &);
 	

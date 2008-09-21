@@ -41,7 +41,7 @@ public:
 					
 					RadiusAttribute();
 					RadiusAttribute(Octet);
-					RadiusAttribute(Octet, char * );
+					RadiusAttribute(Octet, const char * );
 					RadiusAttribute(Octet, string);
 					RadiusAttribute(Octet, uint32_t);
 					~RadiusAttribute(void);
