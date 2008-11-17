@@ -59,7 +59,7 @@ public:
 	void			setType(Octet);
 	
 	Octet *			getValue(void);
-	int			    setValue(char *);
+	int			    setValue(const char *);
 	int			    setValue(int);
 	
 		
