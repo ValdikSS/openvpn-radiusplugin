@@ -62,11 +62,11 @@ foreach(@lines)
        if($first_integer eq 1)
        {
         $first_integer=0;
-        $line2= "id == ".$vendors[$k]{'define'} ." && type == ATTRIBUTE_".uc($values[1])."\n";
+        $line2= "(id == ".$vendors[$k]{'define'} ." && type == ATTRIBUTE_".uc($values[1]).")\n";
        }
        else
        {
-        $line2= "|| id == ".$vendors[$k]{'define'} ." && type == ATTRIBUTE_".uc($values[1])."\n";
+        $line2= "|| (id == ".$vendors[$k]{'define'} ." && type == ATTRIBUTE_".uc($values[1]).")\n";
        }
        push(@newlines_integer,$line2);
      }
@@ -75,11 +75,11 @@ foreach(@lines)
        if($first_date eq 1)
        {
         $first_date=0;
-        $line2= "id == ".$vendors[$k]{'define'} ." && type == ATTRIBUTE_".uc($values[1])."\n";
+        $line2= "(id == ".$vendors[$k]{'define'} ." && type == ATTRIBUTE_".uc($values[1]).")\n";
        }
        else
        {
-        $line2= "|| id == ".$vendors[$k]{'define'} ." && type == ATTRIBUTE_".uc($values[1])."\n";
+        $line2= "|| (id == ".$vendors[$k]{'define'} ." && type == ATTRIBUTE_".uc($values[1]).")\n";
        }
        push(@newlines_date,$line2);
      }
@@ -88,11 +88,11 @@ foreach(@lines)
        if($first_string eq 1)
        {
         $first_string=0;
-        $line2= "id == ".$vendors[$k]{'define'} ." && type == ATTRIBUTE_".uc($values[1])."\n";
+        $line2= "(id == ".$vendors[$k]{'define'} ." && type == ATTRIBUTE_".uc($values[1]).")\n";
        }
        else
        {
-        $line2= "|| id == ".$vendors[$k]{'define'} ." && type == ATTRIBUTE_".uc($values[1])."\n";
+        $line2= "|| (id == ".$vendors[$k]{'define'} ." && type == ATTRIBUTE_".uc($values[1]).")\n";
        
        }
       push(@newlines_string,$line2);
@@ -102,11 +102,11 @@ foreach(@lines)
        if($first_ipaddr eq 1)
        {
         $first_ipaddr=0;
-        $line2= "id == ".$vendors[$k]{'define'} ." && type == ATTRIBUTE_".uc($values[1])."\n";
+        $line2= "(id == ".$vendors[$k]{'define'} ." && type == ATTRIBUTE_".uc($values[1]).")\n";
        }
        else
        {
-        $line2= "|| id == ".$vendors[$k]{'define'} ." && type == ATTRIBUTE_".uc($values[1])."\n";
+        $line2= "|| (id == ".$vendors[$k]{'define'} ." && type == ATTRIBUTE_".uc($values[1]).")\n";
        }
       push(@newlines_ipaddr,$line2);
      }
