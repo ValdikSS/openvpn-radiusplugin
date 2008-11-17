@@ -24,6 +24,8 @@
 #define _CONFIGPARSER_H_
 #include <fstream>
 #include <iostream>
+#include <cstring>
+#include <cstdlib>
 
 #include "RadiusServer.h"
 #include"RadiusServer.h"
@@ -53,7 +55,7 @@ private:
 	
 public:
 	RadiusConfig(void);
-	RadiusConfig(char * configfile);
+	RadiusConfig(string configfile);
 	~RadiusConfig();
 	
 	int parseConfigFile(const char * configfile);
