@@ -175,7 +175,7 @@ int main_test (void)
 	RadiusVendorSpecificAttribute rvsa;
 	
 	//read in the config
-	RadiusConfig config("./exampleconfig");
+	RadiusConfig config(string("./exampleconfig"));
 	
 	cout << "*** Sampleprogramm for the RadiusClass. ***\n";
 	cout << "---- Print Config ----\n";
@@ -191,7 +191,7 @@ int main_test (void)
 	 * the attribut is from, and converts the value correct for
 	 * this type)
 	 */
-	ra2.setValue("testing");
+	ra2.setValue(string("testing"));
 	if(packet_access.addRadiusAttribute(&ra1))
 	{
 		fprintf(stderr, "RADIUS-CLASS: Fail to add attribute ATTRIB_User_Name.\n");
@@ -348,7 +348,7 @@ int main_test (void)
 	}
 	
 	//set status type: start = 1 (see RADIUS RFC)
-	ra11.setValue("1");
+	ra11.setValue(string("1"));
 	if (packet_accounting_start.addRadiusAttribute(&ra11))
 	{
 		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Status_Type.\n");
@@ -402,7 +402,7 @@ int main_test (void)
 				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_FramedProtocol.\n");
 			}
 	}
-	ra9.setValue("111.222.111.111");
+	ra9.setValue(string("111.222.111.111"));
 	if (packet_accounting_start.addRadiusAttribute(&ra9))
 	{
 		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_ID.\n");
@@ -463,7 +463,7 @@ int main_test (void)
 	}
 	
 	//set status type: update = 3(see RADIUS RFC)
-	ra11.setValue("3");
+	ra11.setValue(string("3"));
 	if (packet_accounting_update.addRadiusAttribute(&ra11))
 	{
 		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Status_Type.\n");
@@ -531,7 +531,7 @@ int main_test (void)
 				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_FramedProtocol.\n");
 			}
 	}
-	ra9.setValue("111.222.111.111");
+	ra9.setValue(string("111.222.111.111"));
 	if (packet_accounting_update.addRadiusAttribute(&ra9))
 	{
 		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_ID.\n");
@@ -594,7 +594,7 @@ int main_test (void)
 	}
 	
 	//set status type: update = 2(see RADIUS RFC)
-	ra11.setValue("2");
+	ra11.setValue(string("2"));
 	if (packet_accounting_stop.addRadiusAttribute(&ra11))
 	{
 		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Status_Type.\n");
@@ -662,7 +662,7 @@ int main_test (void)
 				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_FramedProtocol.\n");
 			}
 	}
-	ra9.setValue("111.222.111.111");
+	ra9.setValue(string("111.222.111.111"));
 	if (packet_accounting_stop.addRadiusAttribute(&ra9))
 	{
 		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_ID.\n");
