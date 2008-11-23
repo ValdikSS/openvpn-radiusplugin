@@ -203,7 +203,7 @@ RadiusVendorSpecificAttribute::RadiusVendorSpecificAttribute(const RadiusVendorS
  * @param value A string.
  * @return An integer. 0 if everything is ok, else !=0.
  */
-int RadiusVendorSpecificAttribute::setValue(char * value)
+int RadiusVendorSpecificAttribute::setValue(const char * value)
 {
 	int length=strlen(value);
 	if(!(this->value=new Octet[length]))
