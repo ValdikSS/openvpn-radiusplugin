@@ -23,7 +23,8 @@
 #define _USER_H_
 #include <string>
 #include <iostream>
-#include <stdio.h>
+#include <cstdio>
+#include <cstring>
 #include "openvpn-plugin.h"
 
 

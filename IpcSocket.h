@@ -23,6 +23,7 @@
 #define _IPCSOCKET_H_
 
 #include <string>
+#include <cstring>
 #include "User.h"
 #include "Exception.h"
 #include <sys/socket.h>

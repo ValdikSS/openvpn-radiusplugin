@@ -24,7 +24,7 @@
 #define _CONFIG_H_
 #include <fstream>
 #include <iostream>
-
+#include <cstring>
 
 #include "RadiusClass/error.h"
 
