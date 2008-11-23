@@ -77,7 +77,7 @@ int UserAcct::sendUpdatePacket(PluginContext *context)
 				ra7(ATTRIB_NAS_Port_Type),
 				ra8(ATTRIB_Service_Type),
 				ra9(ATTRIB_Acct_Session_ID, this->getSessionId()),
-				ra10(ATTRIB_Acct_Status_Type,"3"),
+				ra10(ATTRIB_Acct_Status_Type,string("3")),
 				ra11(ATTRIB_Framed_Protocol),
 				ra12(ATTRIB_Acct_Input_Octets, this->bytesin),
 				ra13(ATTRIB_Acct_Output_Octets, this->bytesout),
@@ -256,7 +256,7 @@ int UserAcct::sendStartPacket(PluginContext * context)
 						ra7(ATTRIB_NAS_Port_Type),
 						ra8(ATTRIB_Service_Type),
 						ra9(ATTRIB_Acct_Session_ID, this->getSessionId()),
-						ra10(ATTRIB_Acct_Status_Type,"1"),
+						ra10(ATTRIB_Acct_Status_Type,string("1")),
 						ra11(ATTRIB_Framed_Protocol);
 				
 	
@@ -408,7 +408,7 @@ int UserAcct::sendStopPacket(PluginContext * context)
 				ra7(ATTRIB_NAS_Port_Type),
 				ra8(ATTRIB_Service_Type),
 				ra9(ATTRIB_Acct_Session_ID, this->getSessionId()),
-				ra10(ATTRIB_Acct_Status_Type,"2"),
+				ra10(ATTRIB_Acct_Status_Type,string("2")),
 				ra11(ATTRIB_Framed_Protocol),
 				ra12(ATTRIB_Acct_Input_Octets, this->bytesin),
 				ra13(ATTRIB_Acct_Output_Octets, this->bytesout),
