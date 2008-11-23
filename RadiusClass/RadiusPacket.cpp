@@ -518,7 +518,8 @@ int RadiusPacket::radiusReceive(list<RadiusServer> *serverlist)
 				memset(this->recvbuffer,0,RADIUS_MAX_PACKET_LEN); 	
 				len=sizeof(struct sockaddr_in);
 				this->recvbufferlen=recvfrom(this->sock,this->recvbuffer,RADIUS_MAX_PACKET_LEN,0,(struct sockaddr*)&remoteServAddr,&len);
-				
+				close(this->sock);
+				this->sock=0;
 				//unshape the packet
 				if(this->unShapeRadiusPacket()!=0)
 				{
@@ -534,6 +535,8 @@ int RadiusPacket::radiusReceive(list<RadiusServer> *serverlist)
 			}
 			else
 			{
+				close(this->sock);
+				this->sock=0;
 				//retry only if the retries are less than
 				//the server retries
 				if(retries <= server->getRetry())
