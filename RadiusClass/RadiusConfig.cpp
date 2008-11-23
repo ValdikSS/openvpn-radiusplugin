@@ -42,14 +42,14 @@ RadiusConfig::RadiusConfig(void)
  * @param configfile The name of the configfile.
  */
 
-RadiusConfig::RadiusConfig(char * configfile)
+RadiusConfig::RadiusConfig(string configfile)
 {
 	memset(this->nasPortType,0,2);
 	memset(this->framedProtocol,0,2);
 	memset(this->serviceType,0,2);
 	memset(this->nasIdentifier,0,128);
 	memset(this->nasIpAddress,0,16);
-	this->parseConfigFile(configfile);
+	this->parseConfigFile(configfile.c_str());
 }
 
 
