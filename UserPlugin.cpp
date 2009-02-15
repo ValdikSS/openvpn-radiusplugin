@@ -28,6 +28,7 @@ UserPlugin::UserPlugin() : User()
 {
 	this->accounted=false;
 	this->authenticated=false;
+        this->authcontrolfile="";
 }
 
 /**The destructor, nothing happens here.*/
@@ -49,6 +50,7 @@ UserPlugin & UserPlugin::operator=(const UserPlugin &u)
 		this->sessionid=u.sessionid;
 		this->password=u.password;
 		this->untrustedport=u.untrustedport;
+                this->authcontrolfile=u.authcontrolfile;
 	}
 	return *this;
 	
@@ -75,6 +77,7 @@ UserPlugin::UserPlugin(const UserPlugin &u) : User(u)
 	this->authenticated=u.authenticated;
 	this->accounted=u.accounted;
 	this->untrustedport=u.untrustedport;
+        this->authcontrolfile=u.authcontrolfile;
 }
 
 /**The getter method of the password.
@@ -134,6 +137,16 @@ bool UserPlugin::isAccounted(void)
 void UserPlugin::setAccounted(bool acct)
 {
 	this->accounted=acct;
+}
+
+string UserPlugin::getAuthControlFile(void )
+{
+  return authcontrolfile;
+}
+
+void UserPlugin::setAuthControlFile(string file)
+{
+  authcontrolfile=file;
 }
 
 

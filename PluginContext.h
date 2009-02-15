@@ -32,6 +32,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
+#include <pthread.h>
 
 
 using std::map;
@@ -52,13 +53,23 @@ private:
 
   	int verb; 						/**< Verbosity level of OpenVPN. */
   
-  	map<string, UserPlugin> users; 	/**< The user list of the plugin in for the foreground process.*/
-  	  
-  	
-	list <int> nasportlist; 		/**< The port list. Every user gets an unipue port on connect. The number is deleted if the user disconnects, a new user can
+  	map<string, UserPlugin *> users; 	/**< The user list of the plugin in for the foreground process which are authenticated.*/
+  	list< UserPlugin *> newusers; 	        /**< The user list of the plugin in for the foreground process which are waiting for authentication.*/
+	
+        list <int> nasportlist; 		/**< The port list. Every user gets an unipue port on connect. The number is deleted if the user disconnects, a new user can
 									get the number again. This is important for dynamic IP address assignment via the radius server.*/
 	
-	int sessionid; 					/**< Every user gets a new session id. The session is never decremented.*/
+	int sessionid; 					/**< Every user gets a new session id. The session is never decremented.*/ 
+
+        pthread_cond_t condsend;
+        pthread_mutex_t mutexsend;
+        pthread_cond_t condrecv;
+        pthread_mutex_t mutexrecv;
+        pthread_t thread; 
+        bool stopthread;
+        bool startthread;
+        int result;
+
 	
 public:
   	
@@ -93,7 +104,32 @@ public:
   	
   	int getSessionId(void);
   	
-  	
+  	pthread_cond_t * getCondSend(void);
+        //void setCond(pthread_cond_t);
+        pthread_cond_t * getCondRecv(void);
+      
+        pthread_mutex_t * getMutexSend(void);
+        pthread_mutex_t * getMutexRecv(void);
+        //void setMutex(pthread_mutex_t);
+
+        UserPlugin * getNewUser();
+        void addNewUser(UserPlugin * newuser);
+
+        pthread_t * getThread();
+        
+        int getResult();
+        void setResult(int);
+
+        bool getStopThread();
+        void setStopThread(bool);
+
+        bool UserWaitingtoAuth();
+
+        bool getStartThread();
+        void setStartThread(bool);
+
+   
+        
   	
 	
 };

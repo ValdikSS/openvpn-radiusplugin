@@ -61,7 +61,7 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 	
 	
 	if (DEBUG (context->getVerbosity()))
-    	fprintf (stderr, "RADIUS-PLUGIN: radius_server().\n");
+    	cerr << getTime() << "RADIUS-PLUGIN: radius_server().\n";
 		
 	//get the server list
 	serverlist=context->radiusconf.getRadiusServer();
@@ -70,26 +70,26 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 	
 	
 	if (DEBUG (context->getVerbosity()))
-		cerr << "RADIUS-PLUGIN: Build password packet:  password: *****, sharedSecret: *****.\n";
+		cerr << getTime() << "RADIUS-PLUGIN: Build password packet:  password: *****, sharedSecret: *****.\n";
 	
 	//add the attributes
 	ra2.setValue(this->password);
 	if(packet.addRadiusAttribute(&ra1))
 	{
-		fprintf(stderr, "RADIUS-PLUGIN: Fail to add attribute ATTRIB_User_Name.\n");
+		cerr << getTime() << "RADIUS-PLUGIN: Fail to add attribute ATTRIB_User_Name.\n";
 	}
 	
 	if (packet.addRadiusAttribute(&ra2))
 	{
-		fprintf(stderr, "RADIUS-PLUGIN: Fail to add attribute ATTRIB_User_Password.\n");
+		cerr << getTime() << "RADIUS-PLUGIN: Fail to add attribute ATTRIB_User_Password.\n";
 	}
 	if (packet.addRadiusAttribute(&ra3))
 	{
-		fprintf(stderr, "RADIUS-PLUGIN: Fail to add attribute ATTRIB_NAS_Port.\n");
+		cerr << getTime() << "RADIUS-PLUGIN: Fail to add attribute ATTRIB_NAS_Port.\n";
 	}
 	if (packet.addRadiusAttribute(&ra4))
 	{
-		fprintf(stderr, "RADIUS-PLUGIN: Fail to add attribute ATTRIB_Calling_Station_Id.\n");
+		cerr << getTime() << "RADIUS-PLUGIN: Fail to add attribute ATTRIB_Calling_Station_Id.\n";
 	}
 	//get information from the config and add it to the packet
 	if(strcmp(context->radiusconf.getNASIdentifier(),""))
@@ -97,7 +97,7 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 			ra5.setValue(context->radiusconf.getNASIdentifier());
 			if (packet.addRadiusAttribute(&ra5))
 			{
-				fprintf(stderr, "RADIUS-PLUGIN: Fail to add attribute ATTRIB_NAS_Identifier.\n");
+				cerr << getTime() << "RADIUS-PLUGIN: Fail to add attribute ATTRIB_NAS_Identifier.\n";
 			}
 	}
 	
@@ -105,12 +105,12 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 	{
 			if(ra6.setValue(context->radiusconf.getNASIpAddress())!=0)
 			{
-				fprintf(stderr, "RADIUS-PLUGIN: Fail to set value ATTRIB_NAS_Ip_Address.\n");
+				cerr << getTime() << "RADIUS-PLUGIN: Fail to set value ATTRIB_NAS_Ip_Address.\n";
 			}
 			else
 			if (packet.addRadiusAttribute(&ra6))
 			{
-				fprintf(stderr, "RADIUS-PLUGIN: Fail to add attribute ATTRIB_NAS_Ip_Address.\n");
+				cerr << getTime() << "RADIUS-PLUGIN: Fail to add attribute ATTRIB_NAS_Ip_Address.\n";
 			}
 	}
 	if(strcmp(context->radiusconf.getNASPortType(),""))
@@ -118,7 +118,7 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 			ra7.setValue(context->radiusconf.getNASPortType());
 			if (packet.addRadiusAttribute(&ra7))
 			{
-				fprintf(stderr, "RADIUS-PLUGIN: Fail to add attribute ATTRIB_NAS_Port_Type.\n");
+				cerr << getTime() << "RADIUS-PLUGIN: Fail to add attribute ATTRIB_NAS_Port_Type.\n";
 			}
 	}
 	
@@ -127,27 +127,27 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 			ra8.setValue(context->radiusconf.getServiceType());
 			if (packet.addRadiusAttribute(&ra8))
 			{
-				fprintf(stderr, "RADIUS-PLUGIN: Fail to add attribute ATTRIB_Service_Type.\n");
+				cerr << getTime() << "RADIUS-PLUGIN: Fail to add attribute ATTRIB_Service_Type.\n";
 			}
 	}
 	
 	if(this->getFramedIp().compare("") != 0)
 	{
 		if (DEBUG (context->getVerbosity()))
-			fprintf (stderr, "RADIUS-PLUGIN: Send packet Re-Auth packet for framedIP=%s.\n",this->getFramedIp().c_str());
+			cerr << getTime() << "RADIUS-PLUGIN: Send packet Re-Auth packet for framedIP="<< this->getFramedIp().c_str() << ".\n";
 			ra9.setValue(this->getFramedIp());
 			if (packet.addRadiusAttribute(&ra9))
 			{
-				fprintf(stderr, "RADIUS-PLUGIN: Fail to add attribute Framed-IP-Address.\n");
+				cerr << getTime() << "RADIUS-PLUGIN: Fail to add attribute Framed-IP-Address.\n";
 			}
 	}
 	
 	if (DEBUG (context->getVerbosity()))
-		fprintf (stderr, "RADIUS-PLUGIN: Send packet to %s.\n",server->getName().c_str());
+		cerr << getTime() << "RADIUS-PLUGIN: Send packet to " << server->getName().c_str() <<".\n";
 	//send the packet
 	if (packet.radiusSend(server)<0)
 	{
-		fprintf(stderr, "RADIUS-PLUGIN: Packet was not send.\n");
+		cerr << getTime() << "RADIUS-PLUGIN: Packet was not send.\n";
 	}
 	//receive the packet
 	if (packet.radiusReceive(serverlist)==0)
@@ -156,7 +156,7 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 		if(packet.getCode()==ACCESS_ACCEPT)
 		{
 			if (DEBUG (context->getVerbosity()))
-				fprintf (stderr, "RADIUS-PLUGIN: Get ACCESS_ACCEPT-Packet.\n");
+				cerr << getTime() << "RADIUS-PLUGIN: Get ACCESS_ACCEPT-Packet.\n";
 
 			//parse the attributes for framedip, framedroutes and
 			//acctinteriminterval
@@ -166,14 +166,14 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 		}
 		else
 		{
-			fprintf (stderr, "RADIUS-PLUGIN: Get ACCESS_REJECT or ACCESS_CHALLANGE-Packet.->ACCESS-DENIED.\n");
+			cerr << getTime() << "RADIUS-PLUGIN: Get ACCESS_REJECT or ACCESS_CHALLANGE-Packet.->ACCESS-DENIED.\n";
 			return 1;
 		}
 		
 	}
 	else
 	{
-		fprintf (stderr, "RADIUS-PLUGIN: Got no response from radius server.\n");
+		cerr << getTime() << "RADIUS-PLUGIN: Got no response from radius server.\n";
 	}
 	
 	return 1;
@@ -195,7 +195,7 @@ void UserAuth::parseResponsePacket(RadiusPacket *packet, PluginContext * context
 	RadiusVendorSpecificAttribute vsa;
 		
 	if (DEBUG (context->getVerbosity()))
-    	fprintf (stderr, "RADIUS-PLUGIN: parse_response_packet().\n");
+    	cerr << getTime() << "RADIUS-PLUGIN: parse_response_packet().\n";
 	
 	
 	
@@ -215,7 +215,7 @@ void UserAuth::parseResponsePacket(RadiusPacket *packet, PluginContext * context
 	
 	
 	if (DEBUG (context->getVerbosity()))
-    	cerr << "RADIUS-PLUGIN: BACKGROUND AUTH: routes: " << this->getFramedRoutes() <<".\n";
+    	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: routes: " << this->getFramedRoutes() <<".\n";
 	
 	
 	range=packet->findAttributes(8);
@@ -229,7 +229,7 @@ void UserAuth::parseResponsePacket(RadiusPacket *packet, PluginContext * context
 	}
 	
 	if (DEBUG (context->getVerbosity()))
-    	cerr << "RADIUS-PLUGIN: BACKGROUND AUTH: framed ip: " << this->getFramedIp() <<".\n";
+    	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: framed ip: " << this->getFramedIp() <<".\n";
 	
 	
 	
@@ -242,11 +242,11 @@ void UserAuth::parseResponsePacket(RadiusPacket *packet, PluginContext * context
 	}
 	else
 	{
-		fprintf(stderr,"RADIUS-PLUGIN: No attributes Acct Interim Interval or bad length.\n");
+		cerr << getTime() <<"RADIUS-PLUGIN: No attributes Acct Interim Interval or bad length.\n";
 	}
 	
 	if (DEBUG (context->getVerbosity()))
-    	cerr << "RADIUS-PLUGIN: BACKGROUND AUTH: Acct Interim Interval: " << this->getAcctInterimInterval() << ".\n";
+    	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: Acct Interim Interval: " << this->getAcctInterimInterval() << ".\n";
 	
 	range=packet->findAttributes(26);
 	iter1=range.first;
@@ -1438,7 +1438,7 @@ string UserAuth::valueToString(RadiusVendorSpecificAttribute *vsa)
 	}
 	else
 	{
-	 cerr << "Vendor Specific Attribute (Id: " << vsa->getId() << " Type: " << vsa->getType() << " not implemented, treated as string.";
+	 cerr << getTime() << "Vendor Specific Attribute (Id: " << vsa->getId() << " Type: " << vsa->getType() << " not implemented, treated as string.";
 	 return vsa->stringFromBuf();
 	}
 
@@ -1484,13 +1484,13 @@ int UserAuth::createCcdFile(PluginContext *context)
 		
 				
 		if (DEBUG (context->getVerbosity()))
-	    	fprintf (stderr, "RADIUS-PLUGIN: BACKGROUND AUTH: Try to open ccd file.\n");
+	    	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: Try to open ccd file.\n";
 		
 		//open the file
 		ccdfile.open(filename.c_str(),ios::out);
 		
 		if (DEBUG (context->getVerbosity()))
-	    	fprintf (stderr, "RADIUS-PLUGIN: BACKGROUND AUTH: Opened ccd file.\n");
+	    	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: Opened ccd file.\n";
 		
 		
 		// copy in a temp-string, becaue strtok deletes the delimiter, if it used anywhere
@@ -1504,7 +1504,7 @@ int UserAuth::createCcdFile(PluginContext *context)
 			if (this->framedip[0]!='\0')
 			{
 				if (DEBUG (context->getVerbosity()))
-					fprintf (stderr, "RADIUS-PLUGIN: BACKGORUND AUTH: Write framed ip to ccd-file.\n");
+					cerr << getTime() << "RADIUS-PLUGIN: BACKGORUND AUTH: Write framed ip to ccd-file.\n";
 			
 				//build the ifconfig
 				strncat(ipstring, "ifconfig-push ",14);
@@ -1516,14 +1516,14 @@ int UserAuth::createCcdFile(PluginContext *context)
 				{
 					strncat(ipstring, context->conf.getSubnet() , 15);
 					if (DEBUG (context->getVerbosity()))
-						fprintf (stderr, "RADIUS-PLUGIN: BACKGORUND AUTH: Create ifconfig-push for topology subnet.\n");
+						cerr << getTime() << "RADIUS-PLUGIN: BACKGORUND AUTH: Create ifconfig-push for topology subnet.\n";
 			
 				}
 				else if(context->conf.getP2p()[0]!='\0')
 				{
 					strncat(ipstring, context->conf.getP2p() , 15);
 					if (DEBUG (context->getVerbosity()))
-						fprintf (stderr, "RADIUS-PLUGIN: BACKGORUND AUTH: Create ifconfig-push for topology p2p.\n");
+						cerr << getTime() << "RADIUS-PLUGIN: BACKGORUND AUTH: Create ifconfig-push for topology p2p.\n";
 			
 				}
 				else
@@ -1543,11 +1543,11 @@ int UserAuth::createCcdFile(PluginContext *context)
 					// append the new ip address to the string
 					strncat(ipstring, inet_ntoa(ip3), 15);
 					if (DEBUG (context->getVerbosity()))
-						fprintf (stderr, "RADIUS-PLUGIN: BACKGORUND AUTH: Create ifconfig-push for topology net30.\n");
+						cerr << getTime() << "RADIUS-PLUGIN: BACKGORUND AUTH: Create ifconfig-push for topology net30.\n";
 			
 				}
 				if (DEBUG (context->getVerbosity()))
-					fprintf (stderr, "RADIUS-PLUGIN: Write %s ccd-file.\n",ipstring);
+					cerr << getTime() << "RADIUS-PLUGIN: Write " << ipstring << " ccd-file.\n";
 				
 				
 				ccdfile << ipstring <<"\n";
@@ -1557,13 +1557,13 @@ int UserAuth::createCcdFile(PluginContext *context)
 			if (framedroutes[0]!='\0')
 			{
 				if (DEBUG (context->getVerbosity()))
-					fprintf (stderr, "RADIUS-PLUGIN: BACKGORUND AUTH: Write framed routes to ccd-file.\n");
+					cerr << getTime() << "RADIUS-PLUGIN: BACKGORUND AUTH: Write framed routes to ccd-file.\n";
 			
 				route=strtok(framedroutes,";");
 				len=strlen(route);
 				if (len > 50) //this is to big!! but the length is variable
 				{
-					fprintf(stderr,"RADIUS-PLUGIN: Argument for Framed Route is to long (>100 Characters).\n");
+					cerr << getTime() <<"RADIUS-PLUGIN: Argument for Framed Route is to long (>100 Characters).\n";
 					return 1;
 				}
 				else
@@ -1649,7 +1649,7 @@ int UserAuth::createCcdFile(PluginContext *context)
 							memset(framednetmask,0,16);
 							if (atoi(framednetmask_cidr)>32)
 							{
-								fprintf(stderr, "RADIUS-PLUGIN: Bad net CIDR netmask.\n");
+								cerr << getTime() << "RADIUS-PLUGIN: Bad net CIDR netmask.\n";
 							}
 							else
 							{
@@ -1719,7 +1719,7 @@ int UserAuth::createCcdFile(PluginContext *context)
 							}
 							
 							if (DEBUG (context->getVerbosity()))
-		    						fprintf (stderr, "RADIUS-PLUGIN: Write route string: %s %s %s to ccd-file.\n","iroute " ,framedip, framednetmask);
+		    						cerr << getTime() << "RADIUS-PLUGIN: Write route string: iroute " << framedip << framednetmask << " to ccd-file.\n";
 			
 							//write iroute to client file
 							ccdfile << "iroute " << framedip << " "<< framednetmask << "\n";
@@ -1733,13 +1733,13 @@ int UserAuth::createCcdFile(PluginContext *context)
 		}
 		else
 		{
-			cerr << "RADIUS-PLUGIN: Could not open file "<< filename << "\n.";
+			cerr << getTime() << "RADIUS-PLUGIN: Could not open file "<< filename << ".\n";
 			return 1;
 		}
 	}
 	else
 	{
-		cerr << "RADIUS-PLUGIN: Client config file was not written, overwriteccfiles is false \n.";
+		cerr << getTime() << "RADIUS-PLUGIN: Client config file was not written, overwriteccfiles is false \n.";
 	}
 	
 	return 0;

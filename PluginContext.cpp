@@ -38,7 +38,9 @@ PluginContext::PluginContext()
  	
   	this->verb=0;
   	this->sessionid=1;
-	
+
+        this->stopthread=false;
+	this->startthread=true;
 }
 
 /** The destructor clears the users and nasportlist.*/
@@ -102,9 +104,9 @@ void PluginContext::delNasPort(int num)
  */
 void PluginContext::addUser(UserPlugin * newuser)
 {
-	pair<map<string,UserPlugin>::iterator,bool> success;
+	pair<map<string,UserPlugin *>::iterator,bool> success;
 	
-	success=users.insert(make_pair(newuser->getKey(),*newuser));
+	success=users.insert(make_pair(newuser->getKey(),newuser));
 	
 	if(success.second==false)
 	{
@@ -131,10 +133,10 @@ void PluginContext::delUser(string key)
  */
 UserPlugin * PluginContext::findUser(string key)
 {
-	map<string,UserPlugin>::iterator iter =  users.find(key);
+	map<string,UserPlugin *>::iterator iter =  users.find(key);
 	if (iter != users.end())
 	{
-		return &(iter->second);
+		return iter->second;
 	}
 	return NULL;
 }
@@ -200,3 +202,88 @@ int PluginContext::getSessionId(void)
 {
 	return this->sessionid;
 }
+
+
+/**The method adds an new user to the user list of users waiting for authentication
+ * @param newuser A pointer to the user.
+ */
+void PluginContext::addNewUser(UserPlugin * newuser)
+{
+  this->newusers.push_back(newuser);
+}
+
+/**The method return the first element in the list of waiting users.
+ */
+UserPlugin * PluginContext::getNewUser()
+{
+    
+    
+      UserPlugin * user = this->newusers.front();
+      this->newusers.pop_front();
+      return user;
+	
+}
+
+pthread_cond_t  * PluginContext::getCondSend(void )
+{
+  return &condsend;
+}
+pthread_cond_t  * PluginContext::getCondRecv(void )
+{
+  return &condrecv;
+}
+
+pthread_mutex_t * PluginContext::getMutexSend(void )
+{
+  return &mutexsend;
+}
+
+pthread_mutex_t * PluginContext::getMutexRecv(void )
+{
+  return &mutexrecv;
+}
+
+
+pthread_t * PluginContext::getThread()
+{
+  return &thread;
+}
+
+int PluginContext::getResult()
+{
+  return result;
+}
+
+void PluginContext::setResult(int r)
+{ 
+  result=r;
+}
+
+bool PluginContext::UserWaitingtoAuth()
+{
+  if (this->newusers.size()>0) return true;
+  else return false;
+} 
+
+
+bool PluginContext::getStopThread()
+{
+  return stopthread;
+}
+
+void PluginContext::setStopThread(bool s)
+{
+  stopthread=s;
+}
+
+
+bool PluginContext::getStartThread()
+{
+  return startthread;
+}
+
+void PluginContext::setStartThread(bool value)
+{
+  startthread=value;
+}
+

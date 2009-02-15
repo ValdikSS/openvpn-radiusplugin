@@ -84,18 +84,18 @@ void AcctScheduler::delUser(PluginContext * context, UserAcct *user)
 	user->setGigaOut(bytesout >> 32);
 	
 	if (DEBUG (context->getVerbosity()))
-	    cerr << "RADIUS-PLUGIN: BACKGROUND-ACCT: Got accouting data from file, CN: " << user->getCommonname() << " in: " << user->getBytesIn() << " out: " << user->getBytesOut() << ".\n";
+	    cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Got accouting data from file, CN: " << user->getCommonname() << " in: " << user->getBytesIn() << " out: " << user->getBytesOut() << ".\n";
 	
 	
 	//send the stop ticket
 	if (user->sendStopPacket(context)==0)
 	{
 			if (DEBUG (context->getVerbosity()))
-		    	cerr << "RADIUS-PLUGIN: BACKGROUND-ACCT: Stop packet was sent. CN: " << user->getCommonname() << ".\n";
+		    	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Stop packet was sent. CN: " << user->getCommonname() << ".\n";
 	}
 	else 
 	{
-		cerr << "RADIUS-PLUGIN: BACKGROUND-ACCT: Error on sending stop packet.";
+		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Error on sending stop packet.";
 	}
 	
 	if (user->getAcctInterimInterval()==0)
@@ -120,7 +120,7 @@ void AcctScheduler::delallUsers(PluginContext * context)
 {
 	map<string, UserAcct>::iterator iter1, iter2;
 	if (DEBUG (context->getVerbosity()))
-		cerr << "RADIUS-PLUGIN: BACKGROUND-ACCT: Delete all users.";
+		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Delete all users.";
 	iter1=activeuserlist.begin();
 	iter2=activeuserlist.end();
 		
@@ -160,7 +160,7 @@ void AcctScheduler::doAccounting(PluginContext * context)
 		if ( t>=iter1->second.getNextUpdate())
 		{
 			if (DEBUG (context->getVerbosity()))
-		    cerr << "RADIUS-PLUGIN: BACKGROUND-ACCT: Scheduler: Update for User " << iter1->second.getUsername() << ".\n";
+		    cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Scheduler: Update for User " << iter1->second.getUsername() << ".\n";
 					
 			this->parseStatusFile(context, &bytesin, &bytesout,iter1->second.getKey().c_str()); 
 			iter1->second.setBytesIn(bytesin & 0xFFFFFFFF);
@@ -170,7 +170,7 @@ void AcctScheduler::doAccounting(PluginContext * context)
 			iter1->second.sendUpdatePacket(context);
 			
 			if (DEBUG (context->getVerbosity()))
-			    cerr << "RADIUS-PLUGIN: BACKGROUND-ACCT: Scheduler: Update packet for User " << iter1->second.getUsername() << " was send.\n";
+			    cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Scheduler: Update packet for User " << iter1->second.getUsername() << " was send.\n";
 		
 			//calculate the next update
 			iter1->second.setNextUpdate(iter1->second.getNextUpdate()+iter1->second.getAcctInterimInterval());
@@ -199,7 +199,7 @@ void AcctScheduler::parseStatusFile(PluginContext *context, uint64_t *bytesin, u
 	if (file.is_open())
 	{
 		if (DEBUG (context->getVerbosity()))
-			 fprintf (stderr, "RADIUS-PLUGIN: BACKGROUND ACCT: Scheduler: Read Statusfile.\n");
+			 cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: Scheduler: Read Statusfile.\n";
 	  	
 	  	//find the key, is delimited with a ',' from the informations
 	  	
@@ -224,14 +224,14 @@ void AcctScheduler::parseStatusFile(PluginContext *context, uint64_t *bytesin, u
 		else
 		{
 			
-			cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: No accounting data was found for "<< key <<".\n";
+			cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: No accounting data was found for "<< key <<".\n";
 			
 		}
 		file.close();
 	}
 	else
 	{
-		cerr << "RADIUS-PLUGIN: BACKGROUND-ACCT: Statusfile "<< context->conf.getStatusFile() <<" could not opened.\n";
+		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Statusfile "<< context->conf.getStatusFile() <<" could not opened.\n";
 	}
 }
 

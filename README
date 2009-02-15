@@ -59,9 +59,10 @@ INSTALL:
    The configuration is casesensetive, for an example see radiusplugin.cnf.
 5. Set some configuration in the config file of the OpenVPN server:
 	- status /var/log/openvpn/status.log 1  # The status, where the plugin reads the accounting information from.
-6. Set some configuration in the config file of the OpenVPN client:
+6. Configure in the config file of the OpenVPN client:
 	- auth-user-pass [/etc/openvpn/passwd]  # Set this for sending a username and password to the server, this values are the username and password for the radius authentication.
-7. Maybe write your own script for vendor specific attributes (see section VENDOR SPECIFIC ATTRIBUTES).
+7. If you use auth_control_file (>= OpenVPN 2.1 rc8), the plugin directory needs write permission to the OpenVPN directory.
+8. Maybe write your own script for vendor specific attributes (see section VENDOR SPECIFIC ATTRIBUTES).
 
 
 OTHER DOCUMENTATION
@@ -72,17 +73,19 @@ http://www.roessner-net.com/
 
 FREERADIUS EXAMPLE
 -------------------
-user1   Auth-Type := Local, User-Password == "testing"
-        Service-Type = Framed-User,
-        Framed-IP-Netmask = 255.255.255.0,
-        Framed-Routing = Broadcast-Listen,
-        Framed-Compression = Van-Jacobsen-TCP-IP,
-        Framed-Route += "192.168.101.0/26 10.8.0.1/32 1",
-        Framed-Route += "192.168.111.0/24 10.8.0.1/32 1",
-        Framed-Route += "192.168.112.0/24 10.8.0.1/32 1",
-        Acct-Interim-Interval=5,
-        Framed-Protocol = PPP,
-        Framed-IP-Address = 10.8.0.100
+user1  Cleartext-Password := "testing"
+       Service-Type = Framed-User,
+       Framed-IP-Netmask = 255.255.255.0,
+       Framed-IP-Address = 10.8.0.33,
+       Framed-Routing = Broadcast-Listen,
+       Framed-Compression = Van-Jacobsen-TCP-IP,
+       Framed-Route += "192.168.101.0/26 10.8.0.1/32 1",
+       Framed-Route += "192.168.111.0/24 10.8.0.1/32 1",
+       Framed-Route += "192.168.112.0/24 10.8.0.1/32 1",
+       Acct-Interim-Interval=5,
+       Ascend-Data-Rate=100,
+       Ascend-Xmit-Rate=200,
+       Framed-Protocol = PPP
 
 The Framed-Route attribute must in the format as shown above!
 
@@ -92,7 +95,7 @@ COMPILE
 (tested with Debian on x86, for other architectures see section TROUBLESHOOTING):
 >$ make
 or
->$ g++ -Wall -shared -o radiusplugin.so AccountingProcess.cpp Exception.cpp PluginContext.cpp UserAuth.cpp AcctScheduler.cpp IpcSocket.cpp radiusplugin.cpp User.cpp AuthenticationProcess.cpp main.cpp UserAcct.cpp UserPlugin.cpp Config.cpp RadiusClass/RadiusAttribute.cpp RadiusClass/RadiusPacket.cpp RadiusClass/RadiusConfig.cpp RadiusClass/RadiusServer.cpp  RadiusClass/RadiusVendorSpecificAttribute.cpp -lgcrypt 
+>$ g++ -Wall -shared -fpic -o radiusplugin.so AccountingProcess.cpp Exception.cpp PluginContext.cpp UserAuth.cpp AcctScheduler.cpp IpcSocket.cpp radiusplugin.cpp User.cpp AuthenticationProcess.cpp main.cpp UserAcct.cpp UserPlugin.cpp Config.cpp RadiusClass/RadiusAttribute.cpp RadiusClass/RadiusPacket.cpp RadiusClass/RadiusConfig.cpp RadiusClass/RadiusServer.cpp  RadiusClass/RadiusVendorSpecificAttribute.cpp -lgcrypt -lpthread
 
 
 RADIUS PACKETS and OpenVPN events (see http://openvpn.net/man.html SCRIPTING AND ENVIRONMENTAL VARIABLES)
@@ -118,8 +121,8 @@ RADIUS ATTRIBUTES WHICH PARSED BY THE PLUGIN AND WRITE TO THE CLIENT CONFIG FILE
 
 VENDOR SPECIFIC ATTRIBUTES
 ---------------------------
-If you want use vendor specific attributes the plugin can call your own program or script at OpenVPN action
-CLIENT-CONNECT and CLIENT-DISCONNECT (next version also AUTH_USER_PASS_VERIFY).
+If you want use vendor specific attributes the plugin can call your own program or script at the OpenVPN action
+CLIENT-CONNECT and CLIENT-DISCONNECT.
 If you want to use the feature you have specify the program and a named pipe for communication
 in the config file.
 The file vsascript.pl shows an example.
@@ -194,6 +197,8 @@ TROUBLESHOOTING
 
 - Error at compiling: DBG: md_enable: algorithm -4195948 not available:
 	- Make sure that you use libgrypt 1.2.0 or higher.
+- The plugin can't write the auth_control_file.
+        - The plugin needs write permission in the OpenVPN directory.
 
 
 

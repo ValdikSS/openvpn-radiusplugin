@@ -50,12 +50,12 @@ void AccountingProcess::Accounting(PluginContext * context)
   	}
   	catch (Exception &e)
     {
-     	cerr << "RADIUS-PLUGIN: BACKGROUND-ACCT:" << e <<"\n";
+     	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:" << e <<"\n";
       	goto done;
     }
     
    	if (DEBUG (context->getVerbosity()))
-    	cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: Started, RESPONSE_INIT_SUCCEEDED was sent to Foreground Process.\n";
+    	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: Started, RESPONSE_INIT_SUCCEEDED was sent to Foreground Process.\n";
    	   	
    	
    	// Event loop
@@ -75,7 +75,7 @@ void AccountingProcess::Accounting(PluginContext * context)
       		command = context->acctsocketforegr.recvInt();
       		
       		if (DEBUG (context->getVerbosity()))
-    			cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: Get a command.\n";
+    			cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: Get a command.\n";
    
 		    switch (command)
 			{
@@ -85,7 +85,7 @@ void AccountingProcess::Accounting(PluginContext * context)
 				{
 				
 					if (DEBUG (context->getVerbosity()))
-				    	cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: New User.\n";
+				    	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: New User.\n";
 					
 					//allocate memory				
 					user= new UserAcct;
@@ -103,7 +103,7 @@ void AccountingProcess::Accounting(PluginContext * context)
 					user->setUntrustedPort(context->acctsocketforegr.recvStr());
 					context->acctsocketforegr.recvBuf(user);
 					if (DEBUG (context->getVerbosity()))
-				    	cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: New user acct: username: " << user->getUsername() << ", interval: " << user->getAcctInterimInterval() << ", calling station: " << user->getCallingStationId() << ", commonname: " << user->getCommonname() << ", framed ip: " << user->getFramedIp() <<".\n";
+				    	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: New user acct: username: " << user->getUsername() << ", interval: " << user->getAcctInterimInterval() << ", calling station: " << user->getCallingStationId() << ", commonname: " << user->getCommonname() << ", framed ip: " << user->getFramedIp() <<".\n";
 					
 					
 					//set the starttime
@@ -117,10 +117,10 @@ void AccountingProcess::Accounting(PluginContext * context)
 					{
 						
 						if (DEBUG (context->getVerbosity()))
-				    		cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: Start packet was send.\n";
+				    		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: Start packet was send.\n";
 					
 						if (DEBUG (context->getVerbosity()))
-				    		cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: User was added to accounting scheduler.\n";
+				    		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: User was added to accounting scheduler.\n";
 							
 						//set the system routes
 						user->addSystemRoutes(context);
@@ -131,7 +131,7 @@ void AccountingProcess::Accounting(PluginContext * context)
 					    if(script.length() > 0)
 					    {
 					    	if (DEBUG (context->getVerbosity()))
-					    		cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: Call vendor specific attribute script.\n";
+					    		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: Call vendor specific attribute script.\n";
 							if(callVsaScript(context, user, 1, 0) != 0)
 						    {
 						    	throw Exception("Vendor specific attribute script failed.\n");
@@ -157,19 +157,19 @@ void AccountingProcess::Accounting(PluginContext * context)
 				}
 				catch (Exception &e)
 				{
-					cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: "<< e << "!\n";
+					cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: "<< e << "!\n";
 					context->acctsocketforegr.send(RESPONSE_FAILED);
 					//close the background process, if the ipc socket is bad
 					if (e.getErrnum()==Exception::SOCKETSEND || e.getErrnum()==Exception::SOCKETRECV)
 					{
-						cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: Error in socket!\n";
+						cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: Error in socket!\n";
 						goto done;
 					}
 				}
 				catch (...)
 				{
 					context->acctsocketforegr.send(RESPONSE_FAILED);
-					cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: Unknown Exception!\n";
+					cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: Unknown Exception!\n";
 				}
 				delete user;
 				break;
@@ -178,7 +178,7 @@ void AccountingProcess::Accounting(PluginContext * context)
 			case DEL_USER:
 				
 				if (DEBUG (context->getVerbosity()))
-			    	cerr << "RADIUS-PLUGIN: BACKGROUND-ACCT: Delete user from accounting.\n";
+			    	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Delete user from accounting.\n";
 								
 				//receive the information			
 				try
@@ -187,7 +187,7 @@ void AccountingProcess::Accounting(PluginContext * context)
 				}
 				catch(Exception &e)
 				{
-					cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: "<< e << "!\n";
+					cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: "<< e << "!\n";
 					//close the background process, if the ipc socket is bad
 					if (e.getErrnum()==Exception::SOCKETSEND || e.getErrnum()==Exception::SOCKETRECV)
 					{
@@ -196,7 +196,7 @@ void AccountingProcess::Accounting(PluginContext * context)
 				}
 				catch (...)
 				{
-					cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: Unknown Exception!\n";
+					cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: Unknown Exception!\n";
 				}	
 				
 				//find the user, he must be already there
@@ -205,7 +205,7 @@ void AccountingProcess::Accounting(PluginContext * context)
 				if (user)
 				{
 					if (DEBUG (context->getVerbosity()))
-				    	cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: Stop acct: username: " << user->getUsername()<< ", calling station: " << user->getCallingStationId()<< ", commonname: " << user->getCommonname() << ".\n";
+				    	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: Stop acct: username: " << user->getUsername()<< ", calling station: " << user->getCallingStationId()<< ", commonname: " << user->getCommonname() << ".\n";
 					
 					//delete the system routes
 					user->delSystemRoutes(context);
@@ -219,7 +219,7 @@ void AccountingProcess::Accounting(PluginContext * context)
 					{
 						//string command= context->conf.getVsaScript() + string(" ") + string("ACTION=CLIENT_CONNECT")+string(" ")+string("USERNAME=")+user->getUsername()+string(" ")+string("COMMONNAME=")+user->getCommonname()+string(" ")+string("UNTRUSTED_IP=")+user->getCallingStationId() + string(" ") + string("UNTRUSTED_PORT=") + user->getUntrustedPort() + user->getVsaString();
 						if (DEBUG (context->getVerbosity()))
-				    		cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: Call vendor specific attribute script.\n";
+				    		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: Call vendor specific attribute script.\n";
 						if(callVsaScript(context, user, 1, 0) != 0)
 						{
 						  	throw Exception("Vendor specific attribute script failed.\n");
@@ -232,7 +232,7 @@ void AccountingProcess::Accounting(PluginContext * context)
 						scheduler.delUser(context, user);
 						
 						if (DEBUG (context->getVerbosity()))
-				    		cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: User with key: " << key << " was deleted from accouting.\n";
+				    		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: User with key: " << key << " was deleted from accouting.\n";
 													
 						//send the parent process the ok
 						context->acctsocketforegr.send(RESPONSE_SUCCEEDED);
@@ -241,17 +241,17 @@ void AccountingProcess::Accounting(PluginContext * context)
 					}
 					catch(Exception &e)
 					{
-						cerr << "RADIUS-PLUGIN: BACKGROUND-ACCT: " << e << "\n";
+						cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: " << e << "\n";
 						goto done;
 					}
 					catch (...)
 					{
-						cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: Unknown Exception!\n";
+						cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: Unknown Exception!\n";
 					}	
 				}
 				else
 				{
-					cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: No user with this key "<< key <<".\n";
+					cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: No user with this key "<< key <<".\n";
 					context->acctsocketforegr.send(RESPONSE_FAILED);
 						
 				}
@@ -260,15 +260,15 @@ void AccountingProcess::Accounting(PluginContext * context)
 			//exit the loop
 			case COMMAND_EXIT:
 				if (DEBUG (context->getVerbosity()))
-		    		cerr << "RADIUS-PLUGIN: BACKGROUND-ACCT: Get command exit.\n";
+		    		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Get command exit.\n";
 	  			goto done;
 	  		
 	  		case -1:
-				  cerr << "RADIUS-PLUGIN: BACKGROUND: read error on command channel.\n";
+				  cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND: read error on command channel.\n";
 				  break;
 
 			default:
-			  cerr << "RADIUS-PLUGIN: BACKGROUND: unknown command code: code= "<< command <<", exiting.\n";
+			  cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND: unknown command code: code= "<< command <<", exiting.\n";
 			  goto done;
 			
 		
@@ -282,7 +282,7 @@ void AccountingProcess::Accounting(PluginContext * context)
 		//end the process
  		if(1)
  		scheduler.delallUsers(context);
- 		cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: EXIT\n";
+ 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: EXIT\n";
   		return;
 }
 
@@ -459,11 +459,11 @@ int AccountingProcess::callVsaScript(PluginContext * context, User * user, unsig
       /* FIFO bereits vorhanden - kein fataler Fehler */
       if(errno == EEXIST)
       {
-         cerr << "RADIUS-PLUGIN:FIFO already exist.";
+         cerr << getTime() << "RADIUS-PLUGIN:FIFO already exist.";
       }
       else 
       {
-         cerr <<"RADIUS-PLUGIN: Error in mkfifio()";
+         cerr << getTime() <<"RADIUS-PLUGIN: Error in mkfifio()";
          return -1;
       }
 	}
@@ -471,19 +471,19 @@ int AccountingProcess::callVsaScript(PluginContext * context, User * user, unsig
 	
 	if (fd_fifo == -1) 
 	{
-      cerr <<"RADIUS-PLUGIN: Error in opening pipe to VSAScript.";
+      cerr << getTime() <<"RADIUS-PLUGIN: Error in opening pipe to VSAScript.";
       return -1;
     }
 	string exe=string(context->conf.getVsaScript()) + " " + string(context->conf.getVsaNamedPipe());
 	if (write (fd_fifo, buf, buflen) != buflen)
 	{
-	  cerr << "RADIUS-PLUGIN: Could not write in Pipe to VSAScript!";
+	  cerr << getTime() << "RADIUS-PLUGIN: Could not write in Pipe to VSAScript!";
       return -1;
 	}
 	
 	if(system(exe.c_str())!=0)
 	{
-		cerr << "RADIUS-PLUGIN: Error in VSAScript!";
+		cerr << getTime() << "RADIUS-PLUGIN: Error in VSAScript!";
 		return -1;
 	}
 	close(fd_fifo);

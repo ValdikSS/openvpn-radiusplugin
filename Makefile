@@ -8,7 +8,7 @@ FAILED  =[$(RED) failed $(ESC)]
 CC=g++
 INCL=
 LDFLAGS=
-LIBS=-lgcrypt
+LIBS=-lgcrypt -lpthread
 CFLAGS=-Wall -shared
 PLUGIN=radiusplugin.so
 OBJECTS=\
@@ -41,5 +41,7 @@ $(PLUGIN): $(OBJECTS)
 	@echo -e 'OBJ: $(GREEN) $@ $(ESC)'
 	@$(CC) $(INCL) $(CFLAGS) -o $@ -c $<
 
+test: $(OBJECTS)
+	@$(CC) -Wall $(OBJECTS) -o main $(LDFLAGS) $(LIBS)
 clean:
 	-rm $(PLUGIN) *.o */*.o

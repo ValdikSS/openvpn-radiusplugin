@@ -78,5 +78,10 @@ radiusplugin_2.0d_beta:
 - add some some headerfiles to avoid compiling errors on Fedora with gcc4
 - close socket in radiuspacket.cpp on retries
 - add parenthesize to avoid compiler warnings 
+
+radiusplugin_2.1_beta:
+- Support for OPENVPN_PLUGIN_FUNC_DEFERRED, the authentication is done a thread if an auth_control_file is defined.
+-- The OpenVPN process needs write permission in the OpenVPN directory.
+- Timestamps are included in the debug information.
  
  

@@ -45,6 +45,10 @@
 #include <sstream>
 #include <iomanip>
 #include <time.h>
+#include<sys/ipc.h>
+#include<sys/msg.h>
+#include<sys/wait.h>
+#include<sys/errno.h>
 #include "RadiusClass/RadiusAttribute.h"
 #include "RadiusClass/RadiusPacket.h"
 #include "RadiusClass/RadiusServer.h"
@@ -97,10 +101,17 @@ struct name_value_list {
   struct name_value data[N_NAME_VALUE]; 	/**<The data of the list.*/
 };
 
+
 const char * get_env (const char *name, const char *envp[]);
 int string_array_len (const char *array[]);
 void close_fds_except (int keep);
 void set_signals (void);
 string createSessionId (UserPlugin *);
+
+void * auth_user_pass_verify(void *);
+void write_auth_control_file(PluginContext * context, string filename, char c);
+string getTime();
+
+
 
 #endif //_PLUGIN_H_

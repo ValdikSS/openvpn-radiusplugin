@@ -194,19 +194,19 @@ int main_test (void)
 	ra2.setValue(string("testing"));
 	if(packet_access.addRadiusAttribute(&ra1))
 	{
-		fprintf(stderr, "RADIUS-CLASS: Fail to add attribute ATTRIB_User_Name.\n");
+		cerr << getTime() << "RADIUS-CLASS: Fail to add attribute ATTRIB_User_Name.\n";
 	}
 	if (packet_access.addRadiusAttribute(&ra2))
 	{
-		fprintf(stderr, "RADIUS-CLASS: Fail to add attribute ATTRIB_User_Password.\n");
+		cerr << getTime() << "RADIUS-CLASS: Fail to add attribute ATTRIB_User_Password.\n";
 	}
 	if (packet_access.addRadiusAttribute(&ra3))
 	{
-		fprintf(stderr, "RADIUS-CLASS: Fail to add attribute ATTRIB_NAS_Port.\n");
+		cerr << getTime() << "RADIUS-CLASS: Fail to add attribute ATTRIB_NAS_Port.\n";
 	}
 	if (packet_access.addRadiusAttribute(&ra4))
 	{
-		fprintf(stderr, "RADIUS-CLASS: Fail to add attribute ATTRIB_Calling_Station_Id.\n");
+		cerr << getTime() << "RADIUS-CLASS: Fail to add attribute ATTRIB_Calling_Station_Id.\n";
 	}
 	//get information from the config and add it to the packet
 	if(strcmp(config.getNASIdentifier(),""))
@@ -214,7 +214,7 @@ int main_test (void)
 			ra5.setValue(config.getNASIdentifier());
 			if (packet_access.addRadiusAttribute(&ra5))
 			{
-				fprintf(stderr, "RADIUS-CLASS: Fail to add attribute ATTRIB_NAS_Identifier.\n");
+				cerr << getTime() << "RADIUS-CLASS: Fail to add attribute ATTRIB_NAS_Identifier.\n";
 			}
 	}
 	
@@ -222,12 +222,12 @@ int main_test (void)
 	{
 			if(ra6.setValue(config.getNASIpAddress())!=0)
 			{
-				fprintf(stderr, "RADIUS-CLASS: Fail to set value ATTRIB_NAS_Ip_Address.\n");
+				cerr << getTime() << "RADIUS-CLASS: Fail to set value ATTRIB_NAS_Ip_Address.\n";
 			}
 			else
 			if (packet_access.addRadiusAttribute(&ra6))
 			{
-				fprintf(stderr, "RADIUS-CLASS: Fail to add attribute ATTRIB_NAS_Ip_Address.\n");
+				cerr << getTime() << "RADIUS-CLASS: Fail to add attribute ATTRIB_NAS_Ip_Address.\n";
 			}
 	}
 	if(strcmp(config.getNASPortType(),""))
@@ -235,7 +235,7 @@ int main_test (void)
 			ra7.setValue(config.getNASPortType());
 			if (packet_access.addRadiusAttribute(&ra7))
 			{
-				fprintf(stderr, "RADIUS-CLASS: Fail to add attribute ATTRIB_NAS_Port_Type.\n");
+				cerr << getTime() << "RADIUS-CLASS: Fail to add attribute ATTRIB_NAS_Port_Type.\n";
 			}
 	}
 	
@@ -244,7 +244,7 @@ int main_test (void)
 			ra8.setValue(config.getServiceType());
 			if (packet_access.addRadiusAttribute(&ra8))
 			{
-				fprintf(stderr, "RADIUS-CLASS: Fail to add attribute ATTRIB_Service_Type.\n");
+				cerr << getTime() << "RADIUS-CLASS: Fail to add attribute ATTRIB_Service_Type.\n";
 			}
 	}
 	
@@ -288,7 +288,7 @@ int main_test (void)
 	//send the packet to the first server from the list
 	if (packet_access.radiusSend(server)<0)
 	{
-		fprintf(stderr, "RADIUS-CLASS: Packet was not send.\n");
+		cerr << getTime() << "RADIUS-CLASS: Packet was not send.\n";
 	}
 	
 	//receive the packet, if the server doesn't response send the packet to the next server in list.
@@ -306,13 +306,13 @@ int main_test (void)
 		//If the radius server denied the access or sends a ACCESS_CHALLANGE-packet.
 		else
 		{
-			fprintf (stderr, "RADIUS-CLASS: Get ACCESS_REJECT or ACCESS_CHALLANGE-Packet.->ACCESS-DENIED.\n");
+			cerr << getTime() << "RADIUS-CLASS: Get ACCESS_REJECT or ACCESS_CHALLANGE-Packet.->ACCESS-DENIED.\n";
 		}
 		
 	}
 	else
 	{
-		fprintf (stderr, "RADIUS-CLASS: Got no or bad response from radius server.\n");
+		cerr << getTime() << "RADIUS-CLASS: Got no or bad response from radius server.\n";
 	}
 	
 	
@@ -327,31 +327,31 @@ int main_test (void)
 	//add the attributes to the packet
 	if(packet_accounting_start.addRadiusAttribute(&ra1))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_User_Name.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_User_Name.\n";
 	}
 	
 	
 	if (packet_accounting_start.addRadiusAttribute(&ra3))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Port.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Port.\n";
 	}
 	if (packet_accounting_start.addRadiusAttribute(&ra4))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Calling_Station_Id.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Calling_Station_Id.\n";
 	}
 	
 	
 	
 	if (packet_accounting_start.addRadiusAttribute(&ra10))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Session_Id.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Session_Id.\n";
 	}
 	
 	//set status type: start = 1 (see RADIUS RFC)
 	ra11.setValue(string("1"));
 	if (packet_accounting_start.addRadiusAttribute(&ra11))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Status_Type.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Status_Type.\n";
 	}
 	
 	
@@ -361,7 +361,7 @@ int main_test (void)
 			ra5.setValue(config.getNASIdentifier());
 			if (packet_accounting_start.addRadiusAttribute(&ra5))
 			{
-				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Identifier.\n");
+				cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Identifier.\n";
 			}
 	}
 	
@@ -369,12 +369,12 @@ int main_test (void)
 	{
 			if(ra6.setValue(config.getNASIpAddress())!=0)
 			{
-				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to set value ATTRIB_NAS_Ip_Address.\n");
+				cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to set value ATTRIB_NAS_Ip_Address.\n";
 			}
 	
 			if (packet_accounting_start.addRadiusAttribute(&ra6))
 			{
-				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Ip_Address.\n");
+				cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Ip_Address.\n";
 			}
 	}
 	if(strcmp(config.getNASPortType(),""))
@@ -382,7 +382,7 @@ int main_test (void)
 			ra7.setValue(config.getNASPortType());
 			if (packet_accounting_start.addRadiusAttribute(&ra7))
 			{
-				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Port_Type.\n");
+				cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Port_Type.\n";
 			}
 	}
 	
@@ -391,7 +391,7 @@ int main_test (void)
 			ra8.setValue(config.getServiceType());
 			if (packet_accounting_start.addRadiusAttribute(&ra8))
 			{
-				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Service_Type.\n");
+				cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Service_Type.\n";
 			}
 	}
 	if(strcmp(config.getFramedProtocol(),""))
@@ -399,13 +399,13 @@ int main_test (void)
 			ra12.setValue(config.getFramedProtocol());
 			if (packet_accounting_start.addRadiusAttribute(&ra12))
 			{
-				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_FramedProtocol.\n");
+				cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_FramedProtocol.\n";
 			}
 	}
 	ra9.setValue(string("111.222.111.111"));
 	if (packet_accounting_start.addRadiusAttribute(&ra9))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_ID.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_ID.\n";
 	}
 	
 	
@@ -413,7 +413,7 @@ int main_test (void)
 	//send the packet_accounting_start	
 	if (packet_accounting_start.radiusSend(server)<0)
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Packet was not send.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Packet was not send.\n";
 	}
 	
 	//receive the response
@@ -422,13 +422,13 @@ int main_test (void)
 		//is is a accounting resopnse ?
 		if(packet_accounting_start.getCode()==ACCOUNTING_RESPONSE)
 		{
-			fprintf (stdout, "RADIUS-CLASS:  Get ACCOUNTING_RESPONSET-Packet.\n");
+			cerr << getTime() << "RADIUS-CLASS:  Get ACCOUNTING_RESPONSET-Packet.\n";
 
 		}
 	}	
 	else
 	{
-		fprintf (stderr, "RADIUS-CLASS: Got no or bad response from radius server.\n");
+		cerr << getTime() << "RADIUS-CLASS: Got no or bad response from radius server.\n";
 	}
 	
 	// Send a ACCOUNTING-REQUEST-PACKET, Status-Type:Update
@@ -441,17 +441,17 @@ int main_test (void)
 	//add the attributes to the packet
 	if(packet_accounting_update.addRadiusAttribute(&ra1))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_User_Name.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_User_Name.\n";
 	}
 	
 	
 	if (packet_accounting_update.addRadiusAttribute(&ra3))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Port.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Port.\n";
 	}
 	if (packet_accounting_update.addRadiusAttribute(&ra4))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Calling_Station_Id.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Calling_Station_Id.\n";
 	}
 	
 	
@@ -459,29 +459,29 @@ int main_test (void)
 	
 	if (packet_accounting_update.addRadiusAttribute(&ra10))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Session_Id.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Session_Id.\n";
 	}
 	
 	//set status type: update = 3(see RADIUS RFC)
 	ra11.setValue(string("3"));
 	if (packet_accounting_update.addRadiusAttribute(&ra11))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Status_Type.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Status_Type.\n";
 	}
 	
 	
 	
 	if (packet_accounting_update.addRadiusAttribute(&ra13))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Input_Octets.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Input_Octets.\n";
 	}
 	if (packet_accounting_update.addRadiusAttribute(&ra14))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Output_Octets.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Output_Octets.\n";
 	}
 	if (packet_accounting_update.addRadiusAttribute(&ra14))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_Time.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_Time.\n";
 	}
 	
 	//get information from the config and add the attributes to the packet
@@ -490,7 +490,7 @@ int main_test (void)
 			ra5.setValue(config.getNASIdentifier());
 			if (packet_accounting_update.addRadiusAttribute(&ra5))
 			{
-				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Identifier.\n");
+				cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Identifier.\n";
 			}
 	}
 	
@@ -498,12 +498,12 @@ int main_test (void)
 	{
 			if(ra6.setValue(config.getNASIpAddress())!=0)
 			{
-				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to set value ATTRIB_NAS_Ip_Address.\n");
+				cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to set value ATTRIB_NAS_Ip_Address.\n";
 			}
 	
 			if (packet_accounting_update.addRadiusAttribute(&ra6))
 			{
-				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Ip_Address.\n");
+				cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Ip_Address.\n";
 			}
 	}
 	if(strcmp(config.getNASPortType(),""))
@@ -511,7 +511,7 @@ int main_test (void)
 			ra7.setValue(config.getNASPortType());
 			if (packet_accounting_update.addRadiusAttribute(&ra7))
 			{
-				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Port_Type.\n");
+				cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Port_Type.\n";
 			}
 	}
 	
@@ -520,7 +520,7 @@ int main_test (void)
 			ra8.setValue(config.getServiceType());
 			if (packet_accounting_update.addRadiusAttribute(&ra8))
 			{
-				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Service_Type.\n");
+				cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Service_Type.\n";
 			}
 	}
 	if(strcmp(config.getFramedProtocol(),""))
@@ -528,13 +528,13 @@ int main_test (void)
 			ra12.setValue(config.getFramedProtocol());
 			if (packet_accounting_update.addRadiusAttribute(&ra12))
 			{
-				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_FramedProtocol.\n");
+				cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_FramedProtocol.\n";
 			}
 	}
 	ra9.setValue(string("111.222.111.111"));
 	if (packet_accounting_update.addRadiusAttribute(&ra9))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_ID.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_ID.\n";
 	}
 	
 	
@@ -542,7 +542,7 @@ int main_test (void)
 	//send the packet_accounting_update	
 	if (packet_accounting_update.radiusSend(server)<0)
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Packet was not send.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Packet was not send.\n";
 	}
 	
 	//receive the response
@@ -551,7 +551,7 @@ int main_test (void)
 		//is is a accounting resopnse ?
 		if(packet_accounting_update.getCode()==ACCOUNTING_RESPONSE)
 		{
-			fprintf (stdout, "RADIUS-CLASS: BACKGROUND-ACCT:  Get ACCOUNTING_RESPONSET-Packet.\n");
+			cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Get ACCOUNTING_RESPONSET-Packet.\n";
 
 		}
 		
@@ -559,7 +559,7 @@ int main_test (void)
 	}
 	else
 	{
-		fprintf (stderr, "RADIUS-CLASS: Got no or bad response from radius server.\n");
+		cerr << getTime() << "RADIUS-CLASS: Got no or bad response from radius server.\n";
 	}
 	
 	// Send a ACCOUNTING-REQUEST-PACKET, Status-Type:Stop
@@ -572,17 +572,17 @@ int main_test (void)
 	//add the attributes to the packet
 	if(packet_accounting_stop.addRadiusAttribute(&ra1))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_User_Name.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_User_Name.\n";
 	}
 	
 	
 	if (packet_accounting_stop.addRadiusAttribute(&ra3))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Port.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Port.\n";
 	}
 	if (packet_accounting_stop.addRadiusAttribute(&ra4))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Calling_Station_Id.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Calling_Station_Id.\n";
 	}
 	
 	
@@ -590,29 +590,29 @@ int main_test (void)
 	
 	if (packet_accounting_stop.addRadiusAttribute(&ra10))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Session_Id.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Session_Id.\n";
 	}
 	
 	//set status type: update = 2(see RADIUS RFC)
 	ra11.setValue(string("2"));
 	if (packet_accounting_stop.addRadiusAttribute(&ra11))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Status_Type.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Status_Type.\n";
 	}
 	
 	
 	
 	if (packet_accounting_stop.addRadiusAttribute(&ra13))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Input_Octets.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Input_Octets.\n";
 	}
 	if (packet_accounting_stop.addRadiusAttribute(&ra14))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Output_Octets.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Output_Octets.\n";
 	}
 	if (packet_accounting_stop.addRadiusAttribute(&ra14))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_Time.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_Time.\n";
 	}
 	
 	//get information from the config and add the attributes to the packet
@@ -621,7 +621,7 @@ int main_test (void)
 			ra5.setValue(config.getNASIdentifier());
 			if (packet_accounting_stop.addRadiusAttribute(&ra5))
 			{
-				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Identifier.\n");
+				cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Identifier.\n";
 			}
 	}
 	
@@ -629,12 +629,12 @@ int main_test (void)
 	{
 			if(ra6.setValue(config.getNASIpAddress())!=0)
 			{
-				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to set value ATTRIB_NAS_Ip_Address.\n");
+				cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to set value ATTRIB_NAS_Ip_Address.\n";
 			}
 	
 			if (packet_accounting_stop.addRadiusAttribute(&ra6))
 			{
-				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Ip_Address.\n");
+				cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Ip_Address.\n";
 			}
 	}
 	if(strcmp(config.getNASPortType(),""))
@@ -642,7 +642,7 @@ int main_test (void)
 			ra7.setValue(config.getNASPortType());
 			if (packet_accounting_stop.addRadiusAttribute(&ra7))
 			{
-				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Port_Type.\n");
+				cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Port_Type.\n";
 			}
 	}
 	
@@ -651,7 +651,7 @@ int main_test (void)
 			ra8.setValue(config.getServiceType());
 			if (packet_accounting_stop.addRadiusAttribute(&ra8))
 			{
-				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Service_Type.\n");
+				cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Service_Type.\n";
 			}
 	}
 	if(strcmp(config.getFramedProtocol(),""))
@@ -659,13 +659,13 @@ int main_test (void)
 			ra12.setValue(config.getFramedProtocol());
 			if (packet_accounting_stop.addRadiusAttribute(&ra12))
 			{
-				fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_FramedProtocol.\n");
+				cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_FramedProtocol.\n";
 			}
 	}
 	ra9.setValue(string("111.222.111.111"));
 	if (packet_accounting_stop.addRadiusAttribute(&ra9))
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_ID.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_ID.\n";
 	}
 	
 	
@@ -673,7 +673,7 @@ int main_test (void)
 	//send the packet_accounting_stop	
 	if (packet_accounting_stop.radiusSend(server)<0)
 	{
-		fprintf(stderr, "RADIUS-CLASS: BACKGROUND-ACCT:  Packet was not send.\n");
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Packet was not send.\n";
 	}
 	
 	//receive the response
@@ -682,13 +682,13 @@ int main_test (void)
 		//is is a accounting resopnse ?
 		if(packet_accounting_stop.getCode()==ACCOUNTING_RESPONSE)
 		{
-			fprintf (stdout, "RADIUS-CLASS: BACKGROUND-ACCT:  Get ACCOUNTING_RESPONSET-Packet.\n");
+			cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Get ACCOUNTING_RESPONSET-Packet.\n";
 
 		}
 	}
 	else
 	{
-		fprintf (stderr, "RADIUS-CLASS: Got no or bad response from radius server.\n");
+		cerr << getTime() << "RADIUS-CLASS: Got no or bad response from radius server.\n";
 	}
 	
 	cout << "\n---- End ----";
@@ -741,7 +741,7 @@ void parseResponsePacket(RadiusPacket *packet)
 	}
 	else
 	{
-		fprintf(stderr,"RADIUS-CLASS: No attributes Acct Interim Interval or bad length.\n");
+		cerr << getTime() <<"RADIUS-CLASS: No attributes Acct Interim Interval or bad length.\n";
 	}
 	cout << "\nAcct-Interim-Interval: " << acct_interval;
 	

@@ -50,11 +50,11 @@ void AuthenticationProcess::Authentication(PluginContext * context)
   	}
   	catch(Exception &e)
   	{
-  		cerr << "RADIUS-PLUGIN: BACKGROUND AUTH:" << e <<"\n";
+  		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH:" << e <<"\n";
   		goto done;
   	}
      	if (DEBUG (context->getVerbosity()))
- 			cerr << "RADIUS-PLUGIN: BACKGROUND  AUTH: Started, RESPONSE_INIT_SUCCEEDED was sent to Foreground Process.\n";
+ 			cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND  AUTH: Started, RESPONSE_INIT_SUCCEEDED was sent to Foreground Process.\n";
    	// Event loop
   	while (1)
     {
@@ -80,10 +80,10 @@ void AuthenticationProcess::Authentication(PluginContext * context)
 			    user->setFramedIp(context->authsocketforegr.recvStr());
 		 		
 		 		if (DEBUG (context->getVerbosity()) && (user->getFramedIp().compare("") == 0))
-		    		cerr << "RADIUS-PLUGIN: BACKGROUND  AUTH: New user auth: username: " << user->getUsername() << ", password: *****, calling station: " << user->getCallingStationId() << ", commonname: " << user->getCommonname() << ".\n";
+		    		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND  AUTH: New user auth: username: " << user->getUsername() << ", password: *****, calling station: " << user->getCallingStationId() << ", commonname: " << user->getCommonname() << ".\n";
 
 		 		if (DEBUG (context->getVerbosity()) && (user->getFramedIp().compare("") !=0 ))
-		    		cerr << "RADIUS-PLUGIN: BACKGROUND  AUTH: Old user ReAuth: username: " << user->getUsername() << ", password: *****, calling station: " << user->getCallingStationId() << ", commonname: " << user->getCommonname() << ".\n";
+		    		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND  AUTH: Old user ReAuth: username: " << user->getUsername() << ", password: *****, calling station: " << user->getCallingStationId() << ", commonname: " << user->getCommonname() << ".\n";
 				
 				//send the AcceptRequestPacket
 				if (user->sendAcceptRequestPacket(context)==0) /* Succeeded */
@@ -116,7 +116,7 @@ void AuthenticationProcess::Authentication(PluginContext * context)
 			     	delete user;
 			     	
 			     	if (DEBUG (context->getVerbosity()))
-		    			fprintf (stderr, "RADIUS-PLUGIN: BACKGROUND  AUTH: Auth succeeded in radius_server().\n");
+		    			cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND  AUTH: Auth succeeded in radius_server().\n";
 			  		
 			  		
 			    	
@@ -129,7 +129,7 @@ void AuthenticationProcess::Authentication(PluginContext * context)
 		  	}
 		    catch (Exception &e)
 		    {
-		    	cerr << e;
+		    	cerr << getTime() << e;
 		    	delete user;
 		      	if (e.getErrnum()==Exception::SOCKETSEND || e.getErrnum()==Exception::SOCKETRECV)
 				{
@@ -149,18 +149,18 @@ void AuthenticationProcess::Authentication(PluginContext * context)
 			goto done;
 	
 		case -1:
-		  	cerr << "RADIUS-PLUGIN: BACKGROUND AUTH: read error on command channel.\n";
+		  	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: read error on command channel.\n";
 		  	break;
 	
 		default:
-		  	cerr << "RADIUS-PLUGIN: BACKGROUND AUTH: unknown command code: code="<<command<<", exiting.\n";
+		  	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: unknown command code: code="<<command<<", exiting.\n";
 		  	goto done;
 		}
     }
  done:
 
   if (1)
-    cerr << "RADIUS-PLUGIN: BACKGROUND AUTH: EXIT\n";
+    cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: EXIT\n";
 
   return;
 }

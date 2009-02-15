@@ -137,7 +137,7 @@ int RadiusPacket::addRadiusAttribute(RadiusAttribute *ra)
 {
 	if (ra->getLength()<1)
 	{
-		fprintf(stderr,"No value in the Attribute!");
+		cerr << "No value in the Attribute!\n";
 		return NO_VALUE_IN_ATTRIBUTE;
 	}
 	
@@ -327,7 +327,7 @@ int RadiusPacket::unShapeRadiusPacket(void)
 	
 	//	RADIUS packet header decoding
 	this->code=this->recvbuffer[0];
-	//fprintf(stderr, "\n\nCODE: %s\n\n", this->code);
+	//cerr << getTime() << "\n\nCODE: %s\n\n", this->code);
 	
 	this->identifier=this->recvbuffer[1];
 	memcpy(this->authenticator,recvbuffer+4,RADIUS_PACKET_AUTHENTICATOR_LEN);
@@ -431,7 +431,7 @@ int RadiusPacket::radiusSend(list<RadiusServer>::iterator server)
     //	Socket creation
     if((socket2Radius = socket(AF_INET, SOCK_DGRAM, 0))<0)
 	{
-		fprintf(stderr,"cannot open socket: %s\n",strerror(errno));
+		cerr <<  "Cannot open socket: "<< strerror(errno) <<"\n";
 		return SOCKET_ERROR;
 	}
     
@@ -443,7 +443,7 @@ int RadiusPacket::radiusSend(list<RadiusServer>::iterator server)
 	//Bind the socket port,
     if(bind(socket2Radius,(struct sockaddr*)&cliAddr,sizeof(struct sockaddr))<0)
 	{
-		fprintf(stderr,"cannot bind port: %s\n",strerror(errno));
+		cerr << "Cannot bind port: " << strerror(errno) << "\n";
 		socket2Radius=-1;
 		return BIND_ERROR;
 	}
