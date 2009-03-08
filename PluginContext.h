@@ -41,6 +41,7 @@ using std::list;
 
 using namespace std;
 
+
 /** This class saves all information for the different processes and 
  * it saves the users for the foreground process.*/
 class PluginContext

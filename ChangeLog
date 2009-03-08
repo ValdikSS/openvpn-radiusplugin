@@ -83,5 +83,8 @@ radiusplugin_2.1_beta:
 - Support for OPENVPN_PLUGIN_FUNC_DEFERRED, the authentication is done a thread if an auth_control_file is defined.
 -- The OpenVPN process needs write permission in the OpenVPN directory.
 - Timestamps are included in the debug information.
+- Adapted to OPENVPN_PLUGIN_VERSION 2
+- Option to swith on/off the usage of auth control files
+- Internal key is now based on untrusted_ip and untrusted_before.
  
  

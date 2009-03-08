@@ -106,9 +106,9 @@ int main (void)
 	argv[0]="radiusplugin.so";
 	argv[1]="./radiusplugin.cnf";
 	argv[2]=NULL;
-
+        system("rm acfuser*"); //remove the acf files
+        
 	context=openvpn_plugin_open_v2(&type_mask,(const char **) argv,(const char **) env1, NULL);
-
 	if (context==NULL)
 	{
 		return -1;	
@@ -130,32 +130,46 @@ int main (void)
 	if(success1 == OPENVPN_PLUGIN_FUNC_DEFERRED || success1 == OPENVPN_PLUGIN_FUNC_DEFERRED || success1 == OPENVPN_PLUGIN_FUNC_DEFERRED || success1 == OPENVPN_PLUGIN_FUNC_DEFERRED)
         {
           char c1,c2,c3,c4;
+          ifstream file1(get_env("auth_control_file", env1));
+          ifstream file2(get_env("auth_control_file", env2));
+          ifstream file3(get_env("auth_control_file", env3));
+          ifstream file4(get_env("auth_control_file", env4));
           do
           {
-            ifstream file1(get_env("auth_control_file", env1));
             if(file1.is_open())
             {
               file1.read (&c1, 1);
             }
-            ifstream file2(get_env("auth_control_file", env2));
+            else file1.open(get_env("auth_control_file", env1));
+            
             if(file2.is_open())
             {
               file2.read (&c2, 1);
             }
-            ifstream file3(get_env("auth_control_file", env3));
+            else file2.open(get_env("auth_control_file", env2));
             if(file3.is_open())
             {
               file3.read (&c3, 1);
             }
-            ifstream file4(get_env("auth_control_file", env4));
+            else file3.open(get_env("auth_control_file", env3));
             if(file4.is_open())
             {
-              file4.read (&c4, 1);
+              file4.read(&c4, 1);
             }
-  
+            else file4.open(get_env("auth_control_file", env4));
+            sleep(1);
           }
-          while(c1 != '1' && c2 != '1' && c3 != '1' && c4 != '1');
-          success1=success2=success3=success4=0;
+          while(!file1.is_open() || !file2.is_open() || !file3.is_open() || !file4.is_open());
+          success1=c1-'0';
+          success2=c1-'0';
+          success3=c1-'0';
+          success4=c1-'0';
+          success1=success2=success3=success4= success1 & success2 & success3 & success4;
+          file1.close(); 
+          file2.close();
+          file3.close();
+          file4.close();
+          system("rm acfuser*"); //remove the acf files
         }
 	
 	//CONNECT
@@ -189,32 +203,46 @@ int main (void)
 	if(success1 == OPENVPN_PLUGIN_FUNC_DEFERRED || success1 == OPENVPN_PLUGIN_FUNC_DEFERRED || success1 == OPENVPN_PLUGIN_FUNC_DEFERRED || success1 == OPENVPN_PLUGIN_FUNC_DEFERRED)
         {
           char c1,c2,c3,c4;
+          ifstream file1(get_env("auth_control_file", env1));
+          ifstream file2(get_env("auth_control_file", env2));
+          ifstream file3(get_env("auth_control_file", env3));
+          ifstream file4(get_env("auth_control_file", env4));
           do
           {
-            ifstream file1(get_env ( "auth_control_file", env1));
             if(file1.is_open())
             {
               file1.read (&c1, 1);
             }
-            ifstream file2(get_env ( "auth_control_file", env2));
+            else file1.open(get_env("auth_control_file", env1));
+            
             if(file2.is_open())
             {
               file2.read (&c2, 1);
             }
-            ifstream file3(get_env ( "auth_control_file", env3));
+            else file2.open(get_env("auth_control_file", env2));
             if(file3.is_open())
             {
               file3.read (&c3, 1);
             }
-            ifstream file4(get_env ( "auth_control_file", env4));
+            else file3.open(get_env("auth_control_file", env3));
             if(file4.is_open())
             {
-              file4.read (&c4, 1);
+              file4.read(&c4, 1);
             }
-  
+            else file4.open(get_env("auth_control_file", env4));
+            sleep(1);
           }
-          while(c1 != '1' && c2 != '1' && c3 != '1' && c4 != '1');
-          success1=success2=success3=success4=0;
+          while(!file1.is_open() || !file2.is_open() || !file3.is_open() || !file4.is_open());
+          success1=c1-'0';
+          success2=c1-'0';
+          success3=c1-'0';
+          success4=c1-'0';
+          success1=success2=success3=success4= success1 & success2 & success3 & success4;
+          file1.close(); 
+          file2.close();
+          file3.close();
+          file4.close();
+          system("rm acfuser*"); //remove the acf files
         }
 
 	if (success5==0 && success6==0 && success7==0 && success8==0)

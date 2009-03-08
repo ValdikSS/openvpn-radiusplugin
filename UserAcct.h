@@ -30,6 +30,7 @@
 #include "PluginContext.h"
 
 
+
 /** The class represents a user in the accounting background process. The class is
  * derived from the User class. This class defined additonal attributes
  * for accouting a user.*/

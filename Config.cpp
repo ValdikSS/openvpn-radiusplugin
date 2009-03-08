@@ -32,6 +32,7 @@ Config::Config(void)
 	this->usernameascommonname=false;
 	this->clientcertnotrequired=false;
 	this->overwriteccfiles=true;
+        this->useauthcontrolfile=false;
 	this->ccdPath="";
 	this->openvpnconfig="";
 	this->vsanamedpipe="";
@@ -57,6 +58,7 @@ Config::Config(char * configfile)
 	this->usernameascommonname=false;
 	this->clientcertnotrequired=false;
 	this->overwriteccfiles=true;	
+        this->useauthcontrolfile=false;
 	this->parseConfigFile(configfile);
 	
 }
@@ -128,6 +130,16 @@ int Config::parseConfigFile(const char * configfile)
 					deletechars(&stmp);
 					if(stmp == "true") this->overwriteccfiles=true;
 					else if (stmp =="false") this->overwriteccfiles=false;
+					else return BAD_FILE;
+						
+				}
+                                if (strncmp(line.c_str(),"useauthcontrolfile=",19)==0)
+				{
+					
+					string stmp=line.substr(19,line.size()-19);
+					deletechars(&stmp);
+					if(stmp == "true") this->useauthcontrolfile=true;
+					else if (stmp =="false") this->useauthcontrolfile=false;
 					else return BAD_FILE;
 						
 				}
@@ -434,7 +446,7 @@ void Config::setOpenVPNConfig(string conf)
 	this->openvpnconfig=conf;
 }
 
-/** Returns getter method for the overwriteccfiles variable.
+/** The getter method for the overwriteccfiles variable.
  * @return A bool of overwriteccfiles.
  */
 bool Config::getOverWriteCCFiles(void)
@@ -448,4 +460,20 @@ bool Config::getOverWriteCCFiles(void)
 void Config::setOverWriteCCFiles(bool overwrite)
 {
 	this->overwriteccfiles=overwrite;	
+}
+
+/** Getter method for the authcontrolfile variable.
+ * @return A bool of authcontrolfile .
+ */
+bool Config::getUseAuthControlFile(void)
+{
+	return this->useauthcontrolfile;
+}
+
+/** The setter method for the authcontrolfile  varibale
+ * @param overwrite Set to true if the plugin if auth control files should be if supported by the OpenVPN version.
+ */
+void Config::setUseAuthControlFile(bool b)
+{
+	this->useauthcontrolfile=b;	
 }

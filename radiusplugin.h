@@ -109,7 +109,7 @@ void set_signals (void);
 string createSessionId (UserPlugin *);
 
 void * auth_user_pass_verify(void *);
-void write_auth_control_file(PluginContext * context, string filename, char c);
+void write_auth_control_file(PluginContext *, string filename, char c);
 string getTime();
 
 

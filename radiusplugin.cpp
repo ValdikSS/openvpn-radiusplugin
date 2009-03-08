@@ -439,11 +439,12 @@ extern "C"
 
 
 				newuser->setUntrustedPort ( get_env ( "untrusted_port", envp ) );
-				newuser->setKey ( newuser->getCommonname() +string ( "," ) + untrusted_ip + string ( ":" ) + get_env ( "untrusted_port", envp ) );
+				//newuser->setKey(newuser->getCommonname() +string ( "," ) + untrusted_ip + string ( ":" ) + get_env ( "untrusted_port", envp ) );
+                                newuser->setKey(untrusted_ip + string ( ":" ) + get_env ( "untrusted_port", envp ) );
+                                if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Key: " << newuser->getKey() << ".\n";
                                
-                                if (newuser->getAuthControlFile().length() > 0)
+                                if (newuser->getAuthControlFile().length() > 0 && context->conf.getUseAuthControlFile())
                                 {
-                                  
                                   pthread_mutex_lock(context->getMutexSend());
                                   context->addNewUser(newuser);
                                   pthread_cond_signal( context->getCondSend( ));
@@ -452,7 +453,6 @@ extern "C"
                                 }
                                 else
                                 {
-                                 
                                   pthread_mutex_lock(context->getMutexSend());
                                   context->addNewUser(newuser);
                                   pthread_cond_signal( context->getCondSend( ));
@@ -534,9 +534,12 @@ extern "C"
 
 				const char *ifconfig_pool_remote_ip=get_env ( "ifconfig_pool_remote_ip", envp );
 				//find the user in the context, he was added at the OPENVPN_PLUGIN_AUTH_USER_PASS_VERIFY
-				string key=common_name + string ( "," ) +untrusted_ip+string ( ":" ) + string ( get_env ( "untrusted_port", envp ) );
-
-				newuser=context->findUser(key);
+				//string key=common_name + string ( "," ) +untrusted_ip+string ( ":" ) + string ( get_env ( "untrusted_port", envp ) );
+                                string key=untrusted_ip+string ( ":" ) + string ( get_env ( "untrusted_port", envp ) );
+                                if ( DEBUG ( context->getVerbosity() ) ){
+                                        cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Key: " << key << ".\n";
+				}
+                                newuser=context->findUser(key);
                                 if(newuser == NULL)
                                 {
                                   
@@ -673,8 +676,8 @@ extern "C"
 				}
 
 				//find the user in the context
-				newuser=context->findUser ( common_name + string ( "," ) + untrusted_ip + string ( ":" ) + string ( get_env ( "untrusted_port", envp ) ) );
-
+				//newuser=context->findUser ( common_name + string ( "," ) + untrusted_ip + string ( ":" ) + string ( get_env ( "untrusted_port", envp ) ) );
+                                newuser=context->findUser ( untrusted_ip + string ( ":" ) + string ( get_env ( "untrusted_port", envp ) ) );
 
 				if ( newuser!=NULL )
 				{
@@ -946,10 +949,10 @@ string createSessionId ( UserPlugin * user )
  * @param _context The context pointer from OpenVPN.
  */
  
-void  * auth_user_pass_verify(void * _context)
+void  * auth_user_pass_verify(void * c)
 {
         cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Auth_user_pass_verify thread started.\n";
-        PluginContext * context = (PluginContext *) _context;
+        PluginContext * context = (PluginContext *) c;
 
         //main thread loop for authentication
         while(!context->getStopThread())
@@ -1059,7 +1062,7 @@ void  * auth_user_pass_verify(void * _context)
                                   cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Don't add the user to the map, it is a rekeying.\n";
                           }
                          
-                          if(newuser->getAuthControlFile().length()>0)
+                          if(newuser->getAuthControlFile().length()>0 && context->conf.getUseAuthControlFile())
                           {
                             write_auth_control_file(context, newuser->getAuthControlFile(), '1');
                           }
@@ -1100,7 +1103,7 @@ void  * auth_user_pass_verify(void * _context)
                           context->delNasPort(newuser->getPortnumber());
                           context->delUser(newuser->getKey());
 
-                          if(newuser->getAuthControlFile().length()>0)
+                          if(newuser->getAuthControlFile().length()>0 && context->conf.getUseAuthControlFile())
                           {
                             write_auth_control_file(context, newuser->getAuthControlFile(), '0');
                           }
@@ -1121,7 +1124,7 @@ void  * auth_user_pass_verify(void * _context)
               context->delUser (newuser->getKey());
               
               //return OPENVPN_PLUGIN_FUNC_ERROR;
-              if(newuser->getAuthControlFile().length()>0)
+              if(newuser->getAuthControlFile().length()>0 && context->conf.getUseAuthControlFile())
               {
                 write_auth_control_file(context, newuser->getAuthControlFile(), '0');
               }

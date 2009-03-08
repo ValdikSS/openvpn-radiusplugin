@@ -35,6 +35,11 @@ subnet=255.255.255.0
 # default is true
 overwriteccfiles=true
 
+# Allows the plugin to use auth control files if OpenVPN (>= 2.1 rc8) provides them.
+# default is false
+# useauthcontrolfile=false
+
+
 # Path to a script for vendor specific attributes.
 # Leave it out if you don't use an own script.
 # vsascript=/root/workspace/radiusplugin_v2.0.5_beta/vsascript.pl

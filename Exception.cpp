@@ -57,7 +57,7 @@ Exception::Exception(string txt)
  */
 ostream & operator <<(ostream& os, const Exception& e)
 {
-     os << "Error: " << e.errtext << "\n";
+     os <<"Error: " << e.errtext << "\n";
      return os;
 }
 

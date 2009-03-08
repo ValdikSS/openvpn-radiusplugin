@@ -49,6 +49,7 @@ private:
 	bool clientcertnotrequired;		/**<For OpenVPN option client_cert_not_required, commonname = UNDEF.*/
 	string openvpnconfig;			/**<Path to OpenVPN config.*/
 	bool overwriteccfiles; 			/**<If true the plugin overwrites the client config files.*/
+        bool useauthcontrolfile;                /**<If true and the OpenVPN version supports auth control files, the acf is used.*/
 	
 	void deletechars(string * );
 	
@@ -89,6 +90,9 @@ public:
 	
 	bool getOverWriteCCFiles(void);
 	void setOverWriteCCFiles(bool);
+
+        bool getUseAuthControlFile(void);
+	void setUseAuthControlFile(bool);
 	
 	string getOpenVPNConfig(void);
 	void setOpenVPNConfig(string);

@@ -119,7 +119,7 @@ void PluginContext::addUser(UserPlugin * newuser)
 	
 }
 
-/**The method deletes the user from the map with the key cn.
+/**The method deletes the user from the map with the key.
  * @param key The key of the user.
  */
 void PluginContext::delUser(string key)

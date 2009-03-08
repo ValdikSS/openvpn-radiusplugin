@@ -38,6 +38,8 @@
 #include <stdlib.h>
 using namespace std;
 
+
+
 /**The class represents an user for the authentication process.**/
 class UserAuth : public User
 {
