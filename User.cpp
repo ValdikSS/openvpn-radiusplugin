@@ -27,6 +27,7 @@ User::User()
 	this->framedip="";
 	this->framedroutes="";
 	this->key="";
+        this->statusfilekey="";
 	this->untrustedport="";
 	this->acctinteriminterval=0;
 	this->portnumber=0;
@@ -68,6 +69,7 @@ User & User::operator=(const User & u)
 	this->framedroutes=u.framedroutes;
 	this->framedip=u.framedip;
 	this->key=u.key;
+        this->statusfilekey=u.statusfilekey;
 	this->callingstationid=u.callingstationid;
 	this->portnumber=u.portnumber;
 	this->acctinteriminterval=u.acctinteriminterval;
@@ -96,6 +98,7 @@ User::User(const User & u)
 	this->framedroutes=u.framedroutes;
 	this->framedip=u.framedip;
 	this->key=u.key;
+        this->statusfilekey=u.statusfilekey;
 	this->callingstationid=u.callingstationid;
 	this->portnumber=u.portnumber;
 	this->acctinteriminterval=u.acctinteriminterval;
@@ -171,7 +174,7 @@ string User::getKey(void)
 {
 	return this->key;
 }
-/** The setter method for a unique, it is build from commonname, ip and port.
+/** The setter method for a unique, it is build from ip and port.
  * @param key The unique key.
  */
 void User::setKey(string key)
@@ -179,6 +182,19 @@ void User::setKey(string key)
 	this->key=key;
 }
 
+/** The getter method for the status file key.
+ *  @return The unique status file key as a string.*/
+string User::getStatusFileKey(void)
+{
+	return this->statusfilekey;
+}
+/** The setter method for a unique, it is build from commonname, ip and port.
+ * @param key The unique status file key.
+ */
+void User::setStatusFileKey(string key)
+{
+	this->statusfilekey=key;
+}
 
 /** The getter method for the calling station id.
  *  @return The calling station id as a string.*/

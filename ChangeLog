@@ -79,12 +79,15 @@ radiusplugin_2.0d_beta:
 - close socket in radiuspacket.cpp on retries
 - add parenthesize to avoid compiler warnings 
 
-- Support of OPENVPN_PLUGIN_FUNC_DEFERRED: 
+radiusplugin_2.1:
+- Support of OPENVPN_PLUGIN_FUNC_DEFERRED:
 *** The communication to the radius server for authentication is outsourced in a thread.
 *** If an auth control file is defined and "useauthcontrolfile=true" is defined in the config file of plugin the authentication is done the background.
 *** The OpenVPN process needs write permission in the OpenVPN directory.
 - Timestamps are included in the debug information.
 - Adapted to OPENVPN_PLUGIN_VERSION 2
 - Internal key is now based on untrusted_ip and untrusted_before.
+- Separated key for status file is added.
+
  
  

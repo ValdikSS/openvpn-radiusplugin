@@ -439,7 +439,7 @@ extern "C"
 
 
 				newuser->setUntrustedPort ( get_env ( "untrusted_port", envp ) );
-				//newuser->setKey(newuser->getCommonname() +string ( "," ) + untrusted_ip + string ( ":" ) + get_env ( "untrusted_port", envp ) );
+				newuser->setStatusFileKey(newuser->getCommonname() +string ( "," ) + untrusted_ip + string ( ":" ) + get_env ( "untrusted_port", envp ) );
                                 newuser->setKey(untrusted_ip + string ( ":" ) + get_env ( "untrusted_port", envp ) );
                                 if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Key: " << newuser->getKey() << ".\n";
                                
@@ -570,6 +570,7 @@ extern "C"
 					context->acctsocketbackgr.send ( newuser->getAcctInterimInterval() );
 					context->acctsocketbackgr.send ( newuser->getFramedRoutes() );
 					context->acctsocketbackgr.send ( newuser->getKey() );
+                                        context->acctsocketbackgr.send ( newuser->getStatusFileKey());
 					context->acctsocketbackgr.send ( newuser->getUntrustedPort() );
 					context->acctsocketbackgr.send ( newuser->getVsaBuf(), newuser->getVsaBufLen() );
 					//get the response

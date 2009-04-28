@@ -99,7 +99,8 @@ void AccountingProcess::Accounting(PluginContext * context)
 					user->setCommonname(context->acctsocketforegr.recvStr());
 					user->setAcctInterimInterval(context->acctsocketforegr.recvInt());
 					user->setFramedRoutes(context->acctsocketforegr.recvStr());
-					user->setKey(context->acctsocketforegr.recvStr());				
+					user->setKey(context->acctsocketforegr.recvStr());
+                                        user->setStatusFileKey(context->acctsocketforegr.recvStr());				
 					user->setUntrustedPort(context->acctsocketforegr.recvStr());
 					context->acctsocketforegr.recvBuf(user);
 					if (DEBUG (context->getVerbosity()))

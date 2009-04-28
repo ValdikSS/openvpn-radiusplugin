@@ -76,7 +76,7 @@ void AcctScheduler::delUser(PluginContext * context, UserAcct *user)
 	uint64_t bytesin=0, bytesout=0;
 		
 	//get the sent and received bytes
-	this->parseStatusFile(context, &bytesin, &bytesout,user->getKey().c_str());
+	this->parseStatusFile(context, &bytesin, &bytesout,user->getStatusFileKey().c_str());
 	
 	user->setBytesIn(bytesin & 0xFFFFFFFF);
 	user->setBytesOut(bytesout & 0xFFFFFFFF);
@@ -162,7 +162,7 @@ void AcctScheduler::doAccounting(PluginContext * context)
 			if (DEBUG (context->getVerbosity()))
 		    cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Scheduler: Update for User " << iter1->second.getUsername() << ".\n";
 					
-			this->parseStatusFile(context, &bytesin, &bytesout,iter1->second.getKey().c_str()); 
+			this->parseStatusFile(context, &bytesin, &bytesout,iter1->second.getStatusFileKey().c_str()); 
 			iter1->second.setBytesIn(bytesin & 0xFFFFFFFF);
 			iter1->second.setBytesOut(bytesout & 0xFFFFFFFF);
 			iter1->second.setGigaIn(bytesin >> 32);
