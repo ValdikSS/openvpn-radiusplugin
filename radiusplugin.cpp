@@ -398,15 +398,17 @@ extern "C"
 						throw Exception ( "RADIUS-PLUGIN: FOREGROUND: common_name is not defined\n" );
 					}
 				}
-				else if ( get_env ( "untrusted_port", envp ) ==NULL )
+                                else if ( get_env ( "untrusted_port", envp ) ==NULL )
 				{
 					throw Exception ( "RADIUS-PLUGIN: FOREGROUND: untrusted_port is not defined\n" );
 				}
+
                                 
                                 if (get_env ( "auth_control_file", envp ) != NULL)
                                 {
                                   newuser->setAuthControlFile( get_env ( "auth_control_file", envp ) );
                                 }
+                                
                     
 				// get username, password, unrusted_ip and common_name from envp string array
 				newuser->setUsername ( get_env ( "username", envp ) );
@@ -987,7 +989,10 @@ void  * auth_user_pass_verify(void * c)
                           << "\n";
                   cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: isAuthenticated()" <<  olduser->isAuthenticated();
                   cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: isAcct()" <<  olduser->isAccounted();
-                  //delete the newuser and use the olduser
+                  // update password and username, can happen when a new connection is established from the same client with the same port before the timeout in the openvpn server occurs! 
+                  olduser->setPassword(newuser->getPassword());
+                  olduser->setUsername(newuser->getUsername());
+                  //delete the newuser and use the olduser                
                   delete newuser;
                   newuser=olduser;
                   //TODO: for threading check if the user is already accounted (He must be for renegotiation)

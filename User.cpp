@@ -29,6 +29,8 @@ User::User()
 	this->key="";
         this->statusfilekey="";
 	this->untrustedport="";
+//         this->trustedport="";
+//         this->trustedip="";
 	this->acctinteriminterval=0;
 	this->portnumber=0;
 	this->vsabuf=NULL;
@@ -74,6 +76,8 @@ User & User::operator=(const User & u)
 	this->portnumber=u.portnumber;
 	this->acctinteriminterval=u.acctinteriminterval;
 	this->untrustedport=u.untrustedport;
+//         this->trustedport=u.trustedport;
+//         this->trustedip=u.trustedip;
 	this->vsabuflen=u.vsabuflen;
 	if(u.vsabuf != NULL)
 	{
@@ -103,6 +107,8 @@ User::User(const User & u)
 	this->portnumber=u.portnumber;
 	this->acctinteriminterval=u.acctinteriminterval;
 	this->untrustedport=u.untrustedport;
+//         this->trustedport=u.trustedport;
+//         this->trustedip=u.trustedip;
 	this->vsabuflen=u.vsabuflen;
 	if(u.vsabuf != NULL)
 	{
@@ -316,3 +322,35 @@ void User::setVsaBufLen(unsigned int len)
 
 
 
+
+/** The getter method for trusted port.
+ * @return trusted port
+ */
+// string User::getTrustedPort() const
+// {
+// 	return trustedport;
+// }
+
+/**The setter method for trusted port.
+ * @param The trusted port number as string.
+ */
+// void User::setTrustedPort ( const string& port )
+// {
+// 	trustedport = port;
+// }
+
+/** The getter method for trusted ip.
+ * @return trusted ip
+ */
+// string User::getTrustedIp() const
+// {
+// 	return trustedip;
+// }
+
+/**The setter method for trusted ip.
+ * @param The trusted ip as string.
+ */
+// void User::setTrustedIp ( const string& ip )
+// {
+// 	trustedip = ip;
+// }
