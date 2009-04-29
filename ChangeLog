@@ -88,6 +88,6 @@ radiusplugin_2.1:
 - Adapted to OPENVPN_PLUGIN_VERSION 2
 - Internal key is now based on untrusted_ip and untrusted_before.
 - Separated key for status file is added.
-
+- Update password and username if the user (key) is already known. Before if the ip and port would be the same and the timeout hasn't occured the login will success. The update prevents against this behaviour. 
  
  
