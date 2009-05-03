@@ -221,7 +221,7 @@ void AccountingProcess::Accounting(PluginContext * context)
 						//string command= context->conf.getVsaScript() + string(" ") + string("ACTION=CLIENT_CONNECT")+string(" ")+string("USERNAME=")+user->getUsername()+string(" ")+string("COMMONNAME=")+user->getCommonname()+string(" ")+string("UNTRUSTED_IP=")+user->getCallingStationId() + string(" ") + string("UNTRUSTED_PORT=") + user->getUntrustedPort() + user->getVsaString();
 						if (DEBUG (context->getVerbosity()))
 				    		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: Call vendor specific attribute script.\n";
-						if(callVsaScript(context, user, 1, 0) != 0)
+						if(callVsaScript(context, user, 2, 0) != 0)
 						{
 						  	throw Exception("Vendor specific attribute script failed.\n");
 						}
