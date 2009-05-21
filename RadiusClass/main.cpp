@@ -270,7 +270,7 @@ int main_test (void)
 	//check if there are servers
 	try
 	{
-		if(serverlist->empty()==true)
+		if(serverlist->empty())
 		{
 			throw(string("RADIUS-CLASS: No servers defined!"));
 		}
@@ -288,7 +288,7 @@ int main_test (void)
 	//send the packet to the first server from the list
 	if (packet_access.radiusSend(server)<0)
 	{
-		cerr << getTime() << "RADIUS-CLASS: Packet was not send.\n";
+		cerr << getTime() << "RADIUS-CLASS: Packet was not sent.\n";
 	}
 	
 	//receive the packet, if the server doesn't response send the packet to the next server in list.
@@ -303,10 +303,10 @@ int main_test (void)
 			parseResponsePacket(&packet_access);
 				
 		}
-		//If the radius server denied the access or sends a ACCESS_CHALLANGE-packet.
+		//If the radius server denied the access or sends a ACCESS_CHALLENGE-packet.
 		else
 		{
-			cerr << getTime() << "RADIUS-CLASS: Get ACCESS_REJECT or ACCESS_CHALLANGE-Packet.->ACCESS-DENIED.\n";
+			cerr << getTime() << "RADIUS-CLASS: Get ACCESS_REJECT or ACCESS_CHALLENGE-Packet.->ACCESS-DENIED.\n";
 		}
 		
 	}
@@ -413,7 +413,7 @@ int main_test (void)
 	//send the packet_accounting_start	
 	if (packet_accounting_start.radiusSend(server)<0)
 	{
-		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Packet was not send.\n";
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Packet was not sent.\n";
 	}
 	
 	//receive the response
@@ -422,7 +422,7 @@ int main_test (void)
 		//is is a accounting resopnse ?
 		if(packet_accounting_start.getCode()==ACCOUNTING_RESPONSE)
 		{
-			cerr << getTime() << "RADIUS-CLASS:  Get ACCOUNTING_RESPONSET-Packet.\n";
+			cerr << getTime() << "RADIUS-CLASS:  Get ACCOUNTING_RESPONSE-Packet.\n";
 
 		}
 	}	
@@ -542,7 +542,7 @@ int main_test (void)
 	//send the packet_accounting_update	
 	if (packet_accounting_update.radiusSend(server)<0)
 	{
-		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Packet was not send.\n";
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Packet was not sent.\n";
 	}
 	
 	//receive the response
@@ -551,7 +551,7 @@ int main_test (void)
 		//is is a accounting resopnse ?
 		if(packet_accounting_update.getCode()==ACCOUNTING_RESPONSE)
 		{
-			cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Get ACCOUNTING_RESPONSET-Packet.\n";
+			cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Get ACCOUNTING_RESPONSE-Packet.\n";
 
 		}
 		
@@ -673,7 +673,7 @@ int main_test (void)
 	//send the packet_accounting_stop	
 	if (packet_accounting_stop.radiusSend(server)<0)
 	{
-		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Packet was not send.\n";
+		cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Packet was not sent.\n";
 	}
 	
 	//receive the response
@@ -682,7 +682,7 @@ int main_test (void)
 		//is is a accounting resopnse ?
 		if(packet_accounting_stop.getCode()==ACCOUNTING_RESPONSE)
 		{
-			cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Get ACCOUNTING_RESPONSET-Packet.\n";
+			cerr << getTime() << "RADIUS-CLASS: BACKGROUND-ACCT:  Get ACCOUNTING_RESPONSE-Packet.\n";
 
 		}
 	}

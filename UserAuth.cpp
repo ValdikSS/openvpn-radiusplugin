@@ -147,7 +147,7 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 	//send the packet
 	if (packet.radiusSend(server)<0)
 	{
-		cerr << getTime() << "RADIUS-PLUGIN: Packet was not send.\n";
+		cerr << getTime() << "RADIUS-PLUGIN: Packet was not sent.\n";
 	}
 	//receive the packet
 	if (packet.radiusReceive(serverlist)==0)
@@ -166,7 +166,7 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 		}
 		else
 		{
-			cerr << getTime() << "RADIUS-PLUGIN: Get ACCESS_REJECT or ACCESS_CHALLANGE-Packet.->ACCESS-DENIED.\n";
+			cerr << getTime() << "RADIUS-PLUGIN: Get ACCESS_REJECT or ACCESS_CHALLENGE-Packet.->ACCESS-DENIED.\n";
 			return 1;
 		}
 		
@@ -1473,7 +1473,7 @@ int UserAuth::createCcdFile(PluginContext *context)
 	int len=0;
 	
 	
-	if(context->conf.getOverWriteCCFiles()==true)
+	if(context->conf.getOverWriteCCFiles())
 	{
 		memset(ipstring,0,100);
 		memset(framedip,0,16);
@@ -1504,7 +1504,7 @@ int UserAuth::createCcdFile(PluginContext *context)
 			if (this->framedip[0]!='\0')
 			{
 				if (DEBUG (context->getVerbosity()))
-					cerr << getTime() << "RADIUS-PLUGIN: BACKGORUND AUTH: Write framed ip to ccd-file.\n";
+					cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: Write framed ip to ccd-file.\n";
 			
 				//build the ifconfig
 				strncat(ipstring, "ifconfig-push ",14);
@@ -1516,14 +1516,14 @@ int UserAuth::createCcdFile(PluginContext *context)
 				{
 					strncat(ipstring, context->conf.getSubnet() , 15);
 					if (DEBUG (context->getVerbosity()))
-						cerr << getTime() << "RADIUS-PLUGIN: BACKGORUND AUTH: Create ifconfig-push for topology subnet.\n";
+						cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: Create ifconfig-push for topology subnet.\n";
 			
 				}
 				else if(context->conf.getP2p()[0]!='\0')
 				{
 					strncat(ipstring, context->conf.getP2p() , 15);
 					if (DEBUG (context->getVerbosity()))
-						cerr << getTime() << "RADIUS-PLUGIN: BACKGORUND AUTH: Create ifconfig-push for topology p2p.\n";
+						cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: Create ifconfig-push for topology p2p.\n";
 			
 				}
 				else
@@ -1543,7 +1543,7 @@ int UserAuth::createCcdFile(PluginContext *context)
 					// append the new ip address to the string
 					strncat(ipstring, inet_ntoa(ip3), 15);
 					if (DEBUG (context->getVerbosity()))
-						cerr << getTime() << "RADIUS-PLUGIN: BACKGORUND AUTH: Create ifconfig-push for topology net30.\n";
+						cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: Create ifconfig-push for topology net30.\n";
 			
 				}
 				if (DEBUG (context->getVerbosity()))
@@ -1557,13 +1557,13 @@ int UserAuth::createCcdFile(PluginContext *context)
 			if (framedroutes[0]!='\0')
 			{
 				if (DEBUG (context->getVerbosity()))
-					cerr << getTime() << "RADIUS-PLUGIN: BACKGORUND AUTH: Write framed routes to ccd-file.\n";
+					cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: Write framed routes to ccd-file.\n";
 			
 				route=strtok(framedroutes,";");
 				len=strlen(route);
-				if (len > 50) //this is to big!! but the length is variable
+				if (len > 50) //this is too big! but the length is variable
 				{
-					cerr << getTime() <<"RADIUS-PLUGIN: Argument for Framed Route is to long (>100 Characters).\n";
+					cerr << getTime() <<"RADIUS-PLUGIN: Argument for Framed Route is to long (>50 Characters).\n";
 					return 1;
 				}
 				else

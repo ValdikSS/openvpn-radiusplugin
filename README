@@ -46,28 +46,35 @@ If somebody is interested in a standalone RADIUS-class please contact me. There 
 DOCUMENTATION:
 --------------
 The documentation is done with doxygen. 
-To generate the documentation execute "./doxygen doxygen.conf" in the folder of the plugin.
+To generate the documentation execute "doxygen doxygen.conf" in the folder of the plugin.
 
 
 INSTALL:
 --------
 1. Requirements: the libgcrypt library.
+
 2. Compile: see section COMPILE
+
 3. Set the plugin in the OpenVPN configfile: plugin /path/to/plugin/radiusplugin.so [configfile]
-4. Create a configfile for the plugin, see exampleconfig.conf. If no path is set in the configfile of OpenVPN
+
+4. Create a configfile for the plugin, see radiusplugin.cnf. If no path is set in the configfile of OpenVPN
 	the plugin will read the file /etc/openvpn/radiusplugin.cnf: .
-   The configuration is casesensetive, for an example see radiusplugin.cnf.
+   The configuration is case-sensitive, for an example see radiusplugin.cnf.
+
 5. Set some configuration in the config file of the OpenVPN server:
 	- status /var/log/openvpn/status.log 1  # The status, where the plugin reads the accounting information from.
+
 6. Configure in the config file of the OpenVPN client:
 	- auth-user-pass [/etc/openvpn/passwd]  # Set this for sending a username and password to the server, this values are the username and password for the radius authentication.
+
 7. If you use auth_control_file (>= OpenVPN 2.1 rc8), the plugin directory needs write permission to the OpenVPN directory.
+
 8. Maybe write your own script for vendor specific attributes (see section VENDOR SPECIFIC ATTRIBUTES).
 
 
 OTHER DOCUMENTATION
 -------------------
-A "OpenVPN - RADIUS - MySQL Howto" in german can be found at:
+An "OpenVPN - RADIUS - MySQL Howto" in german can be found at:
 http://www.roessner-net.com/
 
 
@@ -87,15 +94,14 @@ user1  Cleartext-Password := "testing"
        Ascend-Xmit-Rate=200,
        Framed-Protocol = PPP
 
-The Framed-Route attribute must in the format as shown above!
+The Framed-Route attribute must be in the format as shown above!
 
 
 COMPILE 
 --------
 (tested with Debian on x86, for other architectures see section TROUBLESHOOTING):
+
 >$ make
-or
->$ g++ -Wall -shared -fpic -o radiusplugin.so AccountingProcess.cpp Exception.cpp PluginContext.cpp UserAuth.cpp AcctScheduler.cpp IpcSocket.cpp radiusplugin.cpp User.cpp AuthenticationProcess.cpp main.cpp UserAcct.cpp UserPlugin.cpp Config.cpp RadiusClass/RadiusAttribute.cpp RadiusClass/RadiusPacket.cpp RadiusClass/RadiusConfig.cpp RadiusClass/RadiusServer.cpp  RadiusClass/RadiusVendorSpecificAttribute.cpp -lgcrypt -lpthread
 
 
 RADIUS PACKETS and OpenVPN events (see http://openvpn.net/man.html SCRIPTING AND ENVIRONMENTAL VARIABLES)
@@ -123,7 +129,7 @@ VENDOR SPECIFIC ATTRIBUTES
 ---------------------------
 If you want use vendor specific attributes the plugin can call your own program or script at the OpenVPN action
 CLIENT-CONNECT and CLIENT-DISCONNECT.
-If you want to use the feature you have specify the program and a named pipe for communication
+If you want to use the feature you have to specify the program and a named pipe for communication
 in the config file.
 The file vsascript.pl shows an example.
 
@@ -168,7 +174,7 @@ TROUBLESHOOTING
 	
 - Setting of Framed-Routes fails under BSD:
 	- At the moment the plugin can only set the routes on Linux OSs.
-	- The system call for "route ... " must be change. Please contact me for a patch.
+	- The system call for "route ... " must be changed. Please contact me for a patch.
 	- Newer version will integrate OS dependent calls. 
 
 - OpenVPN hangs when a client connects:
@@ -178,7 +184,7 @@ TROUBLESHOOTING
 			- In some cases ifconfig_pool_remote_ip is missing (Depends on OpenVPN config).
 
 - The radius packets are sent over the wrong interface:
-	- Sometimes on multi interface machines with IPSec the operation system don't find the right interface.
+	- Sometimes on multi interface machines with IPSec the operating system doesn't find the right interface.
 	- Use the plugin from Magne J. Andreassen (it is for version 1.2a)
 
 - The plugin writes client config files without any entry:
@@ -186,10 +192,10 @@ TROUBLESHOOTING
 		in the config file of the plugin to a existing dummy directory.
 		
 - Compiling fails on Solaris 10:
-	- add following options: -lsocket -lnsl -lresolv -fPIC -DPIC
+	- add following options: -lsocket -lnsl -lresolv
 	
 - Values for BytesIn/BytesOut are 0 in the accounting log of the RADIUS server:
-	- Make sure that the status file of OpenVPN exist and the plugin can read it.
+	- Make sure that the status file of OpenVPN exists and the plugin can read it.
 	- Use version 1 for the status file.
 
 - Error at compiling: not initialised shared memory before the call to the MD5 function:

@@ -341,7 +341,7 @@ extern "C"
                 //restore the context which was created at the function openvpn_plugin_open_v1
 		PluginContext *context = ( struct PluginContext * ) handle;
 
-                if(context->getStartThread()==true)
+                if(context->getStartThread())
                 {
                   pthread_cond_init (context->getCondSend(), NULL);
                   pthread_mutex_init (context->getMutexSend(), NULL);
@@ -554,7 +554,7 @@ extern "C"
 					cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Set FramedIP to the IP (" << newuser->getFramedIp() << ") OpenVPN assigned to the user " << newuser->getUsername() << "\n";
 				//the user must be there and must be authenticated but not accounted
 				// isAccounted and isAuthenticated is true it is client connect for renegotiation, the user is already in the accounting process
-				if ( newuser!=NULL && newuser->isAccounted() ==false && newuser->isAuthenticated() ==true )
+				if ( newuser!=NULL && newuser->isAccounted() ==false && newuser->isAuthenticated() )
 				{
 					//transform the integers to strings to send them over the socket
 
@@ -1063,7 +1063,7 @@ void  * auth_user_pass_verify(void * c)
                                   //save the success
                                   newuser->setAuthenticated ( true );
                           }
-                          else if ( newuser->isAuthenticated() ==true && olduser!=NULL )
+                          else if ( newuser->isAuthenticated() && olduser!=NULL )
                           {
                                   cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Don't add the user to the map, it is a rekeying.\n";
                           }
@@ -1083,7 +1083,7 @@ void  * auth_user_pass_verify(void * c)
                   }
                   else //AUTH failed
                   {
-                          if ( newuser->isAccounted()==true) //user is already known, delete him from the accounting
+                          if ( newuser->isAccounted() ) //user is already known, delete him from the accounting
                           {
                                   cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Error ar rekeying!\n";
                                   //error on authenticate user at rekeying -> delete the user!
