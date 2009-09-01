@@ -790,22 +790,32 @@ extern "C"
 			{
 				cerr << getTime() << e;
 			}
-
+                        
 			// wait for background process to exit
 			if ( context->getAcctPid() > 0 )
 				waitpid ( context->getAcctPid(), NULL, 0 );
 
 		}
-                
-                //stop the thread
-                pthread_mutex_lock(context->getMutexSend());
-                context->setStopThread(true);
-                pthread_cond_signal( context->getCondSend( ));
-                pthread_mutex_unlock (context->getMutexSend());
-		//wait for the thread to exit
-                pthread_join(*context->getThread(),NULL);
-                //free the context
+
+                if (context->getStartThread()==false)
+                {
+                  if ( DEBUG ( context->getVerbosity() ) )
+                                  cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Stop auth thread .\n";
+                  //stop the thread
+                  pthread_mutex_lock(context->getMutexSend());
+                  context->setStopThread(true);
+                  pthread_cond_signal( context->getCondSend( ));
+                  pthread_mutex_unlock (context->getMutexSend());
+                  //wait for the thread to exit
+                  pthread_join(*context->getThread(),NULL);
+                  //free the context
+                }
+                else
+                {
+                  cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Auth thread was not started so far.\n";
+                }
 		delete context;
+                cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: DONE.\n";
                  
 	}
 
