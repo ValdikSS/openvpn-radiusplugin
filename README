@@ -67,7 +67,7 @@ INSTALL:
 6. Configure in the config file of the OpenVPN client:
 	- auth-user-pass [/etc/openvpn/passwd]  # Set this for sending a username and password to the server, this values are the username and password for the radius authentication.
 
-7. If you use auth_control_file (>= OpenVPN 2.1 rc8), the plugin directory needs write permission to the OpenVPN directory.
+7. If you use auth_control_file (>= OpenVPN 2.1 rc8), the plugin directory needs write permission to the OpenVPN directory or use the "--tmp-dir" option to define a directory for the files.
 
 8. Maybe write your own script for vendor specific attributes (see section VENDOR SPECIFIC ATTRIBUTES).
 

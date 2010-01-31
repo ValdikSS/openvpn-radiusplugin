@@ -20,7 +20,8 @@
  */
  
 #include "RadiusPacket.h"
-
+#define NEED_LIBGCRYPT_VERSION "1.2.0"
+GCRY_THREAD_OPTION_PTHREAD_IMPL;
 
 using namespace std;
 
@@ -576,6 +577,18 @@ void RadiusPacket::calcacctdigest(const char *secret)
 	//as the original MD5 sum (packet->vector).
 	
 	memset((this->sendbuffer+4), 0, 16);
+	//build the hash	
+// 	if (!gcry_control (GCRYCTL_ANY_INITIALIZATION_P))
+// 	{ /* No other library has already initialized libgcrypt. */
+// 
+// 	  gcry_control(GCRYCTL_SET_THREAD_CBS,&gcry_threads_pthread);
+// 
+// 	  if (!gcry_check_version (NEED_LIBGCRYPT_VERSION) )
+// 	    {
+// 		cerr << "libgcrypt is too old (need " << NEED_LIBGCRYPT_VERSION << ", have " << gcry_check_version (NULL) << ")\n";
+// 	    }
+// 	  gcry_control (GCRYCTL_INITIALIZATION_FINISHED);
+// 	}
 	gcry_md_open (&context, GCRY_MD_MD5, 0);
 	gcry_md_write(context, this->sendbuffer, this->length);
 	gcry_md_write(context, secret, strlen(secret));
@@ -653,6 +666,18 @@ int	RadiusPacket::authenticateReceivedPacket(const char *secret)
 	memcpy(cpy_recvpacket+4, this->sendbuffer+4, 16);
 	
 	//bulid the hash of the copy
+	//build the hash	
+// 	if (!gcry_control (GCRYCTL_ANY_INITIALIZATION_P))
+// 	{ /* No other library has already initialized libgcrypt. */
+// 
+// 	  gcry_control(GCRYCTL_SET_THREAD_CBS,&gcry_threads_pthread);
+// 
+// 	  if (!gcry_check_version (NEED_LIBGCRYPT_VERSION) )
+// 	    {
+// 		cerr << "libgcrypt is too old (need " << NEED_LIBGCRYPT_VERSION << ", have " << gcry_check_version (NULL) << ")\n";
+// 	    }
+// 	  gcry_control (GCRYCTL_INITIALIZATION_FINISHED);
+// 	}
 	gcry_md_open (&context, GCRY_MD_MD5, 0);
 	gcry_md_write(context, cpy_recvpacket, this->recvbufferlen);
 	gcry_md_write(context, secret, strlen(secret));

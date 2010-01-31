@@ -1002,7 +1002,8 @@ void  * auth_user_pass_verify(void * c)
                   // update password and username, can happen when a new connection is established from the same client with the same port before the timeout in the openvpn server occurs! 
                   olduser->setPassword(newuser->getPassword());
                   olduser->setUsername(newuser->getUsername());
-                  //delete the newuser and use the olduser                
+                  olduser->setAuthControlFile(newuser->getAuthControlFile());
+		  //delete the newuser and use the olduser                
                   delete newuser;
                   newuser=olduser;
                   //TODO: for threading check if the user is already accounted (He must be for renegotiation)

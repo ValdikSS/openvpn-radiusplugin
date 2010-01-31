@@ -25,7 +25,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-
+#define NEED_LIBGCRYPT_VERSION "1.2.0"
+GCRY_THREAD_OPTION_PTHREAD_IMPL;
 
 /** The constructor sets the type to 0 and the value to NULL.*/
 RadiusAttribute::RadiusAttribute(void)
@@ -160,7 +161,18 @@ char * RadiusAttribute::makePasswordHash(const char *password,char * hpassword, 
 	memset(digest,0,MD5_DIGEST_LENGTH);
 		
 	//build the hash	
-		
+	if (!gcry_control (GCRYCTL_ANY_INITIALIZATION_P))
+// 	{ /* No other library has already initialized libgcrypt. */
+// 
+// 	  gcry_control(GCRYCTL_SET_THREAD_CBS,&gcry_threads_pthread);
+// 
+// 	  if (!gcry_check_version (NEED_LIBGCRYPT_VERSION) )
+// 	    {
+// 		cerr << "libgcrypt is too old (need " << NEED_LIBGCRYPT_VERSION << ", have " << gcry_check_version (NULL) << ")\n";
+// 	    }
+// 	  gcry_control (GCRYCTL_INITIALIZATION_FINISHED);
+// 	}
+
 	gcry_md_open(&context, GCRY_MD_MD5, 0);
 	gcry_md_write(context, sharedSecret, strlen(sharedSecret));
 	gcry_md_write(context, authenticator, MD5_DIGEST_LENGTH);
@@ -189,6 +201,18 @@ char * RadiusAttribute::makePasswordHash(const char *password,char * hpassword, 
 			memset(digest,0,MD5_DIGEST_LENGTH);
 						
 			//put the hash of the last XOR in the digest
+			//build the hash	
+// 			if (!gcry_control (GCRYCTL_ANY_INITIALIZATION_P))
+// 			{ /* No other library has already initialized libgcrypt. */
+// 
+// 			  gcry_control(GCRYCTL_SET_THREAD_CBS,&gcry_threads_pthread);
+// 
+// 			  if (!gcry_check_version (NEED_LIBGCRYPT_VERSION) )
+// 			    {
+// 				cerr << "libgcrypt is too old (need " << NEED_LIBGCRYPT_VERSION << ", have " << gcry_check_version (NULL) << ")\n";
+// 			    }
+// 			  gcry_control (GCRYCTL_INITIALIZATION_FINISHED);
+// 			}
 			gcry_md_open (&context, GCRY_MD_MD5, 0);
 			gcry_md_write(context, sharedSecret, strlen(sharedSecret));
 			gcry_md_write(context, hpassword+(k*MD5_DIGEST_LENGTH), MD5_DIGEST_LENGTH);

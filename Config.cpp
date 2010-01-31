@@ -82,7 +82,7 @@ Config::~Config(void)
 int Config::parseConfigFile(const char * configfile)
 {
 	string line;
-		
+	
 	ifstream file;
 	file.open(configfile, ios::in);
 	if (file.is_open())
@@ -147,79 +147,94 @@ int Config::parseConfigFile(const char * configfile)
 			
 		}
 		file.close();
+		// if the main files contains references to other config files
+		// we don't need to care about recursive includes, OpenVPN does it already
+		list<string> configfiles; 
+		configfiles.push_back(this->openvpnconfig);
 		//open OpenVPN config
-		ifstream file2;
-		file2.open(this->openvpnconfig.c_str(), ios::in);
-		if (file2.is_open())
+		while(configfiles.size() > 0)
 		{
-			while(file2.eof()==false)
-			{
-				getline(file2,line);
-				
-				if(line.empty()==false)
-				{
-					string param=line;
-					// trim leading whitespace
-   					string::size_type  pos = param.find_first_not_of(" \t\r\n\0");
-   					if (pos != string::npos) param.erase(0,pos );
-   					pos=param.find_first_of(" \t\n\0");
-					if (pos != string::npos) param.erase(pos);
-					if (param == "client-cert-not-required")
-					{
-						this->deletechars(&line);
-						if (line == "client-cert-not-required")
-						{
-							this->clientcertnotrequired=true;
-						}
-					}
-					if (param == "username-as-common-name")
-					{
-						this->deletechars(&line);
-						if (line == "username-as-common-name")
-						{
-							this->usernameascommonname=true;
-						}
-					}
-					if (param == "client-config-dir")
-					{
-						this->deletechars(&line);
-						line.erase(0, 17);
-						this->setCcdPath(line);
-					}
-					if (param == "status")
-					{
-						//method deletechars don't work, entry has formet: status <file> [time]
-						pos  = line.find_first_of("#");
-						if (pos != string::npos) 
-						{
-							line.erase(pos);
-						}
-						// trim leading whitespace
-						char const* delims = " \t\r\n\0";
-   						pos = line.find_first_not_of(delims);
-   						if (pos != string::npos) line.erase(0,pos);
-						line.erase(0, 6);
-						// trim leading whitespace again
-						pos = line.find_first_not_of(" \t");
-   						if (pos != string::npos) line.erase(0,pos);
-						
-						//delete the trailing version of status if there
-						pos = line.find_first_of(" \t\n\r\0");
-						if (pos != string::npos) line.erase(pos);
-						this->deletechars(&line);
-						
-						if(!line.empty())
-						{
-							this->statusfile=line;
-						}
-					}	
-				}
-			}
-			file.close();
-		}
-		else
-		{
-			return BAD_FILE;
+		  ifstream file2;
+		  string filename=configfiles.front();
+		  file2.open(filename.c_str(), ios::in);
+		  char const* delims = " \t\r\n\0";
+		  if (file2.is_open())
+		  {
+			  while(file2.eof()==false)
+			  {
+				  getline(file2,line);
+				  
+				  if(line.empty()==false)
+				  {
+					  string param=line;
+					  // trim leading whitespace
+					  string::size_type  pos = param.find_first_not_of(delims);
+					  if (pos != string::npos) param.erase(0,pos );
+					  pos=param.find_first_of(delims);
+					  if (pos != string::npos) param.erase(pos);
+					  if (param == "client-cert-not-required")
+					  {
+						  this->deletechars(&line);
+						  if (line == "client-cert-not-required")
+						  {
+							  this->clientcertnotrequired=true;
+						  }
+					  }
+					  if (param == "username-as-common-name")
+					  {
+						  this->deletechars(&line);
+						  if (line == "username-as-common-name")
+						  {
+							  this->usernameascommonname=true;
+						  }
+					  }
+					  if (param == "client-config-dir")
+					  {
+						  this->deletechars(&line);
+						  line.erase(0, 17);
+						  this->setCcdPath(line);
+					  }
+					  if (param == "config")
+					  {
+						  this->deletechars(&line);
+						  line.erase(0, 6);
+						  configfiles.push_back(line);
+					  }
+					  if (param == "status")
+					  {
+						  //method deletechars don't work, entry has formet: status <file> [time]
+						  pos  = line.find_first_of("#");
+						  if (pos != string::npos) 
+						  {
+							  line.erase(pos);
+						  }
+						  // trim leading whitespace
+						  pos = line.find_first_not_of(delims);
+						  if (pos != string::npos) line.erase(0,pos);
+						  line.erase(0, 6);
+						  // trim leading whitespace again
+						  pos = line.find_first_not_of(" \t");
+						  if (pos != string::npos) line.erase(0,pos);
+						  
+						  //delete the trailing version of status if there
+						  pos = line.find_first_of(delims);
+						  if (pos != string::npos) line.erase(pos);
+						  this->deletechars(&line);
+						  
+						  if(!line.empty())
+						  {
+							  this->statusfile=line;
+						  }
+					  }	
+				  }
+			  }
+			  file.close();
+			  configfiles.remove(filename);
+		  }
+		  else
+		  {
+			  return BAD_FILE;
+		  }
 		}
 	}
 	else
