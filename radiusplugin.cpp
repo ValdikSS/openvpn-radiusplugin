@@ -343,12 +343,13 @@ extern "C"
 
                 if(context->getStartThread())
                 {
-                  pthread_cond_init (context->getCondSend(), NULL);
+                  
+		  pthread_cond_init (context->getCondSend(), NULL);
                   pthread_mutex_init (context->getMutexSend(), NULL);
                   pthread_cond_init (context->getCondRecv(), NULL);
                   pthread_mutex_init (context->getMutexRecv(), NULL);
-
-                  if(pthread_create(context->getThread(), NULL, &auth_user_pass_verify, (void *) context) != 0) 
+		  
+		  if(pthread_create(context->getThread(), NULL, &auth_user_pass_verify, (void *) context) != 0) 
                   {
                     cerr << getTime() << "RADIUS-PLUGIN: Thread creation failed.\n";
                     return OPENVPN_PLUGIN_FUNC_ERROR;
@@ -459,6 +460,7 @@ extern "C"
                                   context->addNewUser(newuser);
                                   pthread_cond_signal( context->getCondSend( ));
                                   pthread_mutex_unlock (context->getMutexSend());
+				  pthread_mutex_lock(context->getMutexRecv());
                                   pthread_cond_wait( context->getCondRecv(), context->getMutexRecv());
                                   return context->getResult();
                                 }
@@ -753,8 +755,7 @@ extern "C"
 
 		if ( DEBUG ( context->getVerbosity() ) )
 			cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: close\n";
-
-
+		
 		if ( context->authsocketbackgr.getSocket() >= 0 )
 		{
 			if ( DEBUG ( context->getVerbosity() ) )
@@ -796,24 +797,27 @@ extern "C"
 				waitpid ( context->getAcctPid(), NULL, 0 );
 
 		}
-
-                if (context->getStartThread()==false)
+		if (context->getStartThread()==false)
                 {
                   if ( DEBUG ( context->getVerbosity() ) )
-                                  cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Stop auth thread .\n";
+                      cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Stop auth thread .\n";
                   //stop the thread
                   pthread_mutex_lock(context->getMutexSend());
-                  context->setStopThread(true);
+		  context->setStopThread(true);
                   pthread_cond_signal( context->getCondSend( ));
-                  pthread_mutex_unlock (context->getMutexSend());
+                  pthread_mutex_unlock(context->getMutexSend());
                   //wait for the thread to exit
                   pthread_join(*context->getThread(),NULL);
-                  //free the context
+		  pthread_cond_destroy(context->getCondSend( ));
+		  pthread_cond_destroy(context->getCondRecv( ));
+		  pthread_mutex_destroy(context->getMutexSend());
+		  pthread_mutex_destroy(context->getMutexRecv());
                 }
                 else
                 {
                   cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Auth thread was not started so far.\n";
                 }
+                
 		delete context;
                 cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: DONE.\n";
                  
@@ -966,27 +970,40 @@ void  * auth_user_pass_verify(void * c)
 {
         cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Auth_user_pass_verify thread started.\n";
         PluginContext * context = (PluginContext *) c;
-
+	pthread_mutex_lock(context->getMutexSend());
         //main thread loop for authentication
+	
+	//ignore signals
+	static sigset_t   signal_mask;
+	sigemptyset (&signal_mask);
+	sigaddset (&signal_mask, SIGINT);
+	sigaddset (&signal_mask, SIGTERM);
+	sigaddset (&signal_mask, SIGHUP);
+	sigaddset (&signal_mask, SIGUSR1);
+	sigaddset (&signal_mask, SIGUSR2);
+	sigaddset (&signal_mask, SIGPIPE);
+        pthread_sigmask (SIG_BLOCK, &signal_mask, NULL);
+	
+	
         while(!context->getStopThread())
         {
           if(context->UserWaitingtoAuth()==false)
           {
-            if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Waiting for new user.\n";
+            if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Waiting for new user.\n"; 
             pthread_cond_wait(context->getCondSend(),context->getMutexSend());
-            if(context->getStopThread())
-            { 
-              cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Stop signal received.\n";  
-              break;
-            }
           }
+	  if(context->getStopThread()==true)
+	  { 
+	    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Stop signal received.\n";
+	    break;
+	  }
           if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: New user from OpenVPN!\n";
           //is the user already known?
           UserPlugin	*olduser=NULL;	/**<A context for an already known user.*/
           UserPlugin	*newuser=NULL;	/**<A context for the new user.*/
           newuser = context->getNewUser();
           olduser=context->findUser ( newuser->getKey() );
-          
+         
           if ( olduser!=NULL )  //probably key renegotiation
           {
                   if ( DEBUG ( context->getVerbosity() ) )
@@ -1010,7 +1027,8 @@ void  * auth_user_pass_verify(void * c)
           }
           else //new user for authentication, no renegotiation
           {
-                  newuser->setPortnumber ( context->addNasPort() );
+                  cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: New user.\n";
+		  newuser->setPortnumber ( context->addNasPort() );
                   newuser->setSessionId ( createSessionId ( newuser ) );
                   //add the user to the context
                   context->addUser(newuser);
@@ -1155,6 +1173,7 @@ void  * auth_user_pass_verify(void * c)
               delete newuser;
           }
         }
+	pthread_mutex_unlock(context->getMutexSend());
         cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Thread finished.\n";
         pthread_exit(NULL);
 }
