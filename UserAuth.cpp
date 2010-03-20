@@ -164,6 +164,15 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 			return 0;
 			
 		}
+		else if(packet.getCode()==ACCESS_REJECT)
+		{
+		      if (DEBUG (context->getVerbosity()))
+				cerr << getTime() << "RADIUS-PLUGIN: Get ACCESS_REJECT-Packet.\n";
+
+			//parse the attributes for replay message
+			this->parseResponsePacket(&packet, context);
+			return 1;
+		}
 		else
 		{
 			cerr << getTime() << "RADIUS-PLUGIN: Get ACCESS_REJECT or ACCESS_CHALLENGE-Packet.->ACCESS-DENIED.\n";
@@ -255,7 +264,18 @@ void UserAuth::parseResponsePacket(RadiusPacket *packet, PluginContext * context
 	{
 		this->appendVsaBuf(iter1->second.getValue(), iter1->second.getLength()-2);
 		iter1++;
-	}	
+	}
+	
+	range=packet->findAttributes(18);
+	iter1=range.first;
+	iter2=range.second;		
+	string msg;
+	while (iter1!=iter2)
+	{
+		msg.append((char*)iter1->second.getValue(),iter1->second.getLength()-2);
+		cerr << getTime() <<"RADIUS-PLUGIN: BACKGROUND AUTH: Reply-Message:" << msg << "\n";
+		iter1++;
+	}
 }
 
 
@@ -1473,7 +1493,7 @@ int UserAuth::createCcdFile(PluginContext *context)
 	int len=0;
 	
 	
-	if(context->conf.getOverWriteCCFiles())
+	if(context->conf.getOverWriteCCFiles()==true)
 	{
 		memset(ipstring,0,100);
 		memset(framedip,0,16);
