@@ -89,5 +89,8 @@ radiusplugin_2.1:
 - Internal key is now based on untrusted_ip and untrusted_before.
 - Separated key for status file is added.
 - Update password and username if the user (key) is already known. Before if the ip and port would be the same and the timeout hasn't occured the login will success. The update prevents against this behaviour. 
- 
- 
+- Initialization of gcrypt library added.
+- Rewrite ACF file when the user is authenticated.
+- Include nested configfiles from main configfile.
+- Add "\r" in the configfile parser, before the carriage return was ignored.
+- Add support for RADIUS reply message, the output is sent to stderr 
