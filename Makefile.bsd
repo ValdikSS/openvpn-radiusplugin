@@ -1,14 +1,7 @@
-BLUE    =\033[20;36m
-GREEN   =\033[32m
-RED     =\033[31m
-ESC     =\033[0m
-OK      =[$(GREEN) Ok $(ESC)]
-FAILED  =[$(RED) failed $(ESC)]
-
 CC=g++
-INCL=
-LDFLAGS=
-LIBS=-lgcrypt -lpthread
+INCL=-I/usr/local/include
+LDFLAGS=-L/usr/local/lib
+LIBS=-lgcrypt -lgpg-error -lstdc++ -lm
 
 CFLAGS=-Wall -shared -fPIC -DPIC
 
@@ -37,12 +30,12 @@ OBJECTS=\
 all: $(PLUGIN)
 
 $(PLUGIN): $(OBJECTS)
-	@echo -e 'BIN: $(GREEN) $(PLUGIN) $(ESC)'
+	@echo 'BIN: $(PLUGIN)'
 	@$(CC) $(CFLAGS) $(OBJECTS) -o $(PLUGIN) $(LDFLAGS) $(LIBS)
 
 %.o: %.cpp
-	@echo -e 'OBJ: $(GREEN) $@ $(ESC)'
-	@$(CC) $(INCL) $(CFLAGS) -o $@ -c $<
+	@echo 'OBJ: $@'
+	@$(CC) $(CFLAGS) $(INCL) -o $@ -c $<
 
 test: $(OBJECTS)
 	@$(CC) -Wall $(OBJECTS) -o main $(LDFLAGS) $(LIBS)

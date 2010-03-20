@@ -26,11 +26,10 @@ The plugin was developed during my diploma thesis for the EWETEL GmbH (www.ewete
 They main idea was to create a virtualized SSL-VPN with RADIUS support. 
 The virtualization was done by XEN. 
 At this place I would like to thank the people from EWETEL GmbH and EWE AG (www.ewe.de) 
-who supported me with the required equipment and hardware
+who supported me with the required equipment, hardware 
 and helped me with all my questions.
 
 The plugin was developed and tested under Debian Sarge and OpenVPN 2.0 on x86-machines. 
-Please report bugs and suggestions of improvement to me (ralfluebben@gmx.de).
 -----------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------
 
@@ -120,10 +119,12 @@ RADIUS ATTRIBUTES WHICH PARSED BY THE PLUGIN AND WRITE TO THE CLIENT CONFIG FILE
 ---------------------------------------------
 - Framed ip address
 - Acct Interim Interval
-- Framed Routes (only in following format, e.g.: "192.168.101.0/26 10.8.0.1/32 1") 
+- Framed Routes (only in following format, e.g.: "192.168.101.0/26 10.8.0.1/32 1")
 
 
-
+OTHER RADIUS ATTRIBUTES
+-----------------------
+- Reply Message 	the text is forwarded to stderr
 
 VENDOR SPECIFIC ATTRIBUTES
 ---------------------------
@@ -155,23 +156,11 @@ char subnet[16];
 
 TROUBLESHOOTING
 ---------------
-- OpenBSD(BSD):
+- BSD:
 	- RADIUS attributes FramedIP and FramedRoutes mandatory
 	- RADIUS attribute FramedIP is ignored
-	- Use gmake for compilation
-	- (maybe) add include and lib path for gcrypt to the Makefile
-		LDFLAGS=-L/usr/local/lib
-		CFLAGS=-Wall -shared -I/usr/local/include
-	- or compile manually:
-		g++ -Wall -I/usr/local/include -L/usr/local/lib -shared -o
-		radiusplugin.so AccountingProcess.cpp Exception.cpp PluginContext.cpp
-		UserAuth.cpp AcctScheduler.cpp IpcSocket.cpp radiusplugin.cpp User.cpp 
-		AuthenticationProcess.cpp main.cpp UserAcct.cpp UserPlugin.cpp
-		Config.cpp RadiusClass/RadiusAttribute.cpp RadiusClass/RadiusPacket.cpp
-		RadiusClass/RadiusConfig.cpp RadiusClass/RadiusServer.cpp
-		RadiusClass/RadiusVendorSpecificAttribute.cpp -lgcrypt -lgpg-error
-		-lstdc++ -lm
-	
+	- Use gmake -f Makefile.bsd (maybe you have to adapt library and include path, it was tested for FreeBSD)
+
 - Setting of Framed-Routes fails under BSD:
 	- At the moment the plugin can only set the routes on Linux OSs.
 	- The system call for "route ... " must be changed. Please contact me for a patch.
@@ -203,6 +192,7 @@ TROUBLESHOOTING
 
 - Error at compiling: DBG: md_enable: algorithm -4195948 not available:
 	- Make sure that you use libgrypt 1.2.0 or higher.
+
 - The plugin can't write the auth_control_file.
         - The plugin needs write permission in the OpenVPN directory.
 
