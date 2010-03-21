@@ -355,6 +355,7 @@ extern "C"
                     return OPENVPN_PLUGIN_FUNC_ERROR;
 			//goto error;
                   }
+		  pthread_mutex_lock(context->getMutexRecv());
                   context->setStartThread(false);
               
                 } 
@@ -460,7 +461,7 @@ extern "C"
                                   context->addNewUser(newuser);
                                   pthread_cond_signal( context->getCondSend( ));
                                   pthread_mutex_unlock (context->getMutexSend());
-				  pthread_mutex_lock(context->getMutexRecv());
+				  
                                   pthread_cond_wait( context->getCondRecv(), context->getMutexRecv());
                                   return context->getResult();
                                 }
