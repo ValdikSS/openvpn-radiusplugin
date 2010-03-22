@@ -507,8 +507,8 @@ extern "C"
 					throw Exception ( "RADIUS-PLUGIN: FOREGROUND: untrusted_port is not defined\n" );
 				}
 				else if ( get_env ( "ifconfig_pool_remote_ip", envp ) ==NULL )
-				{
-					throw Exception ( "RADIUS-PLUGIN: FOREGROUND: ifconfig_pool_remote_ip is not defined\n" );
+				{	
+				  cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: ifconfig_pool_remote_ip is not defined\n" ;
 				}
 				//get username, password and trusted_ip from envp string array
 				//for OpenVPN option client cert not required, common_name is "UNDEF", see status.log
@@ -535,9 +535,9 @@ extern "C"
 				{
 					common_name=get_env ( "username", envp );
 				}
-				//get the IP assigned to the client
+	
 
-				const char *ifconfig_pool_remote_ip=get_env ( "ifconfig_pool_remote_ip", envp );
+				
 				//find the user in the context, he was added at the OPENVPN_PLUGIN_AUTH_USER_PASS_VERIFY
 				//string key=common_name + string ( "," ) +untrusted_ip+string ( ":" ) + string ( get_env ( "untrusted_port", envp ) );
                                 string key=untrusted_ip+string ( ":" ) + string ( get_env ( "untrusted_port", envp ) );
@@ -552,7 +552,10 @@ extern "C"
                                 }
 
 				//set the assigned ip as Framed-IP-Attribute of the user (see RFC2866, chapter 4.1 for more information)
-				newuser->setFramedIp ( string ( ifconfig_pool_remote_ip ) );
+				if(get_env ( "ifconfig_pool_remote_ip", envp ) !=NULL)
+				{
+				  newuser->setFramedIp ( string ( get_env ( "ifconfig_pool_remote_ip", envp ) ) );
+				}
 				if ( DEBUG ( context->getVerbosity() ) )
 					cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Set FramedIP to the IP (" << newuser->getFramedIp() << ") OpenVPN assigned to the user " << newuser->getUsername() << "\n";
 				//the user must be there and must be authenticated but not accounted
