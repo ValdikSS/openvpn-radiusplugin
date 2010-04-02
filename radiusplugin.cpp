@@ -935,12 +935,17 @@ string createSessionId ( UserPlugin * user )
 	int i;
 	time_t rawtime;
 	string strtime;
+	ostringstream portnumber;
 	memset ( digest,0,16 );
 	//build the hash
 	gcry_md_open ( &context, GCRY_MD_MD5, 0 );
 	gcry_md_write ( context, user->getCommonname().c_str(), user->getCommonname().length() );
 	gcry_md_write ( context, user->getCallingStationId().c_str(), user->getCallingStationId().length() );
 	gcry_md_write ( context, user->getUntrustedPort().c_str(), user->getUntrustedPort().length() );
+	gcry_md_write ( context, user->getUntrustedPort().c_str(), user->getUntrustedPort().length() );
+	
+	portnumber << user->getPortnumber();
+	gcry_md_write ( context,portnumber.str().c_str(), portnumber.str().length());
 	time ( &rawtime );
 	strtime=ctime ( &rawtime );
 	gcry_md_write ( context, strtime.c_str(),strtime.length() );
@@ -1051,6 +1056,7 @@ void  * auth_user_pass_verify(void * c)
                   context->authsocketbackgr.send ( newuser->getUsername() );
                   context->authsocketbackgr.send ( newuser->getPassword() );
                   context->authsocketbackgr.send ( newuser->getPortnumber() );
+		  context->authsocketbackgr.send ( newuser->getSessionId() );
                   context->authsocketbackgr.send ( newuser->getCallingStationId() );
                   context->authsocketbackgr.send ( newuser->getCommonname() );
                   context->authsocketbackgr.send ( newuser->getFramedIp() );
