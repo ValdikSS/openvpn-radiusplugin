@@ -76,6 +76,7 @@ User & User::operator=(const User & u)
 	this->portnumber=u.portnumber;
 	this->acctinteriminterval=u.acctinteriminterval;
 	this->untrustedport=u.untrustedport;
+	this->sessionid=u.sessionid;
 //         this->trustedport=u.trustedport;
 //         this->trustedip=u.trustedip;
 	this->vsabuflen=u.vsabuflen;
@@ -107,6 +108,7 @@ User::User(const User & u)
 	this->portnumber=u.portnumber;
 	this->acctinteriminterval=u.acctinteriminterval;
 	this->untrustedport=u.untrustedport;
+	this->sessionid=u.sessionid;
 //         this->trustedport=u.trustedport;
 //         this->trustedip=u.trustedip;
 	this->vsabuflen=u.vsabuflen;
@@ -319,7 +321,18 @@ void User::setVsaBufLen(unsigned int len)
 	this->vsabuflen=len;	
 }
 
-
+/** The getter method for the sessionid.
+ * @return An integer of the sessionid.*/
+string User::getSessionId(void)
+{
+	return this->sessionid;
+}
+/**The setter method for the sessionid.
+ * @param id The session id.*/
+void User::setSessionId(string id)
+{
+	this->sessionid=id;
+}
 
 
 

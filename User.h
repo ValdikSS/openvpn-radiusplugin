@@ -56,6 +56,7 @@ protected:
         //string trustedip;               /**<The trusted ip from OpenVPN for a client.*/
 	Octet * vsabuf; 		/**<Buffer for all VSA attributes.*/
 	unsigned int vsabuflen; 	/**<Length of vsabuf.*/
+	string sessionid;	/**<The user sessionid.*/
 	
 public:
 	User();
@@ -102,6 +103,9 @@ public:
 	
 	unsigned int getVsaBufLen();
 	void setVsaBufLen(unsigned int);
+	
+	string getSessionId(void);
+	void setSessionId(string);
 
 // 	void setTrustedPort ( const string& theValue );
 // 	
