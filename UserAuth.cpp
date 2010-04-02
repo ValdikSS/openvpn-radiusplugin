@@ -50,14 +50,15 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 	list<RadiusServer>::iterator server;
 	RadiusPacket		packet(ACCESS_REQUEST);
 	RadiusAttribute		ra1(ATTRIB_User_Name,this->getUsername().c_str()),
-						ra2(ATTRIB_User_Password),
-						ra3(ATTRIB_NAS_Port,this->getPortnumber()),
-						ra4(ATTRIB_Calling_Station_Id,this->getCallingStationId()),
-						ra5(ATTRIB_NAS_Identifier),
-						ra6(ATTRIB_NAS_IP_Address),
-						ra7(ATTRIB_NAS_Port_Type),
-						ra8(ATTRIB_Service_Type),
-						ra9(ATTRIB_Framed_IP_Address);
+				ra2(ATTRIB_User_Password),
+				ra3(ATTRIB_NAS_Port,this->getPortnumber()),
+				ra4(ATTRIB_Calling_Station_Id,this->getCallingStationId()),
+				ra5(ATTRIB_NAS_Identifier),
+				ra6(ATTRIB_NAS_IP_Address),
+				ra7(ATTRIB_NAS_Port_Type),
+				ra8(ATTRIB_Service_Type),
+				ra9(ATTRIB_Framed_IP_Address),
+				ra10(ATTRIB_Acct_Session_ID, this->getSessionId());
 	
 	
 	if (DEBUG (context->getVerbosity()))
@@ -122,6 +123,11 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 			}
 	}
 	
+	if (packet.addRadiusAttribute(&ra10))
+	{
+		cerr << getTime() << "RADIUS-PLUGIN: Fail to add attribute ATTRIB_Acct_Session_ID.\n";
+	}
+	
 	if(strcmp(context->radiusconf.getServiceType(),""))
 	{
 			ra8.setValue(context->radiusconf.getServiceType());
@@ -141,6 +147,8 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 				cerr << getTime() << "RADIUS-PLUGIN: Fail to add attribute Framed-IP-Address.\n";
 			}
 	}
+	
+	
 	
 	if (DEBUG (context->getVerbosity()))
 		cerr << getTime() << "RADIUS-PLUGIN: Send packet to " << server->getName().c_str() <<".\n";
@@ -1467,6 +1475,7 @@ string UserAuth::valueToString(RadiusVendorSpecificAttribute *vsa)
 
 /** The method creates the client config file in the client config dir (ccd).
  * The path is set in the radiusplugin config file.
+ * Radius attributes which written to the file are FramedIP as ifconfig-push option and FramedRoutes as iroute option.
  * @param context : The plugin context.
  * @return An integer, if everything is ok 0, else 1.
  */
@@ -1493,7 +1502,7 @@ int UserAuth::createCcdFile(PluginContext *context)
 	int len=0;
 	
 	
-	if(context->conf.getOverWriteCCFiles()==true)
+	if(context->conf.getOverWriteCCFiles()==true && (this->getFramedIp().length() > 0 || this->getFramedRoutes().length() > 0))
 	{
 		memset(ipstring,0,100);
 		memset(framedip,0,16);
@@ -1513,7 +1522,7 @@ int UserAuth::createCcdFile(PluginContext *context)
 	    	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: Opened ccd file.\n";
 		
 		
-		// copy in a temp-string, becaue strtok deletes the delimiter, if it used anywhere
+		// copy in a temp-string, becaue strtok deletes the delimiter, if it is used anywhere
 		strncpy(framedroutes,this->getFramedRoutes().c_str(),4095);
 		
 		
