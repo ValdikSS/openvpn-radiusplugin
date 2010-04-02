@@ -162,16 +162,19 @@ char * RadiusAttribute::makePasswordHash(const char *password,char * hpassword, 
 		
 	//build the hash	
 	if (!gcry_control (GCRYCTL_ANY_INITIALIZATION_P))
-// 	{ /* No other library has already initialized libgcrypt. */
-// 
-// 	  gcry_control(GCRYCTL_SET_THREAD_CBS,&gcry_threads_pthread);
-// 
-// 	  if (!gcry_check_version (NEED_LIBGCRYPT_VERSION) )
-// 	    {
-// 		cerr << "libgcrypt is too old (need " << NEED_LIBGCRYPT_VERSION << ", have " << gcry_check_version (NULL) << ")\n";
-// 	    }
-// 	  gcry_control (GCRYCTL_INITIALIZATION_FINISHED);
-// 	}
+	{ /* No other library has already initialized libgcrypt. */
+
+	  gcry_control(GCRYCTL_SET_THREAD_CBS,&gcry_threads_pthread);
+
+	  if (!gcry_check_version (NEED_LIBGCRYPT_VERSION) )
+	    {
+		cerr << "libgcrypt is too old (need " << NEED_LIBGCRYPT_VERSION << ", have " << gcry_check_version (NULL) << ")\n";
+	    }
+	    /* Disable secure memory.  */
+          gcry_control (GCRYCTL_DISABLE_SECMEM, 0);
+
+	  gcry_control (GCRYCTL_INITIALIZATION_FINISHED);
+	}
 
 	gcry_md_open(&context, GCRY_MD_MD5, 0);
 	gcry_md_write(context, sharedSecret, strlen(sharedSecret));
@@ -202,17 +205,19 @@ char * RadiusAttribute::makePasswordHash(const char *password,char * hpassword, 
 						
 			//put the hash of the last XOR in the digest
 			//build the hash	
-// 			if (!gcry_control (GCRYCTL_ANY_INITIALIZATION_P))
-// 			{ /* No other library has already initialized libgcrypt. */
-// 
-// 			  gcry_control(GCRYCTL_SET_THREAD_CBS,&gcry_threads_pthread);
-// 
-// 			  if (!gcry_check_version (NEED_LIBGCRYPT_VERSION) )
-// 			    {
-// 				cerr << "libgcrypt is too old (need " << NEED_LIBGCRYPT_VERSION << ", have " << gcry_check_version (NULL) << ")\n";
-// 			    }
-// 			  gcry_control (GCRYCTL_INITIALIZATION_FINISHED);
-// 			}
+			if (!gcry_control (GCRYCTL_ANY_INITIALIZATION_P))
+			{ /* No other library has already initialized libgcrypt. */
+
+			  gcry_control(GCRYCTL_SET_THREAD_CBS,&gcry_threads_pthread);
+
+			  if (!gcry_check_version (NEED_LIBGCRYPT_VERSION) )
+			    {
+				cerr << "libgcrypt is too old (need " << NEED_LIBGCRYPT_VERSION << ", have " << gcry_check_version (NULL) << ")\n";
+			    }
+			  /* Disable secure memory.  */
+			  gcry_control (GCRYCTL_DISABLE_SECMEM, 0);
+			  gcry_control (GCRYCTL_INITIALIZATION_FINISHED);
+			}
 			gcry_md_open (&context, GCRY_MD_MD5, 0);
 			gcry_md_write(context, sharedSecret, strlen(sharedSecret));
 			gcry_md_write(context, hpassword+(k*MD5_DIGEST_LENGTH), MD5_DIGEST_LENGTH);

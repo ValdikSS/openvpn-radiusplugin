@@ -66,7 +66,7 @@ radiusplugin_2.0b:
 - update example config file
 - use string for config parsing
 - correct bug in Config.cpp: parameter status was detected wrong if parameter status-version parameter is used in OpenVPN config
-- don't delete client config file at CLIENT-DISCONNECT it could already a new file from a new AUTH-USER-PASS-VERIFY
+- don't delete client config file at CLIENT-DISCONNECT it could be already a new file from a new AUTH-USER-PASS-VERIFY
 - Fix segmentation fault in radiusplugin.cpp. The error occurs if an accounting request fails after a successful authentication.
 
 radiusplugin_2.0c:
@@ -75,7 +75,7 @@ radiusplugin_2.0c:
 - delete NAS port if authentication fails
 
 radiusplugin_2.0d_beta:
-- add some some headerfiles to avoid compiling errors on Fedora with gcc4
+- add some headerfiles to avoid compiling errors on Fedora with gcc4
 - close socket in radiuspacket.cpp on retries
 - add parenthesize to avoid compiler warnings 
 
@@ -94,3 +94,6 @@ radiusplugin_2.1:
 - Include nested configfiles from main configfile.
 - Add "\r" in the configfile parser, before the carriage return was ignored.
 - Add support for RADIUS reply message, the output is sent to stderr 
+- Only create the client-config file, if one of attributes for it is defined.
+- Add NAS port number to the session id, it's definitely unique
+- Acct-Session-Id added to Access-Request packet (RFC2866)

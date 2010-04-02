@@ -38,7 +38,6 @@
 class UserAcct : public User
 {
 private:
-	string sessionid;		/**< The sessionid of the user.*/
 	uint32_t gigain;		/**< The received bytes.*/
 	uint32_t gigaout;		/**< The sent bytes.*/
 	uint32_t bytesin;		/**< The received bytes.*/
@@ -52,9 +51,6 @@ public:
 	
 	UserAcct();
 	~UserAcct();
-	
-	string getSessionId(void);
-	void setSessionId(string);
 	
 	int getServiceType(void);
 	void setServiceType(int);

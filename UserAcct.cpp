@@ -32,12 +32,46 @@ UserAcct::UserAcct():User()
 	bytesout=0;
 	nextupdate=0;
 	starttime=0;
-		
 }
 
 /** The destructor. Nothing happens here.*/
 UserAcct::~UserAcct()
 {
+}
+
+/** The assignment-operator.
+ * @param u A refernece to a UserAcct.*/
+UserAcct & UserAcct::operator=(const UserAcct &u)
+{
+	
+	if (this!=&u)
+	{
+		this->User::operator=(u);
+		this->gigain=u.gigain;
+		this->gigaout=u.gigaout;
+		this->bytesin=u.bytesin;
+		this->bytesout=u.bytesout;
+		this->nextupdate=u.nextupdate;
+		this->starttime=u.starttime;
+	}
+	return *this;
+}
+
+
+
+
+/**The copy constructor, it calls first the copy constructor
+ * of the User class.
+ * @param UserAcct u : A reference to an UserAcct object.*/
+UserAcct::UserAcct(const UserAcct &u):User(u)
+{
+	this->gigain=u.gigain;
+	this->gigaout=u.gigaout;
+	this->bytesin=u.bytesin;
+	this->bytesout=u.bytesout;
+	this->nextupdate=u.nextupdate;
+	this->starttime=u.starttime;
+	
 }
 
 /** The method sends an accounting update packet for the user to the radius server.
@@ -859,58 +893,7 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 	
 }
 
-/** The assignment-operator.
- * @param u A refernece to a UserAcct.*/
-UserAcct & UserAcct::operator=(const UserAcct &u)
-{
-	
-	if (this!=&u)
-	{
-		this->sessionid=u.sessionid;
-		//this->servicetype=u.servicetype;
-		
-		this->gigain=u.gigain;
-		this->gigaout=u.gigaout;
-		this->bytesin=u.bytesin;
-		this->bytesout=u.bytesout;
-		this->nextupdate=u.nextupdate;
-		this->starttime=u.starttime;
-	}
-	return *this;
-}
 
-
-
-/**The copy constructor, it calls first the copy constructor
- * of the User class.
- * @param UserAcct u : A reference to an UserAcct object.*/
-UserAcct::UserAcct(const UserAcct &u):User(u)
-{
-	
-	this->sessionid=u.sessionid;
-	//this->servicetype=u.servicetype;
-	
-	this->gigain=u.gigain;
-	this->gigaout=u.gigaout;
-	this->bytesin=u.bytesin;
-	this->bytesout=u.bytesout;
-	this->nextupdate=u.nextupdate;
-	this->starttime=u.starttime;
-	
-}
-
-/** The getter method for the sessionid.
- * @return An integer of the sessionid.*/
-string UserAcct::getSessionId(void)
-{
-	return this->sessionid;
-}
-/**The setter method for the sessionid.
- * @param id The session id.*/
-void UserAcct::setSessionId(string id)
-{
-	this->sessionid=id;
-}
 
 
 /** The getter method for the gigain variable.
@@ -995,7 +978,7 @@ int UserAcct::deleteCcdFile(PluginContext * context)
 {
 	string filename;
 	filename = context->conf.getCcdPath()+ this->getCommonname();
-	if(context->conf.getOverWriteCCFiles())
+	if(context->conf.getOverWriteCCFiles()==true && (this->getFramedIp().length() > 0 || this->getFramedRoutes().length() > 0))
 	{
 		remove(filename.c_str());
 	}

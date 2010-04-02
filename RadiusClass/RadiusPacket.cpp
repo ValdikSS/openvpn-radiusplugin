@@ -578,17 +578,19 @@ void RadiusPacket::calcacctdigest(const char *secret)
 	
 	memset((this->sendbuffer+4), 0, 16);
 	//build the hash	
-// 	if (!gcry_control (GCRYCTL_ANY_INITIALIZATION_P))
-// 	{ /* No other library has already initialized libgcrypt. */
-// 
-// 	  gcry_control(GCRYCTL_SET_THREAD_CBS,&gcry_threads_pthread);
-// 
-// 	  if (!gcry_check_version (NEED_LIBGCRYPT_VERSION) )
-// 	    {
-// 		cerr << "libgcrypt is too old (need " << NEED_LIBGCRYPT_VERSION << ", have " << gcry_check_version (NULL) << ")\n";
-// 	    }
-// 	  gcry_control (GCRYCTL_INITIALIZATION_FINISHED);
-// 	}
+	if (!gcry_control (GCRYCTL_ANY_INITIALIZATION_P))
+	{ /* No other library has already initialized libgcrypt. */
+
+	  gcry_control(GCRYCTL_SET_THREAD_CBS,&gcry_threads_pthread);
+
+	  if (!gcry_check_version (NEED_LIBGCRYPT_VERSION) )
+	    {
+		cerr << "libgcrypt is too old (need " << NEED_LIBGCRYPT_VERSION << ", have " << gcry_check_version (NULL) << ")\n";
+	    }
+	    /* Disable secure memory.  */
+          gcry_control (GCRYCTL_DISABLE_SECMEM, 0);
+	  gcry_control (GCRYCTL_INITIALIZATION_FINISHED);
+	}
 	gcry_md_open (&context, GCRY_MD_MD5, 0);
 	gcry_md_write(context, this->sendbuffer, this->length);
 	gcry_md_write(context, secret, strlen(secret));
@@ -667,17 +669,19 @@ int	RadiusPacket::authenticateReceivedPacket(const char *secret)
 	
 	//bulid the hash of the copy
 	//build the hash	
-// 	if (!gcry_control (GCRYCTL_ANY_INITIALIZATION_P))
-// 	{ /* No other library has already initialized libgcrypt. */
-// 
-// 	  gcry_control(GCRYCTL_SET_THREAD_CBS,&gcry_threads_pthread);
-// 
-// 	  if (!gcry_check_version (NEED_LIBGCRYPT_VERSION) )
-// 	    {
-// 		cerr << "libgcrypt is too old (need " << NEED_LIBGCRYPT_VERSION << ", have " << gcry_check_version (NULL) << ")\n";
-// 	    }
-// 	  gcry_control (GCRYCTL_INITIALIZATION_FINISHED);
-// 	}
+	if (!gcry_control (GCRYCTL_ANY_INITIALIZATION_P))
+	{ /* No other library has already initialized libgcrypt. */
+
+	  gcry_control(GCRYCTL_SET_THREAD_CBS,&gcry_threads_pthread);
+
+	  if (!gcry_check_version (NEED_LIBGCRYPT_VERSION) )
+	    {
+		cerr << "libgcrypt is too old (need " << NEED_LIBGCRYPT_VERSION << ", have " << gcry_check_version (NULL) << ")\n";
+	    }
+	    /* Disable secure memory.  */
+          gcry_control (GCRYCTL_DISABLE_SECMEM, 0);
+	  gcry_control (GCRYCTL_INITIALIZATION_FINISHED);
+	}
 	gcry_md_open (&context, GCRY_MD_MD5, 0);
 	gcry_md_write(context, cpy_recvpacket, this->recvbufferlen);
 	gcry_md_write(context, secret, strlen(secret));

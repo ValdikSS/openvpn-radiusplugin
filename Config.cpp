@@ -215,15 +215,14 @@ int Config::parseConfigFile(const char * configfile)
 						  // trim leading whitespace again
 						  pos = line.find_first_not_of(" \t");
 						  if (pos != string::npos) line.erase(0,pos);
-						  
 						  //delete the trailing version of status if there
 						  pos = line.find_first_of(delims);
 						  if (pos != string::npos) line.erase(pos);
 						  this->deletechars(&line);
-						  
 						  if(!line.empty())
 						  {
-							  this->statusfile=line;
+							    
+						    this->statusfile=line;
 						  }
 					  }	
 				  }

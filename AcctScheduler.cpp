@@ -195,7 +195,6 @@ void AcctScheduler::parseStatusFile(PluginContext *context, uint64_t *bytesin, u
 	
 	//open the status file to read
 	ifstream file(context->conf.getStatusFile().c_str(), ios::in);
-	
 	if (file.is_open())
 	{
 		if (DEBUG (context->getVerbosity()))
