@@ -6,11 +6,14 @@ OK      =[$(GREEN) Ok $(ESC)]
 FAILED  =[$(RED) failed $(ESC)]
 
 CC=g++
+
+
+
 INCL=
 LDFLAGS=
 LIBS=-lgcrypt -lpthread
-
 CFLAGS=-Wall -shared -fPIC -DPIC
+
 
 PLUGIN=radiusplugin.so
 

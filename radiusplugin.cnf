@@ -39,6 +39,20 @@ overwriteccfiles=true
 # default is false
 # useauthcontrolfile=false
 
+# Only the accouting functionality is used, if no user name to forwarded to the plugin, the common name of certificate is used
+# as user name for radius accounting.
+# default is false
+# accountingonly=false
+
+
+# If the accounting is non essential, nonfatalaccounting can be set to true. 
+# If set to true all errors during the accounting procedure are ignored, which can be
+# - radius accounting can fail
+# - FramedRouted (if configured) maybe not configured correctly
+# - errors during vendor specific attributes script execution are ignored
+# But if set to true the performance is increased because OpenVPN does not block during the accounting procedure.
+# default is false
+nonfatalaccounting=false
 
 # Path to a script for vendor specific attributes.
 # Leave it out if you don't use an own script.
@@ -66,19 +80,19 @@ server
 	sharedsecret=testpw
 }
 
-server
-{
-	# The UDP port for radius accounting.
-	acctport=1813
-	# The UDP port for radius authentication.
-	authport=1812
-	# The name or ip address of the radius server.
-	name=127.0.0.1
-	# How many times should the plugin send the if there is no response?
-	retry=1
-	# How long should the plugin wait for a response?
-	wait=1
-	# The shared secret.
-	sharedsecret=testpw
-}
+#server
+#{
+#	# The UDP port for radius accounting.
+#	acctport=1813
+#	# The UDP port for radius authentication.
+#	authport=1812
+#	# The name or ip address of the radius server.
+#	name=127.0.0.1
+#	# How many times should the plugin send the if there is no response?
+#	retry=1
+#	# How long should the plugin wait for a response?
+#	wait=1
+#	# The shared secret.
+#	sharedsecret=testpw
+#}
 

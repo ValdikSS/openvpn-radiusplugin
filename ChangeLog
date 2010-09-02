@@ -97,3 +97,5 @@ radiusplugin_2.1:
 - Only create the client-config file, if one of attributes for it is defined.
 - Add NAS port number to the session id, it's definitely unique
 - Acct-Session-Id added to Access-Request packet (RFC2866)
+- Implement accounting only feature (option: accountingonly, default false)
+- Implement non fatal accounting (failures during accounting let the user still connect) (nonfatalaccounting)

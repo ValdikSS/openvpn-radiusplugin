@@ -107,7 +107,7 @@ int string_array_len (const char *array[]);
 void close_fds_except (int keep);
 void set_signals (void);
 string createSessionId (UserPlugin *);
-
+void get_user_env(PluginContext *, const int type,const char *envp[], UserPlugin *);
 void * auth_user_pass_verify(void *);
 void write_auth_control_file(PluginContext *, string filename, char c);
 string getTime();

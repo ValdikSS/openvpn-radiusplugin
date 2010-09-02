@@ -67,7 +67,7 @@ void AcctScheduler::addUser(UserAcct *user)
 
 /** The method deletes an user from the user lists. Before 
  * the user is deleted the status file is parsed for the sent and received bytes
- * and the stop accouting ticket is send to the server.
+ * and the stop accounting ticket is send to the server.
  * @param context The plugin context as an object from the class PluginContext.
  * @param user A pointer to an object from the class UserAcct
  */
@@ -84,7 +84,7 @@ void AcctScheduler::delUser(PluginContext * context, UserAcct *user)
 	user->setGigaOut(bytesout >> 32);
 	
 	if (DEBUG (context->getVerbosity()))
-	    cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Got accouting data from file, CN: " << user->getCommonname() << " in: " << user->getBytesIn() << " out: " << user->getBytesOut() << ".\n";
+	    cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Got accounting data from file, CN: " << user->getCommonname() << " in: " << user->getBytesIn() << " out: " << user->getBytesOut() << ".\n";
 	
 	
 	//send the stop ticket
@@ -113,7 +113,7 @@ void AcctScheduler::delUser(PluginContext * context, UserAcct *user)
 
 /** The method deletes all users from the user lists. Before 
  * the user is deleted the status file is parsed for the sent and received bytes
- * and the stop accouting ticket is send to the server.
+ * and the stop accounting ticket is send to the server.
  * @param context The plugin context as an object from the class PluginContext.
  */
 void AcctScheduler::delallUsers(PluginContext * context)
@@ -133,7 +133,7 @@ void AcctScheduler::delallUsers(PluginContext * context)
 	
 }
 
-/** The accouting method. When the method is called it
+/** The accounting method. When the method is called it
  * searches for users in activeuserlist for users who need an update.
  * If a user is found the sent and received bytes are read from the
  * OpenVpn status file.

@@ -1,7 +1,7 @@
 CC=g++
 INCL=-I/usr/local/include
 LDFLAGS=-L/usr/local/lib
-LIBS=-lgcrypt -lgpg-error -lstdc++ -lm
+LIBS=-lgcrypt -lgpg-error -lstdc++ -lm -lpthread
 
 CFLAGS=-Wall -shared -fPIC -DPIC
 

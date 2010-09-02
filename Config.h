@@ -50,7 +50,8 @@ private:
 	string openvpnconfig;			/**<Path to OpenVPN config.*/
 	bool overwriteccfiles; 			/**<If true the plugin overwrites the client config files.*/
         bool useauthcontrolfile;                /**<If true and the OpenVPN version supports auth control files, the acf is used.*/
-	
+        bool accountingonly;			/**<Only the accounting is done by the plugin.*/
+	bool nonfatalaccounting;		/**<If errors during the accounting occurs, the users can still connect.*/
 	void deletechars(string * );
 	
 public:
@@ -93,6 +94,12 @@ public:
 
         bool getUseAuthControlFile(void);
 	void setUseAuthControlFile(bool);
+	
+	bool getAccountingOnly(void);
+	void setAccountingOnly(bool);
+	
+	bool getNonFatalAccounting(void);
+	void setNonFatalAccounting(bool);
 	
 	string getOpenVPNConfig(void);
 	void setOpenVPNConfig(string);

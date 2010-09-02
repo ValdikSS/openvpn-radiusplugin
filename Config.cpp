@@ -33,6 +33,8 @@ Config::Config(void)
 	this->clientcertnotrequired=false;
 	this->overwriteccfiles=true;
         this->useauthcontrolfile=false;
+	this->accountingonly=false;
+	this->nonfatalaccounting=false;
 	this->ccdPath="";
 	this->openvpnconfig="";
 	this->vsanamedpipe="";
@@ -59,6 +61,8 @@ Config::Config(char * configfile)
 	this->clientcertnotrequired=false;
 	this->overwriteccfiles=true;	
         this->useauthcontrolfile=false;
+	this->accountingonly=false;
+	this->nonfatalaccounting=false;
 	this->parseConfigFile(configfile);
 	
 }
@@ -140,6 +144,26 @@ int Config::parseConfigFile(const char * configfile)
 					deletechars(&stmp);
 					if(stmp == "true") this->useauthcontrolfile=true;
 					else if (stmp =="false") this->useauthcontrolfile=false;
+					else return BAD_FILE;
+						
+				}
+				if (strncmp(line.c_str(),"accountingonly=",15)==0)
+				{
+					
+					string stmp=line.substr(15,line.size()-15);
+					deletechars(&stmp);
+					if(stmp == "true") this->accountingonly=true;
+					else if (stmp =="false") this->accountingonly=false;
+					else return BAD_FILE;
+						
+				}
+				if (strncmp(line.c_str(),"nonfatalaccounting=",19)==0)
+				{
+					
+					string stmp=line.substr(19,line.size()-19);
+					deletechars(&stmp);
+					if(stmp == "true") this->nonfatalaccounting=true;
+					else if (stmp =="false") this->nonfatalaccounting=false;
 					else return BAD_FILE;
 						
 				}
@@ -490,4 +514,26 @@ bool Config::getUseAuthControlFile(void)
 void Config::setUseAuthControlFile(bool b)
 {
 	this->useauthcontrolfile=b;	
+}
+
+
+bool Config::getAccountingOnly(void)
+{
+ return this->accountingonly; 
+}
+
+void Config::setAccountingOnly(bool b)
+{
+ this->accountingonly=b; 
+}
+
+
+bool Config::getNonFatalAccounting(void)
+{
+ return this->nonfatalaccounting; 
+}
+
+void Config::setNonFatalAccounting(bool b)
+{
+ this->nonfatalaccounting=b; 
 }

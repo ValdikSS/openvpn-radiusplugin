@@ -261,7 +261,7 @@ int UserAcct::sendUpdatePacket(PluginContext *context)
 	return 1;
 }
 
-/** The method sends an accouting start packet for the user to the radius server.
+/** The method sends an accounting start packet for the user to the radius server.
  *  The following attributes are sent to the radius server:
  * - User_Name, 
  * - Framed_IP_Address,
@@ -384,7 +384,8 @@ int UserAcct::sendStartPacket(PluginContext * context)
 	}
 	
 	//receive the response
-	if (packet.radiusReceive(serverlist)>=0)
+	int ret=packet.radiusReceive(serverlist);
+	if (ret>=0)
 	{
 		//is is a accounting resopnse ?
 		if(packet.getCode()==ACCOUNTING_RESPONSE)
@@ -398,10 +399,14 @@ int UserAcct::sendStartPacket(PluginContext * context)
 		else
 		{
 			if (DEBUG (context->getVerbosity()))
-				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  No response on accounting request.\n";
+				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Get no ACCOUNTING_RESPONSE-Packet.\n";
 			return 1;
 		}
 		
+	}
+	else
+	{
+	  cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Error on receiving radius response, code: " <<  ret << endl;
 	}
 	
 	return 1;
