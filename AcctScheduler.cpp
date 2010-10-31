@@ -182,7 +182,7 @@ void AcctScheduler::doAccounting(PluginContext * context)
 /**The method parses the status file for accounting information. It reads the bytes sent
  * and received from the status file. It finds the values about the commonname. The method will
  * only work if there are no changes in the structure of the status file.
- * The method is test with OpenVpn 2.0.
+ * The method was tested with OpenVpn 2.0.
  * @param context The plugin context as an object from the class PluginContext.
  * @param bytesin An int pointer for the received bytes.
  * @param bytesout An int pointer for the sent bytes.
@@ -208,12 +208,13 @@ void AcctScheduler::parseStatusFile(PluginContext *context, uint64_t *bytesin, u
 		do
 		{
 			file.getline(line, 512);
+			cerr << getTime() << "TEST: RADIUS-PLUGIN: BACKGROUND ACCT: " << line << endl;
 			
 		}
 		while (line!=NULL && strncmp(line,key.c_str(),key.length())!=0 && strcmp(line,"ROUTING TABLE")!=0 && file.eof()==false);
 		
 		
-		//the information is after the next delimiters
+		//the information is behind the next delimiters
 		if (line!=NULL && strncmp(line,key.c_str(),key.length())==0)
 		{
 			memcpy(newline, line+key.length(), strlen(line)-key.length()+1);
@@ -223,7 +224,7 @@ void AcctScheduler::parseStatusFile(PluginContext *context, uint64_t *bytesin, u
 		else
 		{
 			
-			cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: No accounting data was found for "<< key <<".\n";
+			cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: No accounting data was found for "<< key << " in file " << context->conf.getStatusFile() << endl;
 			
 		}
 		file.close();
