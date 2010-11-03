@@ -90,10 +90,14 @@ void AccountingProcess::Accounting(PluginContext * context)
 		    // if accounting errors are non fatal return success and proceed with accounting
 		    if(context->conf.getNonFatalAccounting()==true)
 		      context->acctsocketforegr.send(RESPONSE_SUCCEEDED);
-                    
-		    //allocate memory
-                    user= new UserAcct;
-
+                    try{
+		      //allocate memory
+		      user= new UserAcct;
+		    }
+		    catch(...)
+		    {
+		      cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: New failed for UserAcct." << endl;
+		    }
                     //get the information from the foreground process
                     user->setUsername(context->acctsocketforegr.recvStr());
                     user->setSessionId(context->acctsocketforegr.recvStr()) ;

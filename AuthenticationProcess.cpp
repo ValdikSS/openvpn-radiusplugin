@@ -66,11 +66,10 @@ void AuthenticationProcess::Authentication(PluginContext * context)
 		//authenticate the user
 		case COMMAND_VERIFY:
 			//allcoate memory for the new user
-			user=new UserAuth;
-		  	
-		  	try
+			try
 		  	{
-			  	//get the user informations
+			    user=new UserAuth;
+			    //get the user informations
 			    user->setUsername(context->authsocketforegr.recvStr());
 			    user->setPassword(context->authsocketforegr.recvStr());
 			    user->setPortnumber(context->authsocketforegr.recvInt());
@@ -137,6 +136,10 @@ void AuthenticationProcess::Authentication(PluginContext * context)
 					goto done;
 				}
 		    }
+		    catch(std::bad_alloc){
+		      cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: New failed for UserAuth." << endl;
+		      goto done;
+		    }
 		    catch (...)
 		    {
 		    	delete user;
@@ -150,7 +153,7 @@ void AuthenticationProcess::Authentication(PluginContext * context)
 			goto done;
 	
 		case -1:
-		  	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: read error on command channel.\n";
+		  	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: read error on command channel."<< endl;
 		  	break;
 	
 		default:
@@ -162,7 +165,6 @@ void AuthenticationProcess::Authentication(PluginContext * context)
 
   if (1)
     cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: EXIT\n";
-
   return;
 }
 

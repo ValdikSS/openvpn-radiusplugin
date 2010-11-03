@@ -61,9 +61,7 @@ extern "C"
         PluginContext *context=NULL; 			/**<The context for this functions.*/
 
 
-        //Create the context.
-        context=new PluginContext;
-
+        
         //list for additional arguments
         struct name_value_list name_value_list;
 
@@ -71,7 +69,14 @@ extern "C"
         //There must be one param, the name of the plugin file
         const int base_parms = 1;
 
-
+	//Create the context.
+	try{
+	  context=new PluginContext;
+	}
+	catch(...){
+	  cerr << getTime() << "RADIUS-PLUGIN: New failed for PluginContext.\n";
+          return NULL;
+	}
 
 
         // Get verbosity level from the environment.
@@ -383,14 +388,11 @@ error:
             {
                 cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: OPENVPN_PLUGIN_AUTH_USER_PASS_VERIFY is called."<< endl;
             }
-            //create a new user
-            newuser=new UserPlugin();
-
-
-            //allocate the memory, don't care about the value
+            
             try
             {
-                get_user_env(context,type,envp, newuser);
+                newuser=new UserPlugin();
+		get_user_env(context,type,envp, newuser);
                  if (newuser->getAuthControlFile().length() > 0 && context->conf.getUseAuthControlFile())
                                 {
                                   pthread_mutex_lock(context->getMutexSend());
@@ -417,6 +419,10 @@ error:
             {
                 cerr << getTime() << e;
             }
+            catch (std::bad_alloc)
+            {
+	      cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: New failed on UserPlugin in OPENVPN_PLUGIN_AUTH_USER_PASS_VERIFY" << endl;
+	    }
             catch ( ... )
             {
                 cerr << getTime() << "Unknown Exception!";
@@ -530,6 +536,10 @@ error:
             {
                 cerr << getTime() << e;
             }
+            catch (std::bad_alloc)
+            {
+	      cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: New failed on UserPlugin in OPENVPN_PLUGIN_CLIENT_CONNECT" << endl;
+	    }
             catch ( ... )
             {
                 cerr << getTime() << "Unknown Exception!";
@@ -604,6 +614,10 @@ error:
             {
                 cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND:" << e;
             }
+            catch (std::bad_alloc)
+            {
+	      cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: New failed on UserPlugin in OPENVPN_PLUGIN_CLIENT_DISCONNECT" << endl;
+	    }
             catch ( ... )
             {
                 cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND:" << "Unknown Exception!\n";
@@ -643,6 +657,10 @@ error:
             {
                 cerr << getTime() << e;
             }
+            catch ( ... )
+            {
+                cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND:" << "Unknown Exception!\n";
+            }
 
             // wait for background process to exit
             if ( context->getAuthPid() > 0 )
@@ -663,6 +681,10 @@ error:
             catch ( Exception &e )
             {
                 cerr << getTime() << e;
+            }
+            catch ( ... )
+            {
+                cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND:" << "Unknown Exception!\n";
             }
 
             // wait for background process to exit
