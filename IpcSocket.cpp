@@ -181,7 +181,13 @@ string IpcSocket::recvStr(void)
 	}
         if(len > 0)
         {
-          buffer=new char[len+1];
+          try{
+	    buffer=new char[len+1];
+	  }
+	  catch(...)
+	  {
+	    cerr << "RADIUS-PLUGIN: BACKGROUND ACCT: New failed for buffer in IpcSocket::recvStr." << endl;
+	  }
           memset (buffer, 0, len+1);
           size = read (this->socket, buffer, len);
           if (size!=len)
@@ -214,7 +220,13 @@ void IpcSocket::recvBuf(User * user)
 	user->setVsaBufLen(len);
 	if (len > 0)
 	{
+	  try{ 
 	    user->setVsaBuf(new Octet[len]);
+	  }
+	  catch(...)
+	  {
+	    cerr  << "RADIUS-PLUGIN: BACKGROUND ACCT: New failed for buffer in IpcSocket::recvBuf." << endl;
+	  }
 	    size = read (this->socket, user->getVsaBuf(), len);
 	    if (size != len)
 		{

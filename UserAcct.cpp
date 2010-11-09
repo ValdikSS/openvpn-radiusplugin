@@ -610,7 +610,13 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 	
 	//copy the framed route string to an char array, it is easier to
 	//analyse
-	framedroutes=new char[this->getFramedRoutes().size()+1];
+	try{
+	  framedroutes=new char[this->getFramedRoutes().size()+1];
+	}
+	catch(...)
+	{
+	  cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: New failed for framedroutes." << endl;
+	}
 	memset(framedroutes,0,this->getFramedRoutes().size()+1);
 	
 	// copy in a temp-string, because strtok deletes the delimiter, if it used anywhere
@@ -763,7 +769,13 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 	
 	//copy the framed route string to an char array, it is easier to
 	//analyse
-	framedroutes=new char[this->getFramedRoutes().size()+1];
+	try{
+	  framedroutes=new char[this->getFramedRoutes().size()+1];
+	}
+	catch(...)
+	{
+	  cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: New failed for framedroutes." << endl;
+	}
 	memset(framedroutes,0,this->getFramedRoutes().size()+1);
 	
 	// copy in a temp-string, becaue strtok deletes the delimiter, if it used anywhere

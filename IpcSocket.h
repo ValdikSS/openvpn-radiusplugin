@@ -22,6 +22,7 @@
 #ifndef _IPCSOCKET_H_
 #define _IPCSOCKET_H_
 
+//#include "radiusplugin.h"
 #include <string>
 #include <cstring>
 #include "User.h"
@@ -30,6 +31,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+
 
 typedef unsigned char Octet;
 

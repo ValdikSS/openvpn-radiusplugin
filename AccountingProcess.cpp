@@ -329,6 +329,7 @@ done:
 int AccountingProcess::callVsaScript(PluginContext * context, User * user, unsigned int action, unsigned int rekeying)
 {
     char * route;
+    Octet * buf;
     int buflen = 3 * sizeof(int);
     if (user->getUsername().length() != 0)
     {
@@ -366,9 +367,14 @@ int AccountingProcess::callVsaScript(PluginContext * context, User * user, unsig
             buflen=buflen+strlen(route)+2*sizeof(int);
         }
     }
-
-    Octet * buf = new Octet[buflen];
-    unsigned int value = htonl(action);
+    try{
+      buf = new Octet[buflen];
+    }
+    catch(...)
+    {
+      cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: New failed for framedroutes buf." << endl;
+    }
+      unsigned int value = htonl(action);
     memcpy(buf,&value, 4);
 
     value = htonl(rekeying);

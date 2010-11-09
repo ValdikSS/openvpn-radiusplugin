@@ -82,7 +82,15 @@ User & User::operator=(const User & u)
 	this->vsabuflen=u.vsabuflen;
 	if(u.vsabuf != NULL)
 	{
-		this->vsabuf=new Octet[this->vsabuflen];
+		try{
+		  this->vsabuf=new Octet[this->vsabuflen];
+		}
+		catch(...)
+		{
+		  cerr <<  "RADIUS-PLUGIN: BACKGROUND ACCT: New failed for vsabuflen." << endl;
+		}
+		
+		
 		memcpy(this->vsabuf, u.vsabuf, this->vsabuflen);
 	}
 	else
@@ -114,7 +122,13 @@ User::User(const User & u)
 	this->vsabuflen=u.vsabuflen;
 	if(u.vsabuf != NULL)
 	{
-		this->vsabuf=new Octet[this->vsabuflen];
+		try{
+		  this->vsabuf=new Octet[this->vsabuflen];
+		}
+		catch(...)
+		{
+		  cerr  << "RADIUS-PLUGIN: BACKGROUND ACCT: New failed for vsabuflen." << endl;
+		}
 		memcpy(this->vsabuf, u.vsabuf, this->vsabuflen);
 	}
 	else
@@ -271,8 +285,14 @@ void User::setUntrustedPort(string port)
 int User::appendVsaBuf(Octet *value, unsigned int len)
 {
 	if(this->vsabuf == NULL)
-	{
-		this->vsabuf=new Octet[len];
+	{	
+		try{
+		  this->vsabuf=new Octet[len];
+		}
+		catch(...)
+		{
+		  cerr  << "RADIUS-PLUGIN: BACKGROUND ACCT: New failed for vsabuflen." << endl;
+		}
 		memcpy(this->vsabuf, value, len);
 		this->vsabuflen=len;
 	}	
@@ -281,7 +301,13 @@ int User::appendVsaBuf(Octet *value, unsigned int len)
 		Octet old_vsa[this->vsabuflen];
 		memcpy(old_vsa, this->vsabuf, this->vsabuflen);
 		delete [] this->vsabuf;
-		this->vsabuf=new Octet[this->vsabuflen+len];
+		try{
+		  this->vsabuf=new Octet[this->vsabuflen+len];
+		}
+		catch(...)
+		{
+		  cerr  << "RADIUS-PLUGIN: BACKGROUND ACCT: New failed for vsabuflen." << endl;
+		}
 		memcpy(this->vsabuf, old_vsa, this->vsabuflen);
 		memcpy((this->vsabuf+this->vsabuflen), value, len);
 		this->vsabuflen=this->vsabuflen+len;

@@ -25,6 +25,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cstring>
+//#include "radiusplugin.h"
 //#include "openvpn-plugin.h"
 
 
