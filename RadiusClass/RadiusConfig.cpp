@@ -149,11 +149,11 @@ int RadiusConfig::parseConfigFile(const char * configfile)
 						
 					if (strncmp(line.c_str(),"authport=",9)==0) 
 					{
-						tmpServer->setAuthPort(atoi(line.substr(9,4).c_str()));
+						tmpServer->setAuthPort(atoi(line.substr(9,5).c_str()));
 					}
 					if (strncmp(line.c_str(),"acctport=",9)==0)
 					{
-						tmpServer->setAcctPort(atoi(line.substr(9,4).c_str()));
+						tmpServer->setAcctPort(atoi(line.substr(9,5).c_str()));
 					}
 					if (strncmp(line.c_str(),"name=",5)==0)
 					{
