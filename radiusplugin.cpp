@@ -1054,7 +1054,6 @@ void  * auth_user_pass_verify(void * c)
                     context->setResult(OPENVPN_PLUGIN_FUNC_ERROR);
                     pthread_cond_signal( context->getCondRecv( ));
                     pthread_mutex_unlock (context->getMutexRecv());
-
                 }
                 delete newuser;
             }
@@ -1172,15 +1171,17 @@ void get_user_env(PluginContext * context,const int type,const char * envp[], Us
         user->setUsername ( get_env ( "common_name", envp ) );
     if ( get_env ( "password", envp ) !=NULL )
         user->setPassword ( get_env ( "password", envp ) );
-    //rewrite the username if OpenVPN use the option username-as-comon-name
+    
+    if ( get_env ( "common_name", envp ) !=NULL )
+    {
+        user->setCommonname ( get_env ( "common_name", envp ) );
+    }
+    
+    //rewrite the commonname if OpenVPN use the option username-as-comon-name
     if ( context->conf.getUsernameAsCommonname() == true )
     {
         if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Commonname set to Username\n";
         user->setCommonname ( get_env ( "username", envp ) );
-    }
-    if ( get_env ( "common_name", envp ) !=NULL )
-    {
-        user->setCommonname ( get_env ( "common_name", envp ) );
     }
 
     string untrusted_ip;
@@ -1198,7 +1199,10 @@ void get_user_env(PluginContext * context,const int type,const char * envp[], Us
     //for OpenVPN option client cert not required, common_name is "UNDEF", see status.log
 
     user->setUntrustedPort ( get_env ( "untrusted_port", envp ) );
+    
+    
     user->setStatusFileKey(user->getCommonname() + string ( "," ) + untrusted_ip + string ( ":" ) + get_env ( "untrusted_port", envp ) );
+    if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: StatusFileKey: " << user->getStatusFileKey() << endl;
     user->setKey(untrusted_ip + string ( ":" ) + get_env ( "untrusted_port", envp ) );
     if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Key: " << user->getKey() << ".\n";
 }

@@ -158,7 +158,8 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 		cerr << getTime() << "RADIUS-PLUGIN: Packet was not sent.\n";
 	}
 	//receive the packet
-	if (packet.radiusReceive(serverlist)==0)
+	int rc=packet.radiusReceive(serverlist);
+	if (rc==0)
 	{
 		//is it a accept?
 		if(packet.getCode()==ACCESS_ACCEPT)
@@ -190,7 +191,7 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 	}
 	else
 	{
-		cerr << getTime() << "RADIUS-PLUGIN: Got no response from radius server.\n";
+		cerr << getTime() << "RADIUS-PLUGIN: Got no response from radius server, return code:" << rc << endl;
 	}
 	
 	return 1;

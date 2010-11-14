@@ -36,6 +36,8 @@ subnet=255.255.255.0
 overwriteccfiles=true
 
 # Allows the plugin to use auth control files if OpenVPN (>= 2.1 rc8) provides them.
+# The plugin needs write permission to the folder, by default it is the OpenVPN directory (e.g. /etc/openvpm)
+# The OpenVPN option tmp-dir changes the directory.
 # default is false
 # useauthcontrolfile=false
 

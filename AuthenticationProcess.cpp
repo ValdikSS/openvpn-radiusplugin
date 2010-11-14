@@ -79,14 +79,14 @@ void AuthenticationProcess::Authentication(PluginContext * context)
 				// framed-ip is an @IP if we're renegotiating, "" otherwise
 			    user->setFramedIp(context->authsocketforegr.recvStr());
 		 		
-		 		if (DEBUG (context->getVerbosity()) && (user->getFramedIp().compare("") == 0))
-		    		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND  AUTH: New user auth: username: " << user->getUsername() << ", password: *****, calling station: " << user->getCallingStationId() << ", commonname: " << user->getCommonname() << ".\n";
+			    if (DEBUG (context->getVerbosity()) && (user->getFramedIp().compare("") == 0))
+			    cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND  AUTH: New user auth: username: " << user->getUsername() << ", password: *****, calling station: " << user->getCallingStationId() << ", commonname: " << user->getCommonname() << ".\n";
 
-		 		if (DEBUG (context->getVerbosity()) && (user->getFramedIp().compare("") !=0 ))
-		    		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND  AUTH: Old user ReAuth: username: " << user->getUsername() << ", password: *****, calling station: " << user->getCallingStationId() << ", commonname: " << user->getCommonname() << ".\n";
-				
-				//send the AcceptRequestPacket
-				if (user->sendAcceptRequestPacket(context)==0) /* Succeeded */
+			    if (DEBUG (context->getVerbosity()) && (user->getFramedIp().compare("") !=0 ))
+			    cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND  AUTH: Old user ReAuth: username: " << user->getUsername() << ", password: *****, calling station: " << user->getCallingStationId() << ", commonname: " << user->getCommonname() << ".\n";
+			    
+			    //send the AcceptRequestPacket
+			    if (user->sendAcceptRequestPacket(context)==0) /* Succeeded */
 			    {
 			     	//if the authentication succeeded
 			     	//create the user configuration file

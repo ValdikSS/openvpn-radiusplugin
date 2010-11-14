@@ -208,7 +208,6 @@ void AcctScheduler::parseStatusFile(PluginContext *context, uint64_t *bytesin, u
 		do
 		{
 			file.getline(line, 512);
-			cerr << getTime() << "TEST: RADIUS-PLUGIN: BACKGROUND ACCT: " << line << endl;
 			
 		}
 		while (line!=NULL && strncmp(line,key.c_str(),key.length())!=0 && strcmp(line,"ROUTING TABLE")!=0 && file.eof()==false);

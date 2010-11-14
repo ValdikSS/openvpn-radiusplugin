@@ -496,13 +496,12 @@ int RadiusPacket::radiusReceive(list<RadiusServer> *serverlist)
 	    while (retries<=server->getRetry())
 	    {
 		    // wait for the specified time for a response
-			tv.tv_sec = server->getWait();  
+		    tv.tv_sec = server->getWait();  
 		    tv.tv_usec = 0;
 		    FD_ZERO(&set);				// clear out the set 
 		    FD_SET(this->sock, &set);	// wait only for the RADIUS UDP socket 
 			result = select(FD_SETSIZE, &set, NULL, NULL, &tv);
-			
-					
+				
 			if (result>0)
 			{
 				
