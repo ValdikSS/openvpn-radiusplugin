@@ -502,13 +502,15 @@ int AccountingProcess::callVsaScript(PluginContext * context, User * user, unsig
     string exe=string(context->conf.getVsaScript()) + " " + string(context->conf.getVsaNamedPipe());
     if (write (fd_fifo, buf, buflen) != buflen)
     {
-        cerr << getTime() << "RADIUS-PLUGIN: Could not write in Pipe to VSAScript!";
+        close(fd_fifo);
+	cerr << getTime() << "RADIUS-PLUGIN: Could not write in Pipe to VSAScript!";
         return -1;
     }
 
     if (system(exe.c_str())!=0)
     {
-        cerr << getTime() << "RADIUS-PLUGIN: Error in VSAScript!";
+        close(fd_fifo);
+	cerr << getTime() << "RADIUS-PLUGIN: Error in VSAScript!";
         return -1;
     }
     close(fd_fifo);
