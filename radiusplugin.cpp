@@ -1176,6 +1176,10 @@ void get_user_env(PluginContext * context,const int type,const char * envp[], Us
     {
         user->setCommonname ( get_env ( "common_name", envp ) );
     }
+    else if(context->conf.getClientCertNotRequired()==true) // if there is no username, set it to UNDEF, this is what OPENVPN does
+    {
+      user->setCommonname ("UNDEF");
+    }
     
     //rewrite the commonname if OpenVPN use the option username-as-comon-name
     if ( context->conf.getUsernameAsCommonname() == true )
