@@ -1119,6 +1119,11 @@ string getTime()
     timeinfo = localtime ( &rawtime );
     string t(ctime(&rawtime));
     t.replace(t.find("\n"),1," ");
+	size_t str_pos=t.find("\n");
+    if (pos!=string::npos)
+    {
+         t.replace(str_pos,1," ");
+    }
     return t;
 }
 
