@@ -22,7 +22,8 @@
 //The callback functions of the plugin infrastructure.
 
 #include "radiusplugin.h"
-
+#define NEED_LIBGCRYPT_VERSION "1.2.0"
+GCRY_THREAD_OPTION_PTHREAD_IMPL;
 
 //define extern "C", so the c++ compiler generate a shared library
 //which is compatible with c programms
@@ -828,6 +829,19 @@ string createSessionId ( UserPlugin * user )
     string strtime;
     ostringstream portnumber;
     memset ( digest,0,16 );
+    if (!gcry_control (GCRYCTL_ANY_INITIALIZATION_P))
+    { /* No other library has already initialized libgcrypt. */
+
+      gcry_control(GCRYCTL_SET_THREAD_CBS,&gcry_threads_pthread);
+
+      if (!gcry_check_version (NEED_LIBGCRYPT_VERSION) )
+	{
+	    cerr << "libgcrypt is too old (need " << NEED_LIBGCRYPT_VERSION << ", have " << gcry_check_version (NULL) << ")\n";
+	}
+	/* Disable secure memory.  */
+      gcry_control (GCRYCTL_DISABLE_SECMEM, 0);
+      gcry_control (GCRYCTL_INITIALIZATION_FINISHED);
+    }
     //build the hash
     gcry_md_open ( &context, GCRY_MD_MD5, 0 );
     gcry_md_write ( context, user->getCommonname().c_str(), user->getCommonname().length() );
