@@ -693,21 +693,25 @@ error:
                 waitpid ( context->getAcctPid(), NULL, 0 );
 
         }
-        if (context->getStartThread()==false)
+        if (context->getStartThread()==false) //means the thread is running
         {
             if ( DEBUG ( context->getVerbosity() ) )
                 cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Stop auth thread .\n";
-            //stop the thread
+            
+	    //stop the thread
             pthread_mutex_lock(context->getMutexSend());
             context->setStopThread(true);
             pthread_cond_signal( context->getCondSend( ));
             pthread_mutex_unlock(context->getMutexSend());
-            //wait for the thread to exit
-            pthread_join(*context->getThread(),NULL);
-            pthread_cond_destroy(context->getCondSend( ));
-            pthread_cond_destroy(context->getCondRecv( ));
-            pthread_mutex_destroy(context->getMutexSend());
-            pthread_mutex_destroy(context->getMutexRecv());
+	    
+            
+	    //wait for the thread to exit
+	    pthread_join(*context->getThread(),NULL);
+	    pthread_cond_destroy(context->getCondSend( ));
+	    pthread_cond_destroy(context->getCondRecv( ));
+	    pthread_mutex_destroy(context->getMutexSend());
+	    pthread_mutex_destroy(context->getMutexRecv());
+	  
         }
         else
         {
@@ -1128,9 +1132,7 @@ void write_auth_control_file(PluginContext * context, string filename, char c)
 string getTime()
 {
     time_t rawtime;
-    struct tm * timeinfo;
     time ( &rawtime );
-    timeinfo = localtime ( &rawtime );
     string t(ctime(&rawtime));
     t.replace(t.find("\n"),1," ");
     size_t str_pos=t.find("\n");
