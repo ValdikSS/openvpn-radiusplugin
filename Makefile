@@ -54,12 +54,3 @@ test: $(OBJECTS)
 clean:
 	rm -f $(PLUGIN) *.o */*.o
 
-# use make dist-gz PLUGIN_VERS=2.2
-dist-gz:
-	@[ x"$(PLUGIN_VERS)" != x"" ] || ( echo 'Need a non empty PLUGIN_VERS value to create versionned tar' && false )
-	rm -rf ./tmp && mkdir tmp
-	cd tmp && cvs -z3 -d `cat ../CVS/Root` export -DNOW radiusplugin
-	mv tmp/radiusplugin tmp/radiusplugin-$(PLUGIN_VERS)
-	rm -rf tmp/radiusplugin-$(PLUGIN_VERS)/radiusplugin_v2.0a
-	cd tmp && tar zcf ../radiusplugin-$(PLUGIN_VERS).tar.gz radiusplugin-$(PLUGIN_VERS)
-	@rm -rf ./tm
