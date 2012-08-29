@@ -32,7 +32,7 @@
 
 
 /** The class represents a user in the accounting background process. The class is
- * derived from the User class. This class defined additonal attributes
+ * derived from the User class. This class defined additional attributes
  * for accounting a user.*/
 
 class UserAcct : public User

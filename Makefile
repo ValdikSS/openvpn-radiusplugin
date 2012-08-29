@@ -1,18 +1,10 @@
-BLUE    =\033[20;36m
-GREEN   =\033[32m
-RED     =\033[31m
-ESC     =\033[0m
-OK      =[$(GREEN) Ok $(ESC)]
-FAILED  =[$(RED) failed $(ESC)]
-
-CC=g++
-
-
+CXX ?=g++
 
 INCL=
-LDFLAGS=
+
 LIBS=-lgcrypt -lpthread
-CFLAGS=-Wall -shared -fPIC -DPIC
+CXXFLAGS ?= -O2 -g
+CXXFLAGS +=-Wall -shared -fPIC -DPIC
 
 
 PLUGIN=radiusplugin.so
@@ -37,18 +29,37 @@ OBJECTS=\
   UserPlugin.o \
   Config.o
 
+ifeq ($(V),1)
+Q=
+NQ=true
+else
+Q=@
+NQ=echo
+endif
+
 all: $(PLUGIN)
 
 $(PLUGIN): $(OBJECTS)
-	@echo -e 'BIN: $(GREEN) $(PLUGIN) $(ESC)'
-	@$(CC) $(CFLAGS) $(OBJECTS) -o $(PLUGIN) $(LDFLAGS) $(LIBS)
+	@$(NQ) 'CXXLD $@'
+	$(Q)$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(PLUGIN) $(LDFLAGS) $(LIBS)
 
 %.o: %.cpp
-	@echo -e 'OBJ: $(GREEN) $@ $(ESC)'
-	@$(CC) $(INCL) $(CFLAGS) -o $@ -c $<
+	@$(NQ) 'CXX $@'
+	$(Q)$(CXX) $(INCL) $(CXXFLAGS) -o $@ -c $<
 
 test: $(OBJECTS)
-	@$(CC) -Wall $(OBJECTS) -o main $(LDFLAGS) $(LIBS)
+	@$(NQ) 'CXX $@'
+	$(Q)$(CXX) -Wall $(OBJECTS) -o main $(LDFLAGS) $(LIBS)
 
 clean:
-	-rm $(PLUGIN) *.o */*.o
+	rm -f $(PLUGIN) *.o */*.o
+
+# use make dist-gz PLUGIN_VERS=2.2
+dist-gz:
+	@[ x"$(PLUGIN_VERS)" != x"" ] || ( echo 'Need a non empty PLUGIN_VERS value to create versionned tar' && false )
+	rm -rf ./tmp && mkdir tmp
+	cd tmp && cvs -z3 -d `cat ../CVS/Root` export -DNOW radiusplugin
+	mv tmp/radiusplugin tmp/radiusplugin-$(PLUGIN_VERS)
+	rm -rf tmp/radiusplugin-$(PLUGIN_VERS)/radiusplugin_v2.0a
+	cd tmp && tar zcf ../radiusplugin-$(PLUGIN_VERS).tar.gz radiusplugin-$(PLUGIN_VERS)
+	@rm -rf ./tm

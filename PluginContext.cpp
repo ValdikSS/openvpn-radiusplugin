@@ -159,7 +159,7 @@ void PluginContext::setVerbosity(int v)
 }
 
 /** The getter method for the authentication
- * background proccess id.
+ * background process id.
  * @returns The process id.
  */
 pid_t PluginContext::getAuthPid(void)
@@ -168,7 +168,7 @@ pid_t PluginContext::getAuthPid(void)
 }
 
 /** The setter method for the authentication
- * background proccess id.
+ * background process id.
  * @param The process id.
  */
 void PluginContext::setAuthPid(pid_t p)
@@ -177,7 +177,7 @@ void PluginContext::setAuthPid(pid_t p)
 } 
 
 /** The getter method for the accounting
- * background proccess id.
+ * background process id.
  * @returns The process id.
  */	
 pid_t PluginContext::getAcctPid(void)
@@ -186,7 +186,7 @@ pid_t PluginContext::getAcctPid(void)
 }	
 
 /** The setter method for the accounting
- * background proccess id.
+ * background process id.
  * @param The process id.
  */		
 void PluginContext::setAcctPid(pid_t p)

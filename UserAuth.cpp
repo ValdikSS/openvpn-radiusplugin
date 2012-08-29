@@ -43,7 +43,7 @@ UserAuth::~UserAuth()
  * - NAS_Port_Type
  * - Service_Type.
  * @param context The context of the background process.
- * @return An integer, 0 if the authentication succeded, else 1.*/
+ * @return An integer, 0 if the authentication succeeded, else 1.*/
 int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 {
 	list<RadiusServer> * serverlist;

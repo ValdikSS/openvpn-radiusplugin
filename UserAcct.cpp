@@ -471,7 +471,7 @@ int UserAcct::sendStopPacket(PluginContext * context)
 	
 	if (packet.addRadiusAttribute(&ra2))
 	{
-		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_FramedIP_Adress.\n";
+		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_FramedIP_Address.\n";
 	}
 	if (packet.addRadiusAttribute(&ra3))
 	{

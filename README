@@ -202,7 +202,7 @@ FOR TESTING
 -----------
 
 Attention: Some values are hard coded in main.cpp testing, so you can get unexpected values when testing.
-For example the framedip is always 10.8.0.100, because it is read from the enviroment variable "ifconfig_pool_remote_ip", which is passed 
+For example the framedip is always 10.8.0.100, because it is read from the environment variable "ifconfig_pool_remote_ip", which is passed 
 to the plugin from OpenVPN!
 All hard coded variabled:
 env1[0]="username=user1";

@@ -43,7 +43,7 @@ private:
     string statusfile; 				/**< The path and filename of the status file, where openvpn writes the status information.*/ 
 	char subnet[16];				/**<The subnet which is assigned to the client in topology option.*/
 	char p2p[16];					/**<The OpenVPN server address which is assigned to the client in topology p2p.*/
-	string vsascript;				/**<A script whcih handles vendor specific attributes.*/
+	string vsascript;				/**<A script which handles vendor specific attributes.*/
 	string vsanamedpipe;		/**<The named pipe to the vsascript.*/
 	bool usernameascommonname;		/**<Use the username as commonname in the plugin (for OpenVPN option username-as-common-name (no commonname in the enviroment!)).*/
 	bool clientcertnotrequired;		/**<For OpenVPN option client_cert_not_required, commonname = UNDEF.*/

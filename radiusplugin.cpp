@@ -30,7 +30,7 @@ GCRY_THREAD_OPTION_PTHREAD_IMPL;
 extern "C"
 {
 
-    /** The function is needed by the OpenVpn plugin model. The funtion is called
+    /** The function is needed by the OpenVpn plugin model. The function is called
      * when OpenVpn starts. In this case here two background process are
      * started. One for authentication and one for accounting. The communication
      * between the processes is made via sockets.
@@ -43,7 +43,7 @@ extern "C"
      * and it is undependent from the openvpn process.
      * @param The type of plugin, maybe client_connect, client_disconnect, user_auth_pass_verify...
      * @param A list of arguments which are set in the configuration file of openvpn in plugin line.
-     * @param The list of enviromental variables, it is created by the OpenVpn-Process.
+     * @param The list of environmental variables, it is created by the OpenVpn-Process.
      */
 
 
@@ -320,7 +320,7 @@ error:
     }
 
 
-    /** This funtion is called from the OpenVpn process everytime
+    /** This function is called from the OpenVpn process every time
      * a event happens. The function handle the events (plugins)
      * AUTH_USER_PASS_VERIFY, CLIENT_CONNECT, CLIENT_DISCONNECT.
      * The function reads the information from the envriomental
@@ -336,8 +336,8 @@ error:
      * @param The handle which was allocated in the open function.
      * @param The type of plugin, maybe client_conect, client_disconnect, auth_user_pass_verify
      * @param A list of arguments which are set in the openvpn configuration file.
-     * @param The list of enviromental variables, it is created by the OpenVpn-Process.
-     * @return A interger with the status of the funtion (OPENVPN_PLUGIN_FUNC_SUCCESS or OPENVPN_PLUGIN_FUNC_ERROR).
+     * @param The list of environmental variables, it is created by the OpenVpn-Process.
+     * @return An integer with the status of the function (OPENVPN_PLUGIN_FUNC_SUCCESS or OPENVPN_PLUGIN_FUNC_ERROR).
      */
 
     //OPENVPN_EXPORT int
@@ -377,7 +377,7 @@ error:
         UserPlugin 	*newuser=NULL; 	/**< A context for an new user.*/
         UserPlugin 	*tmpuser=NULL; 	/**< A context for an temporary user.*/
 
-        string common_name;			/**<A string for the common_name from the enviroment.*/
+        string common_name;			/**<A string for the common_name from the environment.*/
         string untrusted_ip;			/** untrusted_ip for ipv6 support **/
 
 
@@ -579,7 +579,7 @@ error:
                     context->acctsocketbackgr.send ( DEL_USER );
                     context->acctsocketbackgr.send ( newuser->getKey() );
 
-                    //get the responce
+                    //get the response
                     const int status = context->acctsocketbackgr.recvInt();
                     if ( status == RESPONSE_SUCCEEDED )
                     {
@@ -733,7 +733,7 @@ error:
  * if found or NULL otherwise.
  * A field in the envp-array looks like: name=user1
  * @param The name of the variable.
- * @param The array with the enviromental variables.
+ * @param The array with the environmental variables.
  * @return A poniter to the variable value or NULL, if the varaible was not found.
  */
 const char * get_env ( const char *name, const char *envp[] )
@@ -745,7 +745,7 @@ const char * get_env ( const char *name, const char *envp[] )
 
         for ( i = 0; envp[i]; ++i )
         {
-            //compare the enviromental names
+            //compare the environmental names
             if ( !strncmp ( envp[i], name, namelen ) )
             {
                 //if the varibale is found
@@ -963,7 +963,7 @@ void  * auth_user_pass_verify(void * c)
         //there must be a username
         if ( newuser->getUsername().size() > 0 )  //&& olduser==NULL)
         {
-            //send the informations to the backgorund process
+            //send the informations to the background process
             context->authsocketbackgr.send ( COMMAND_VERIFY );
             context->authsocketbackgr.send ( newuser->getUsername() );
             context->authsocketbackgr.send ( newuser->getPassword() );
@@ -1044,7 +1044,7 @@ void  * auth_user_pass_verify(void * c)
                     context->acctsocketbackgr.send ( DEL_USER );
                     context->acctsocketbackgr.send ( newuser->getKey() );
 
-                    //get the responce
+                    //get the response
                     const int status = context->acctsocketbackgr.recvInt();
                     if ( status == RESPONSE_SUCCEEDED )
                     {
@@ -1202,7 +1202,7 @@ void get_user_env(PluginContext * context,const int type,const char * envp[], Us
       user->setCommonname ("UNDEF");
     }
     
-    //rewrite the commonname if OpenVPN use the option username-as-comon-name
+    //rewrite the commonname if OpenVPN use the option username-as-common-name
     if ( context->conf.getUsernameAsCommonname() == true )
     {
         if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Commonname set to Username\n";

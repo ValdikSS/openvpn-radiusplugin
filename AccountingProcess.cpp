@@ -38,7 +38,7 @@ void AccountingProcess::Accounting(PluginContext * context)
     string					key;		//The unique key.
     AcctScheduler 			scheduler; 	//The scheduler for the accounting.
     fd_set  				set; 		//A set for the select function.
-    struct timeval 			tv; 		//A timeinterval for the select funtion.
+    struct timeval 			tv; 		//A timeinterval for the select function.
 
 
 
