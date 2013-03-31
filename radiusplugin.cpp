@@ -488,6 +488,7 @@ error:
                     context->acctsocketbackgr.send ( ADD_USER );
                     context->acctsocketbackgr.send ( newuser->getUsername() );
                     context->acctsocketbackgr.send ( newuser->getSessionId() );
+                    context->acctsocketbackgr.send ( newuser->getDev() );
                     context->acctsocketbackgr.send ( newuser->getPortnumber() );
                     context->acctsocketbackgr.send ( newuser->getCallingStationId() );
                     context->acctsocketbackgr.send ( newuser->getFramedIp() );
@@ -968,6 +969,7 @@ void  * auth_user_pass_verify(void * c)
             context->authsocketbackgr.send ( COMMAND_VERIFY );
             context->authsocketbackgr.send ( newuser->getUsername() );
             context->authsocketbackgr.send ( newuser->getPassword() );
+            context->authsocketbackgr.send ( newuser->getDev() );
             context->authsocketbackgr.send ( newuser->getPortnumber() );
             context->authsocketbackgr.send ( newuser->getSessionId() );
             context->authsocketbackgr.send ( newuser->getCallingStationId() );
@@ -1213,6 +1215,8 @@ void get_user_env(PluginContext * context,const int type,const char * envp[], Us
         if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Commonname set to Username\n";
         user->setCommonname ( get_env ( "username", envp ) );
     }
+
+    user->setDev ( get_env ( "dev", envp ) );
 
     string untrusted_ip;
     // it's ipv4

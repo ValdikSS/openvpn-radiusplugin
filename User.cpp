@@ -24,6 +24,7 @@
 /** The constructor sets the acctinteriminterval and the portnumber to 0.*/
 User::User()
 {
+	this->dev="";
 	this->framedip="";
 	this->framedroutes="";
 	this->framedroutes6="";
@@ -42,6 +43,7 @@ User::User()
  * @param num  The portnumber.*/
 /*User::User(int num)
 {
+	this->dev="";
 	this->framedip="";
 	this->framedroutes="";
 	this->framedroutes6="";
@@ -70,6 +72,7 @@ User & User::operator=(const User & u)
 {
 	this->username=u.username;
 	this->commonname=u.commonname;
+	this->dev=u.dev;
 	this->framedroutes=u.framedroutes;
 	this->framedip=u.framedip;
 	this->framedroutes6=u.framedroutes6;
@@ -111,6 +114,7 @@ User::User(const User & u)
 {
 	this->username=u.username;
 	this->commonname=u.commonname;
+	this->dev=u.dev;
 	this->framedroutes=u.framedroutes;
 	this->framedip=u.framedip;
 	this->framedroutes6=u.framedroutes6;
@@ -165,6 +169,19 @@ string User::getCommonname(void)
 void User::setCommonname(string cn)
 {
 	this->commonname=cn;
+}
+
+/** The getter method for the device.
+ *  @return The device as a string.*/
+string User::getDev(void)
+{
+	return this->dev;
+}
+/** The setter method for the device.
+ * @param dev The device.*/
+void User::setDev(string dev)
+{
+	this->dev=dev;
 }
 
 /** The getter method for the framed routes.

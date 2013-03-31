@@ -45,6 +45,7 @@ class User
 protected:
 	string username;		/**<The username.*/
 	string commonname;		/**<The commonname.*/
+	string dev;			/**<The device.*/
 	string framedroutes;		/**<The framedroutes, they are stored as a string. If there are more routes, they must be delimited by an ';'*/
 	string framedip;		/**<The framed ip.*/
 	string framedroutes6;		/**<The framed IPv6 routes, they are stored as a string. If there are more routes, they must be delimited by an ';'*/
@@ -74,6 +75,8 @@ public:
 	string getCommonname(void);
 	void setCommonname(string);
 		
+	string getDev(void);
+	void setDev(string);
 	
 	string getFramedRoutes(void);
 	void setFramedRoutes(string);

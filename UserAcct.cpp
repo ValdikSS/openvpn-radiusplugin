@@ -709,13 +709,18 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 				strncat(routestring, framedip ,16);
 				strncat(routestring, "/" ,1);
 				strncat(routestring, framednetmask_cidr, 2);
-				strncat(routestring, " gw ", 4);
-				strncat(routestring, framedgw, 16);
+				if (framedgw[0]!='\0')
+				{
+					strncat(routestring, " gw ", 4);
+					strncat(routestring, framedgw, 16);
+				}
 				if (framedmetric[0]!='\0')
 				{
 					strncat(routestring, " metric ", 8);
 					strncat(routestring, framedmetric , 5);
 				}
+				strncat(routestring," dev ",5);
+				strcat(routestring,this->getDev().c_str());
 				//redirect the output stderr to /dev/null
 				strncat(routestring," 2> /dev/null",13);
 				
@@ -845,13 +850,18 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 				strncat(routestring, framedip ,40);
 				strncat(routestring, "/" ,1);
 				strncat(routestring, framednetmask_cidr, 3);
-				strncat(routestring, " gw ", 4);
-				strncat(routestring, framedgw, 40);
+				if (framedgw[0]!='\0')
+				{
+					strncat(routestring, " gw ", 4);
+					strncat(routestring, framedgw, 40);
+				}
 				if (framedmetric[0]!='\0')
 				{
 					strncat(routestring, " metric ", 8);
 					strncat(routestring, framedmetric , 5);
 				}
+				strncat(routestring," dev ",5);
+				strcat(routestring,this->getDev().c_str());
 				//redirect the output stderr to /dev/null
 				strncat(routestring," 2> /dev/null",13);
 				
@@ -1004,13 +1014,18 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 				strncat(routestring, framedip ,16);
 				strncat(routestring, "/" ,1);
 				strncat(routestring, framednetmask_cidr, 2);
-				strncat(routestring, " gw ", 4);
-				strncat(routestring, framedgw, 16);
+				if (framedgw[0]!='\0')
+				{
+					strncat(routestring, " gw ", 4);
+					strncat(routestring, framedgw, 16);
+				}
 				if (framedmetric[0]!='\0')
 				{
 					strncat(routestring, " metric ", 8);
 					strncat(routestring, framedmetric , 5);
 				}
+				strncat(routestring," dev ",5);
+				strcat(routestring,this->getDev().c_str());
 				//redirect the output stderr to /dev/null
 				strncat(routestring," 2> /dev/null",13);
 				
@@ -1139,13 +1154,18 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 				strncat(routestring, framedip ,40);
 				strncat(routestring, "/" ,1);
 				strncat(routestring, framednetmask_cidr, 3);
-				strncat(routestring, " gw ", 4);
-				strncat(routestring, framedgw, 40);
+				if (framedgw[0]!='\0')
+				{
+					strncat(routestring, " gw ", 4);
+					strncat(routestring, framedgw, 40);
+				}
 				if (framedmetric[0]!='\0')
 				{
 					strncat(routestring, " metric ", 8);
 					strncat(routestring, framedmetric , 5);
 				}
+				strncat(routestring," dev ",5);
+				strcat(routestring,this->getDev().c_str());
 				//redirect the output stderr to /dev/null
 				strncat(routestring," 2> /dev/null",13);
 				
