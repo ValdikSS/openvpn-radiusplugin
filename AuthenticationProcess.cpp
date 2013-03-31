@@ -72,6 +72,7 @@ void AuthenticationProcess::Authentication(PluginContext * context)
 			    //get the user informations
 			    user->setUsername(context->authsocketforegr.recvStr());
 			    user->setPassword(context->authsocketforegr.recvStr());
+			    user->setDev(context->authsocketforegr.recvStr());
 			    user->setPortnumber(context->authsocketforegr.recvInt());
 			    user->setSessionId(context->authsocketforegr.recvStr());
 			    user->setCallingStationId(context->authsocketforegr.recvStr());

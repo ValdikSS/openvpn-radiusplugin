@@ -101,6 +101,7 @@ void AccountingProcess::Accounting(PluginContext * context)
                     //get the information from the foreground process
                     user->setUsername(context->acctsocketforegr.recvStr());
                     user->setSessionId(context->acctsocketforegr.recvStr()) ;
+                    user->setDev(context->acctsocketforegr.recvStr()) ;
                     user->setPortnumber(context->acctsocketforegr.recvInt());
                     user->setCallingStationId(context->acctsocketforegr.recvStr());
                     user->setFramedIp(context->acctsocketforegr.recvStr());
