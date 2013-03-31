@@ -705,13 +705,13 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 				}
 															
 				//create system call
-				strncat(routestring, "route del -net ",15);
+				strncat(routestring, "ip route del ",13);
 				strncat(routestring, framedip ,16);
 				strncat(routestring, "/" ,1);
 				strncat(routestring, framednetmask_cidr, 2);
 				if (framedgw[0]!='\0')
 				{
-					strncat(routestring, " gw ", 4);
+					strncat(routestring, " via ", 5);
 					strncat(routestring, framedgw, 16);
 				}
 				if (framedmetric[0]!='\0')
@@ -721,6 +721,7 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 				}
 				strncat(routestring," dev ",5);
 				strcat(routestring,this->getDev().c_str());
+				strncat(routestring," proto static",13);
 				//redirect the output stderr to /dev/null
 				strncat(routestring," 2> /dev/null",13);
 				
@@ -846,13 +847,13 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 				}
 															
 				//create system call
-				strncat(routestring, "route -6 del ",13);
+				strncat(routestring, "ip -6 route del ",16);
 				strncat(routestring, framedip ,40);
 				strncat(routestring, "/" ,1);
 				strncat(routestring, framednetmask_cidr, 3);
 				if (framedgw[0]!='\0')
 				{
-					strncat(routestring, " gw ", 4);
+					strncat(routestring, " via ", 5);
 					strncat(routestring, framedgw, 40);
 				}
 				if (framedmetric[0]!='\0')
@@ -862,6 +863,7 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 				}
 				strncat(routestring," dev ",5);
 				strcat(routestring,this->getDev().c_str());
+				strncat(routestring," proto static",13);
 				//redirect the output stderr to /dev/null
 				strncat(routestring," 2> /dev/null",13);
 				
@@ -1010,13 +1012,13 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 															
 														
 				//create system call
-				strncat(routestring, "route add -net ",15);
+				strncat(routestring, "ip route add ",13);
 				strncat(routestring, framedip ,16);
 				strncat(routestring, "/" ,1);
 				strncat(routestring, framednetmask_cidr, 2);
 				if (framedgw[0]!='\0')
 				{
-					strncat(routestring, " gw ", 4);
+					strncat(routestring, " via ", 5);
 					strncat(routestring, framedgw, 16);
 				}
 				if (framedmetric[0]!='\0')
@@ -1026,6 +1028,7 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 				}
 				strncat(routestring," dev ",5);
 				strcat(routestring,this->getDev().c_str());
+				strncat(routestring," proto static",13);
 				//redirect the output stderr to /dev/null
 				strncat(routestring," 2> /dev/null",13);
 				
@@ -1150,13 +1153,13 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 															
 														
 				//create system call
-				strncat(routestring, "route -6 add ",13);
+				strncat(routestring, "ip -6 route add ",21);
 				strncat(routestring, framedip ,40);
 				strncat(routestring, "/" ,1);
 				strncat(routestring, framednetmask_cidr, 3);
 				if (framedgw[0]!='\0')
 				{
-					strncat(routestring, " gw ", 4);
+					strncat(routestring, " via ", 5);
 					strncat(routestring, framedgw, 40);
 				}
 				if (framedmetric[0]!='\0')
@@ -1166,6 +1169,7 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 				}
 				strncat(routestring," dev ",5);
 				strcat(routestring,this->getDev().c_str());
+				strncat(routestring," proto static",13);
 				//redirect the output stderr to /dev/null
 				strncat(routestring," 2> /dev/null",13);
 				
@@ -1285,7 +1289,7 @@ int UserAcct::deleteCcdFile(PluginContext * context)
 {
 	string filename;
 	filename = context->conf.getCcdPath()+ this->getCommonname();
-	if(context->conf.getOverWriteCCFiles()==true && (this->getFramedIp().length() > 0 || this->getFramedRoutes().length() > 0 || this->getFramedRoutes6().length() > 0))
+	if(context->conf.getOverWriteCCFiles()==true && (this->getFramedIp().length() > 0 || this->getFramedRoutes().length() > 0 || this->getFramedIp6().length() > 0 || this->getFramedRoutes6().length() > 0))
 	{
 		remove(filename.c_str());
 	}
