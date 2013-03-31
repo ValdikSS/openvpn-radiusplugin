@@ -599,13 +599,13 @@ int UserAcct::sendStopPacket(PluginContext * context)
 void UserAcct::delSystemRoutes(PluginContext * context)
 {
 	char * route;
-	char framedip[16];
+	char framedip[40];
 	
-	char routestring[100];
-	char framednetmask_cidr[3]; 
-	char framedgw[16];
+	char routestring[200];
+	char framednetmask_cidr[4]; 
+	char framedgw[40];
 	char framedmetric[5];  
-	char * framedroutes;
+	char * framedroutes, * framedroutes6;
 	int j=0,k=0,len=0;
 	
 	//copy the framed route string to an char array, it is easier to
@@ -750,6 +750,141 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 	delete [] framedroutes;
 		
 
+	//copy the framed route string to an char array, it is easier to
+	//analyse
+	framedroutes6=new char[this->getFramedRoutes6().size()+1];
+	memset(framedroutes6,0,this->getFramedRoutes6().size()+1);
+	
+	// copy in a temp-string, because strtok deletes the delimiter, if it used anywhere
+	strncpy(framedroutes6,this->getFramedRoutes6().c_str(),this->getFramedRoutes6().size());
+	
+	//are there framed routes
+	if (framedroutes6[0]!='\0')
+	{
+		//get the first route
+		route=strtok(framedroutes6,";");
+		len=strlen(route);
+		if (len > 150) //this is too big!! but the length is variable
+		{
+			cerr << getTime() <<"RADIUS-PLUGIN: BACKGROUND-ACCT:  Argument for Framed Route is too long (>150 Characters).\n";
+		}
+		else
+		{
+			while (route!=NULL)
+			{		
+				//set the arrays to 0
+				memset(routestring,0,200);
+				memset(framednetmask_cidr,0,4);
+				memset(framedip,0,40);
+				memset(framedgw,0,40);
+				memset(framedmetric,0,5);
+							
+				j=0;k=0;
+				//get ip address and add it to framedip
+				while(route[j]!='/' && j<len)
+				{
+					if (route[j]!=' ')
+					{
+						framedip[k]=route[j];
+						k++;
+					}
+					j++;
+				}
+				k=0;
+				j++;
+				//get the framednetmask and add it to framednetmack_cidr
+				while(route[j]!=' ' && j<=len)
+				{
+					framednetmask_cidr[k]=route[j];
+					k++;
+					j++;
+				}
+				k=0;
+				//jump spaces
+				while(route[j]==' ' && j<=len)
+				{
+					j++;
+				}
+				//get the gateway
+				while(route[j]!='/' && j<=len)
+				{
+					if (route[j]!=' ')
+					{
+						framedgw[k]=route[j];
+						k++;
+					}
+					j++;
+				}
+				j++;
+				//find gateway netmask (this isn't used
+				//at the command route under linux)
+				while(route[j]!=' ' && j<=len)
+				{
+					j++;
+				}
+				//jump spaces
+				while(route[j]==' ' && j<=len)
+				{
+					j++;
+				}
+				k=0;
+				if (j<=len) //is there a metric (optional)
+				{
+					k=0;
+					//find the metric
+					while(route[j]!=' ' && j<=len)
+					{
+							framedmetric[k]=route[j];
+							k++;
+							j++;
+					}
+				}
+															
+				//create system call
+				strncat(routestring, "route -6 del ",13);
+				strncat(routestring, framedip ,40);
+				strncat(routestring, "/" ,1);
+				strncat(routestring, framednetmask_cidr, 3);
+				strncat(routestring, " gw ", 4);
+				strncat(routestring, framedgw, 40);
+				if (framedmetric[0]!='\0')
+				{
+					strncat(routestring, " metric ", 8);
+					strncat(routestring, framedmetric , 5);
+				}
+				//redirect the output stderr to /dev/null
+				strncat(routestring," 2> /dev/null",13);
+				
+						
+				if (DEBUG (context->getVerbosity()))
+	    			cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Create IPv6 route string "<< routestring <<".\n";
+				
+				//system call
+				if(system(routestring)!=0) 
+				//if(1)//-> the debugg can't context system()
+				{
+					cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Route " << routestring << " could not set. Route already set or bad route string.\n";
+				}
+				else
+				{
+					if (DEBUG (context->getVerbosity()))
+	    				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Add route to system routing table.\n";
+					
+				}
+				//get the next route
+				route=strtok(NULL,";");	
+			}
+		}
+		
+	}
+	else
+	{
+		if (DEBUG (context->getVerbosity()))
+    		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  No IPv6 routes for user in AccessAcceptPacket.\n";
+	}
+	//free the char array
+	delete [] framedroutes6;
+		
 }
 
 /** The method adds ths routes of the user to the system routing table.
@@ -758,13 +893,13 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 void UserAcct::addSystemRoutes(PluginContext * context)
 {
 	char * route;
-	char framedip[16];
+	char framedip[40];
 	
-	char routestring[100];
-	char framednetmask_cidr[3]; 
-	char framedgw[16];
+	char routestring[200];
+	char framednetmask_cidr[4]; 
+	char framedgw[40];
 	char framedmetric[5];  
-	char * framedroutes;
+	char * framedroutes, * framedroutes6;
 	int j=0,k=0,len=0;
 	
 	//copy the framed route string to an char array, it is easier to
@@ -905,8 +1040,143 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 		if (DEBUG (context->getVerbosity()))
     		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  No routes for user.\n";
 	}
-	//fre the chat array
+	//free the char array
 	delete [] framedroutes;
+	
+	//copy the framed route string to an char array, it is easier to
+	//analyse
+	framedroutes6=new char[this->getFramedRoutes6().size()+1];
+	memset(framedroutes6,0,this->getFramedRoutes6().size()+1);
+	
+	// copy in a temp-string, becaue strtok deletes the delimiter, if it used anywhere
+	strncpy(framedroutes6,this->getFramedRoutes6().c_str(),this->getFramedRoutes6().size());
+	
+	//are there framed routes
+	if (framedroutes6[0]!='\0')
+	{
+		//get the first route
+		route=strtok(framedroutes6,";");
+		len=strlen(route);
+		if (len > 150) //this is to big!! but the length is variable
+		{
+			cerr << getTime() <<"RADIUS-PLUGIN: BACKGROUND-ACCT:  Argument for Framed Route is to long (>150 Characters).\n";
+		}
+		else
+		{
+			while (route!=NULL)
+			{		
+				//set the arrays to 0
+				memset(routestring,0,200);
+				memset(framednetmask_cidr,0,4);
+				memset(framedip,0,40);
+				memset(framedgw,0,40);
+				memset(framedmetric,0,5);
+							
+				j=0;k=0;
+				//get ip address and add it to framedip
+				while(route[j]!='/' && j<len)
+				{
+					if (route[j]!=' ')
+					{
+						framedip[k]=route[j];
+						k++;
+					}
+					j++;
+				}
+				k=0;
+				j++;
+				//get the framednetmask and add it to framednetmask_cidr
+				while(route[j]!=' ' && j<=len)
+				{
+					framednetmask_cidr[k]=route[j];
+					k++;
+					j++;
+				}
+				k=0;
+				//jump spaces
+				while(route[j]==' ' && j<=len)
+				{
+					j++;
+				}
+				//get the gateway
+				while(route[j]!='/' && j<=len)
+				{
+					if (route[j]!=' ')
+					{
+						framedgw[k]=route[j];
+						k++;
+					}
+					j++;
+				}
+				j++;
+				//find gateway netmask (this isn't used
+				//at the command route under linux)
+				while(route[j]!=' ' && j<=len)
+				{
+					j++;
+				}
+				//jump spaces
+				while(route[j]==' ' && j<=len)
+				{
+					j++;
+				}
+				k=0;
+				if (j<=len) //is there a metric (optional)
+				{
+					k=0;
+					//find the metric
+					while(route[j]!=' ' && j<=len)
+					{
+							framedmetric[k]=route[j];
+							k++;
+							j++;
+					}
+				}
+															
+														
+				//create system call
+				strncat(routestring, "route -6 add ",13);
+				strncat(routestring, framedip ,40);
+				strncat(routestring, "/" ,1);
+				strncat(routestring, framednetmask_cidr, 3);
+				strncat(routestring, " gw ", 4);
+				strncat(routestring, framedgw, 40);
+				if (framedmetric[0]!='\0')
+				{
+					strncat(routestring, " metric ", 8);
+					strncat(routestring, framedmetric , 5);
+				}
+				//redirect the output stderr to /dev/null
+				strncat(routestring," 2> /dev/null",13);
+				
+						
+				if (DEBUG (context->getVerbosity()))
+				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Create IPv6 route string "<< routestring << " dev " << this->getDev() << ".\n";
+				
+				//system call route
+				if(system(routestring)!=0) 
+				//if(1)//-> the debugg can't context system()
+				{
+					cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Route " << routestring << " could not set. Route already set or bad route string.\n";
+				}
+				else
+				{
+					if (DEBUG (context->getVerbosity()))
+	    				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Add route to system routing table.\n";
+												
+				}
+				//get the next route
+				route=strtok(NULL,";");	
+			}
+		}
+	}
+	else
+	{
+		if (DEBUG (context->getVerbosity()))
+    		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  No IPv6 routes for user.\n";
+	}
+	//free the char array
+	delete [] framedroutes6;
 	
 }
 
@@ -995,7 +1265,7 @@ int UserAcct::deleteCcdFile(PluginContext * context)
 {
 	string filename;
 	filename = context->conf.getCcdPath()+ this->getCommonname();
-	if(context->conf.getOverWriteCCFiles()==true && (this->getFramedIp().length() > 0 || this->getFramedRoutes().length() > 0))
+	if(context->conf.getOverWriteCCFiles()==true && (this->getFramedIp().length() > 0 || this->getFramedRoutes().length() > 0 || this->getFramedRoutes6().length() > 0))
 	{
 		remove(filename.c_str());
 	}

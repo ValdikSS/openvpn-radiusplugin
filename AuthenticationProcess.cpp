@@ -105,6 +105,9 @@ void AuthenticationProcess::Authentication(PluginContext * context)
 				//send the framed ip to the parent process
 			     	context->authsocketforegr.send(user->getFramedIp());
 										
+			     	//send the IPv6 routes to the parent process
+			     	context->authsocketforegr.send(user->getFramedRoutes6());
+					
 					//send the interval to the parent process
 			     	context->authsocketforegr.send(user->getAcctInterimInterval());
 			     	

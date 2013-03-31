@@ -251,6 +251,25 @@ void UserAuth::parseResponsePacket(RadiusPacket *packet, PluginContext * context
 	
 	
 	
+	range=packet->findAttributes(99);
+	iter1=range.first;
+	iter2=range.second;	
+	string froutes6;
+	
+	while (iter1!=iter2)
+	{
+		
+		froutes6.append((char *) iter1->second.getValue(), iter1->second.getLength()-2);
+		froutes6.append(";");
+		iter1++;
+	}
+	this->setFramedRoutes6(froutes6);
+	
+	if (DEBUG (context->getVerbosity()))
+    	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: framed ipv6 route: " << this->getFramedRoutes6() <<".\n";
+	
+	
+	
 	range=packet->findAttributes(85);
 	iter1=range.first;
 	iter2=range.second;		
@@ -1485,15 +1504,16 @@ int UserAuth::createCcdFile(PluginContext *context)
 	ofstream ccdfile;
 	
 	char * route;
-	char framedip[16];
+	char framedip[40];
 	char ipstring[100];
 	in_addr_t ip2;
 	in_addr ip3;
 	string filename;
 	char framedroutes[4096];
-	char framednetmask_cidr[3]; // ->/24
+	char framedroutes6[4096];
+	char framednetmask_cidr[4]; // ->/128
 	char framednetmask[16]; // ->255.255.255.0
-	char framedgw[16];
+	char framedgw[40];
 	char framedmetric[5]; //what is the biggest metric? 
 	
 	unsigned long d1,d2;
@@ -1502,11 +1522,12 @@ int UserAuth::createCcdFile(PluginContext *context)
 	int len=0;
 	
 	
-	if(context->conf.getOverWriteCCFiles()==true && (this->getFramedIp().length() > 0 || this->getFramedRoutes().length() > 0))
+	if(context->conf.getOverWriteCCFiles()==true && (this->getFramedIp().length() > 0 || this->getFramedRoutes().length() > 0 || this->getFramedRoutes6().length() > 0))
 	{
 		memset(ipstring,0,100);
 		memset(framedip,0,16);
 		memset(framedroutes,0,4096);
+		memset(framedroutes6,0,4096);
 			
 		//create the filename, ccd-path + commonname
 		filename=context->conf.getCcdPath()+this->getCommonname();
@@ -1524,6 +1545,9 @@ int UserAuth::createCcdFile(PluginContext *context)
 		
 		// copy in a temp-string, becaue strtok deletes the delimiter, if it is used anywhere
 		strncpy(framedroutes,this->getFramedRoutes().c_str(),4095);
+		
+		// copy in a temp-string, becaue strtok deletes the delimiter, if it is used anywhere
+		strncpy(framedroutes6,this->getFramedRoutes6().c_str(),4095);
 		
 		
 		if (ccdfile.is_open())
@@ -1704,6 +1728,105 @@ int UserAuth::createCcdFile(PluginContext *context)
 			
 							//write iroute to client file
 							ccdfile << "iroute " << framedip << " "<< framednetmask << "\n";
+						
+							route=strtok(NULL,";");
+					}
+				}
+			}
+			
+			//set the IPv6 framed routes in the file for the openvpn process
+			if (framedroutes6[0]!='\0')
+			{
+				if (DEBUG (context->getVerbosity()))
+					cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: Write framed routes to ccd-file.\n";
+			
+				route=strtok(framedroutes6,";");
+				len=strlen(route);
+				if (len > 150) //this is too big! but the length is variable
+				{
+					cerr << getTime() <<"RADIUS-PLUGIN: Argument for Framed Route is to long (>50 Characters).\n";
+					return 1;
+				}
+				else
+				{
+					while (route!=NULL)
+					{
+						j=0;k=0;
+						//set everything back for the next route entry
+						memset(framednetmask_cidr,0,4);
+						memset(framedip,0,40);
+						memset(framednetmask,0,40);
+						memset(framedgw,0,40);
+						memset(framedmetric,0,5);
+						
+						//add ip address to string
+						while(route[j]!='/' && j<len)
+							{
+								if (route[j]!=' ')
+								{
+									framedip[k]=route[j];
+									k++;
+								}
+								j++;
+							}
+							k=0;
+							j++;
+							//add netmask
+							while(route[j]!=' ' && j<=len)
+							{
+								framednetmask_cidr[k]=route[j];
+								k++;
+								j++;
+							}
+							k=0;
+							//jump spaces
+							while(route[j]==' ' && j<len)
+							{
+								j++;
+							}
+							//find gateway
+							while(route[j]!='/' && j<len)
+							{
+								if (route[j]!=' ')
+								{
+									framedgw[k]=route[j];
+									k++;
+								}
+								j++;
+							}
+							j++;
+							
+							//find gateway netmask (this isn't used
+							//at the command route under linux)
+							while(route[j]!=' ' && j<len)
+							{
+								j++;
+							}
+							//jump spaces
+							
+							while(route[j]==' ' && j<len )
+							{
+								j++;
+							}
+							k=0;
+							if (j<=len)
+							{
+							
+								k=0;
+								//find the metric
+								while(route[j]!=' ' && j<len)
+								{
+									framedmetric[k]=route[j];
+									k++;
+									j++;
+								}
+							}
+																								
+							if (DEBUG (context->getVerbosity()))
+		    						cerr << getTime() << "RADIUS-PLUGIN: Write route string: iroute-ipv6 " << framedip << "/" << framednetmask_cidr << " " << framedgw << " " << framedmetric << " to ccd-file.\n";
+			
+							//write iroute to client file
+							ccdfile << "iroute-ipv6 " << framedip << "/"<< framednetmask_cidr << "\n";
 						
 							route=strtok(NULL,";");
 					}
