@@ -161,6 +161,8 @@
   	//ATTRIBUTE	Login-IPv6-Host			98	ipaddr6	
   	//ATTRIBUTE	Framed-IPv6-Route		99	string	
   	//ATTRIBUTE	Framed-IPv6-Pool		100	string	
+  	//ATTRIBUTE	Framed-IPv6-Address		168	ipaddr6	
+  	//
   	//ATTRIBUTE	X-Ascend-FCP-Parameter		119	string	
   	//ATTRIBUTE	Ascend-Modem-PortNo		120	integer	
   	//ATTRIBUTE	Ascend-Modem-SlotNo		121	integer	

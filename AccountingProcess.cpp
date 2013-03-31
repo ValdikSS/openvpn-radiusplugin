@@ -105,6 +105,7 @@ void AccountingProcess::Accounting(PluginContext * context)
                     user->setPortnumber(context->acctsocketforegr.recvInt());
                     user->setCallingStationId(context->acctsocketforegr.recvStr());
                     user->setFramedIp(context->acctsocketforegr.recvStr());
+                    user->setFramedIp6(context->acctsocketforegr.recvStr());
                     user->setCommonname(context->acctsocketforegr.recvStr());
                     user->setAcctInterimInterval(context->acctsocketforegr.recvInt());
                     user->setFramedRoutes(context->acctsocketforegr.recvStr());
@@ -114,7 +115,7 @@ void AccountingProcess::Accounting(PluginContext * context)
                     user->setUntrustedPort(context->acctsocketforegr.recvStr());
                     context->acctsocketforegr.recvBuf(user);
                     if (DEBUG (context->getVerbosity()))
-                        cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: New user acct: username: " << user->getUsername() << ", interval: " << user->getAcctInterimInterval() << ", calling station: " << user->getCallingStationId() << ", commonname: " << user->getCommonname() << ", framed ip: " << user->getFramedIp() <<".\n";
+                        cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: New user acct: username: " << user->getUsername() << ", interval: " << user->getAcctInterimInterval() << ", calling station: " << user->getCallingStationId() << ", commonname: " << user->getCommonname() << ", framed ip: " << user->getFramedIp() << ", framed ipv6: " << user->getFramedIp6() <<".\n";
 
 
                     //set the starttime

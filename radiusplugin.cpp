@@ -492,6 +492,7 @@ error:
                     context->acctsocketbackgr.send ( newuser->getPortnumber() );
                     context->acctsocketbackgr.send ( newuser->getCallingStationId() );
                     context->acctsocketbackgr.send ( newuser->getFramedIp() );
+                    context->acctsocketbackgr.send ( newuser->getFramedIp6() );
                     context->acctsocketbackgr.send ( newuser->getCommonname() );
                     context->acctsocketbackgr.send ( newuser->getAcctInterimInterval() );
                     context->acctsocketbackgr.send ( newuser->getFramedRoutes() );
@@ -995,6 +996,10 @@ void  * auth_user_pass_verify(void * c)
                 newuser->setFramedRoutes6 ( context->authsocketbackgr.recvStr() );
                 if ( DEBUG ( context->getVerbosity() ) )
                     cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Received IPv6 routes for user: "<< newuser->getFramedRoutes6() << ".\n";
+                //get the framed IPv6
+                newuser->setFramedIp6 ( context->authsocketbackgr.recvStr() );
+                if ( DEBUG ( context->getVerbosity() ) )
+                    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Received framed IPv6 for user: "<< newuser->getFramedIp6() << "." << endl;
 
 
                 // get the interval from the background process
