@@ -26,6 +26,7 @@ User::User()
 {
 	this->framedip="";
 	this->framedroutes="";
+	this->framedroutes6="";
 	this->key="";
         this->statusfilekey="";
 	this->untrustedport="";
@@ -43,6 +44,7 @@ User::User()
 {
 	this->framedip="";
 	this->framedroutes="";
+	this->framedroutes6="";
 	this->key="";
 	this->untrustedport="";
 	this->acctinteriminterval=0;
@@ -70,6 +72,7 @@ User & User::operator=(const User & u)
 	this->commonname=u.commonname;
 	this->framedroutes=u.framedroutes;
 	this->framedip=u.framedip;
+	this->framedroutes6=u.framedroutes6;
 	this->key=u.key;
         this->statusfilekey=u.statusfilekey;
 	this->callingstationid=u.callingstationid;
@@ -110,6 +113,7 @@ User::User(const User & u)
 	this->commonname=u.commonname;
 	this->framedroutes=u.framedroutes;
 	this->framedip=u.framedip;
+	this->framedroutes6=u.framedroutes6;
 	this->key=u.key;
         this->statusfilekey=u.statusfilekey;
 	this->callingstationid=u.callingstationid;
@@ -171,7 +175,7 @@ string User::getFramedRoutes(void)
 }
 /** The setter method for the framedroutes.
  * @param froutes The framedroutes, if there are more 
- * routes they are diveded through a ';'.*/
+ * routes they are divided through a ';'.*/
 void User::setFramedRoutes(string froutes)
 {
 	this->framedroutes=froutes;
@@ -188,6 +192,20 @@ string User::getFramedIp(void)
 void User::setFramedIp(string ip)
 {
 	this->framedip=ip;
+}
+
+/** The getter method for the framed IPv6 routes.
+ *  @return The framed IPv6 routes as a string.*/
+string User::getFramedRoutes6(void)
+{
+	return this->framedroutes6;
+}
+/** The setter method for the framed IPv6 routes.
+ * @param froutes6 The framed IPv6 routes, if there are more 
+ * routes they are divided through a ';'.*/
+void User::setFramedRoutes6(string froutes6)
+{
+	this->framedroutes6=froutes6;
 }
 
 /** The getter method for the fkey.
