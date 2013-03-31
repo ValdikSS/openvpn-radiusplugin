@@ -49,6 +49,7 @@ protected:
 	string framedroutes;		/**<The framedroutes, they are stored as a string. If there are more routes, they must be delimited by an ';'*/
 	string framedip;		/**<The framed ip.*/
 	string framedroutes6;		/**<The framed IPv6 routes, they are stored as a string. If there are more routes, they must be delimited by an ';'*/
+	string framedip6;		/**<The framed ipv6.*/
 	string callingstationid;	/**<The calling station id, in this case the real ip address of the client.*/
 	string key;			/**<A unique key to find the user in a map. */
 	string statusfilekey;		/**<Unique identifier in the status log file (version 1) "commonname,untrusted_ip:untrusted_port"*/
@@ -86,6 +87,9 @@ public:
 	
 	string getFramedRoutes6(void);
 	void setFramedRoutes6(string);
+	
+	string getFramedIp6(void);
+	void setFramedIp6(string);
 	
 	string getKey(void);
 	void setKey(string);

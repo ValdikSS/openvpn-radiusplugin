@@ -43,6 +43,7 @@ private:
     string statusfile; 				/**< The path and filename of the status file, where openvpn writes the status information.*/ 
 	char subnet[16];				/**<The subnet which is assigned to the client in topology option.*/
 	char p2p[16];					/**<The OpenVPN server address which is assigned to the client in topology p2p.*/
+	char p2p6[40];					/**<The OpenVPN server IPv6 address which is assigned to the client in topology p2p.*/
 	string vsascript;				/**<A script which handles vendor specific attributes.*/
 	string vsanamedpipe;		/**<The named pipe to the vsascript.*/
 	bool usernameascommonname;		/**<Use the username as commonname in the plugin (for OpenVPN option username-as-common-name (no commonname in the enviroment!)).*/
@@ -76,6 +77,9 @@ public:
 	
 	char * getP2p(void);
 	void setP2p(char * );
+	
+	char * getP2p6(void);
+	void setP2p6(char * );
 	
 	string getVsaScript(void);
 	void setVsaScript(string);

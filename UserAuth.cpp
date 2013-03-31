@@ -269,6 +269,19 @@ void UserAuth::parseResponsePacket(RadiusPacket *packet, PluginContext * context
     	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: framed ipv6 route: " << this->getFramedRoutes6() <<".\n";
 	
 	
+	range=packet->findAttributes(168);
+	iter1=range.first;
+	iter2=range.second;	
+	
+	
+	if (iter1!=iter2)
+	{
+		this->setFramedIp6(iter1->second.ip6FromBuf());
+	}
+	
+	if (DEBUG (context->getVerbosity()))
+    	cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: framed IPv6: " << this->getFramedIp6() <<".\n";
+	
 	
 	range=packet->findAttributes(85);
 	iter1=range.first;
@@ -1522,7 +1535,7 @@ int UserAuth::createCcdFile(PluginContext *context)
 	int len=0;
 	
 	
-	if(context->conf.getOverWriteCCFiles()==true && (this->getFramedIp().length() > 0 || this->getFramedRoutes().length() > 0 || this->getFramedRoutes6().length() > 0))
+	if(context->conf.getOverWriteCCFiles()==true && (this->getFramedIp().length() > 0 || this->getFramedRoutes().length() > 0 || this->getFramedIp6().length() > 0 || this->getFramedRoutes6().length() > 0))
 	{
 		memset(ipstring,0,100);
 		memset(framedip,0,16);
@@ -1732,6 +1745,32 @@ int UserAuth::createCcdFile(PluginContext *context)
 							route=strtok(NULL,";");
 					}
 				}
+			}
+			
+			//set the IPv6 address in the file
+			if (this->framedip6[0]!='\0')
+			{
+				if (DEBUG (context->getVerbosity()))
+					cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: Write framed IPv6 to ccd-file.\n";
+			
+				//build the ifconfig
+				ipstring[0] = 0;
+				strncat(ipstring, "ifconfig-ipv6-push ",19);
+				strncat(ipstring, this->getFramedIp6().c_str() , 39);
+				strncat(ipstring, " ", 1);
+				
+				if(context->conf.getP2p6()[0]!='\0')
+				{
+					strncat(ipstring, context->conf.getP2p6() , 39);
+					if (DEBUG (context->getVerbosity()))
+						cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND AUTH: Create ifconfig-ipv6-push for topology p2p.\n";
+				}
+				
+				if (DEBUG (context->getVerbosity()))
+					cerr << getTime() << "RADIUS-PLUGIN: Write " << ipstring << " ccd-file.\n";
+				
+				
+				ccdfile << ipstring <<"\n";
 			}
 			
 			//set the IPv6 framed routes in the file for the openvpn process

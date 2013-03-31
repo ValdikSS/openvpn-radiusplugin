@@ -568,3 +568,26 @@ string RadiusAttribute::ipFromBuf(void)
 	}
 	return string(ip3);			 
 }  
+
+/** The method converts the value into an IPv6.
+ * The attribute must have the right datatype IPADDRESS6.
+ * @return The ip address as a string.
+ */
+string RadiusAttribute::ip6FromBuf(void)
+{
+	int num,i,len;
+	char ip2[3],ip3[40];
+	memset(ip3,0,40);
+	len=(this->length-2);
+	if(len>16)
+		len=16;
+	for (i=0;i<len;i++)
+	{
+		num=(int)this->value[i];
+		sprintf(ip2,"%02x",num);
+		strcat(ip3,ip2);
+		if((i%2)==1 && i<len-1)
+			strcat(ip3,":");
+	}
+	return string(ip3);
+}  

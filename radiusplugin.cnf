@@ -30,6 +30,9 @@ subnet=255.255.255.0
 # If you use topology option "p2p", fill in the right network, e.g. from OpenVPN option "--server NETWORK NETMASK"
 # p2p=10.8.0.1
 
+# If using Framed-IPv6-Address, fill in the gateway, e.g. from OpenVPN option "--server-ipv6 ADDRESS"
+# p2p6=fc00::1
+
 
 # Allows the plugin to overwrite the client config in client config file directory,
 # default is true
