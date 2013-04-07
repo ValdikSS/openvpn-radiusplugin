@@ -1225,8 +1225,11 @@ void get_user_env(PluginContext * context,const int type,const char * envp[], Us
 
     user->setUntrustedPort ( get_env ( "untrusted_port", envp ) );
     
-    
-    user->setStatusFileKey(user->getCommonname() + string ( "," ) + untrusted_ip + string ( ":" ) + get_env ( "untrusted_port", envp ) );
+    if (untrusted_ip.find(":") == untrusted_ip.npos)
+    	user->setStatusFileKey(user->getCommonname() + string ( "," ) + untrusted_ip + string ( ":" ) + get_env ( "untrusted_port", envp ) );
+    else
+    	user->setStatusFileKey(user->getCommonname() + string ( "," ) + untrusted_ip);
+
     if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: StatusFileKey: " << user->getStatusFileKey() << endl;
     user->setKey(untrusted_ip + string ( ":" ) + get_env ( "untrusted_port", envp ) );
     if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Key: " << user->getKey() << ".\n";
