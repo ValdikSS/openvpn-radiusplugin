@@ -1493,11 +1493,10 @@ int UserAuth::createCcdFile(PluginContext *context)
 	char framedroutes[4096];
 	char framednetmask_cidr[3]; // ->/24
 	char framednetmask[16]; // ->255.255.255.0
-	char mask_part[6];
 	char framedgw[16];
 	char framedmetric[5]; //what is the biggest metric? 
 	
-	double d1,d2;
+	unsigned long d1,d2;
 	
 	int j=0,k=0;
 	int len=0;
@@ -1602,7 +1601,6 @@ int UserAuth::createCcdFile(PluginContext *context)
 					{
 						j=0;k=0;
 						//set everything back for the next route entry
-						memset(mask_part,0,6);
 						memset(framednetmask_cidr,0,3);
 						memset(framedip,0,16);
 						memset(framednetmask,0,16);
@@ -1674,78 +1672,31 @@ int UserAuth::createCcdFile(PluginContext *context)
 																								
 							//create string for client config file
 							//transform framednetmask_cidr
-							d2=7;
-							d1=0;
 							memset(framednetmask,0,16);
-							if (atoi(framednetmask_cidr)>32)
+							d2=atoi(framednetmask_cidr);
+							if (d2>32)
 							{
 								cerr << getTime() << "RADIUS-PLUGIN: Bad net CIDR netmask.\n";
 							}
 							else
 							{
-								for (k=1; k<=atoi(framednetmask_cidr); k++)
+								if (d2==32)
 								{
-									d1=d1+pow(2,d2);
-									d2--;
-									
-									if (k==8)
-									{
-										sprintf(mask_part,"%.0lf.", d1);
-										d1=0;
-										d2=7;
-										strncat(framednetmask, mask_part, 4);
-										memset(mask_part,0,6);
-									}
-									if(k==16)
-									{
-										sprintf(mask_part,"%.0lf.", d1);
-										d1=0;
-										d2=7;
-										strncat(framednetmask, mask_part, 4);
-										memset(mask_part,0,6);
-									}
-									if(k==24)
-									{
-										sprintf(mask_part,"%.0lf.", d1);
-										d1=0;
-										d2=7;
-										strncat(framednetmask, mask_part, 4);
-										memset(mask_part,0,6);
-									}
+									d1=0xffffffffUL;
 								}
-								if (j<8)
+								else if (d2==0)
 								{
-										sprintf(mask_part,"%.0lf.", d1);
-										d1=0;
-										strncat(framednetmask, mask_part, 4);
-										strncat(framednetmask, "0.0.0", 5);
-										memset(mask_part,0,6);
+									d1=0x00000000UL;
 								}
-								else if (j<16)
+								else
 								{
-										sprintf(mask_part,"%.0lf.", d1);
-										d1=0;
-										strncat(framednetmask, mask_part, 4);
-										strncat(framednetmask, "0.0", 3);
-										memset(mask_part,0,6);
+									d1=((1UL<<d2)-1UL)<<(32-d2);
 								}
-								else if (j<24)
-								{
-										sprintf(mask_part,"%.0lf.", d1);
-										d1=0;
-										strncat(framednetmask, mask_part, 4);
-										strncat(framednetmask, "0", 1);
-										memset(mask_part,0,6);
-								}
-								else if (j>24)
-								{
-										sprintf(mask_part,"%.0lf", d1);
-										d1=0;
-										strncat(framednetmask, mask_part, 4);
-										memset(mask_part,0,6);
-								}
-								
-								
+								snprintf(framednetmask, 16, "%lu.%lu.%lu.%lu",
+										(d1 >> 24) & 0xff,
+										(d1 >> 16) & 0xff,
+										(d1 >>  8) & 0xff,
+										(d1      ) & 0xff);
 							}
 							
 							if (DEBUG (context->getVerbosity()))
