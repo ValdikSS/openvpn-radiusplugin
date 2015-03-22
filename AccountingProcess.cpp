@@ -39,6 +39,7 @@ void AccountingProcess::Accounting(PluginContext * context)
     AcctScheduler 			scheduler; 	//The scheduler for the accounting.
     fd_set  				set; 		//A set for the select function.
     struct timeval 			tv; 		//A timeinterval for the select function.
+    uint64_t bytesin=0, bytesout=0;
 
 
 
@@ -246,6 +247,13 @@ void AccountingProcess::Accounting(PluginContext * context)
                     try
                     {
                         //delete the user from the accounting scheduler
+			bytesout = strtoull(context->acctsocketforegr.recvStr().c_str(),NULL,10);
+			bytesin = strtoull(context->acctsocketforegr.recvStr().c_str(),NULL,10);
+			user->setBytesIn(bytesin & 0xFFFFFFFF);
+			user->setBytesOut(bytesout & 0xFFFFFFFF);
+			user->setGigaIn(bytesin >> 32);
+			user->setGigaOut(bytesout >> 32);
+
                         scheduler.delUser(context, user);
 
                         if (DEBUG (context->getVerbosity()))
