@@ -73,15 +73,6 @@ void AcctScheduler::addUser(UserAcct *user)
  */
 void AcctScheduler::delUser(PluginContext * context, UserAcct *user)
 {
-	uint64_t bytesin=0, bytesout=0;
-		
-	//get the sent and received bytes
-	this->parseStatusFile(context, &bytesin, &bytesout,user->getStatusFileKey().c_str());
-	
-	user->setBytesIn(bytesin & 0xFFFFFFFF);
-	user->setBytesOut(bytesout & 0xFFFFFFFF);
-	user->setGigaIn(bytesin >> 32);
-	user->setGigaOut(bytesout >> 32);
 	
 	if (DEBUG (context->getVerbosity()))
 	    cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Got accounting data from file, CN: " << user->getCommonname() << " in: " << user->getBytesIn() << " out: " << user->getBytesOut() << ".\n";
@@ -163,14 +154,18 @@ void AcctScheduler::doAccounting(PluginContext * context)
 		    cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Scheduler: Update for User " << iter1->second.getUsername() << ".\n";
 					
 			this->parseStatusFile(context, &bytesin, &bytesout,iter1->second.getStatusFileKey().c_str()); 
-			iter1->second.setBytesIn(bytesin & 0xFFFFFFFF);
-			iter1->second.setBytesOut(bytesout & 0xFFFFFFFF);
-			iter1->second.setGigaIn(bytesin >> 32);
-			iter1->second.setGigaOut(bytesout >> 32);
-			iter1->second.sendUpdatePacket(context);
-			
-			if (DEBUG (context->getVerbosity()))
-			    cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Scheduler: Update packet for User " << iter1->second.getUsername() << " was send.\n";
+			if (bytesin > 0 && bytesout > 0){
+				iter1->second.setBytesIn(bytesin & 0xFFFFFFFF);
+				iter1->second.setBytesOut(bytesout & 0xFFFFFFFF);
+				iter1->second.setGigaIn(bytesin >> 32);
+				iter1->second.setGigaOut(bytesout >> 32);
+				iter1->second.sendUpdatePacket(context);
+
+				if (DEBUG (context->getVerbosity()))
+					cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Scheduler: Update packet for User " << iter1->second.getUsername() << " was send.\n";
+			}else{
+				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Scheduler: Don't update for "<< iter1->second.getUsername() << " because of lack of data.\n";
+			}
 		
 			//calculate the next update
 			iter1->second.setNextUpdate(iter1->second.getNextUpdate()+iter1->second.getAcctInterimInterval());

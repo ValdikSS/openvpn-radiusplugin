@@ -521,7 +521,17 @@ error:
 
                     //send the information to the background process
                     context->acctsocketbackgr.send ( DEL_USER );
-                    context->acctsocketbackgr.send ( newuser->getKey() );
+		    context->acctsocketbackgr.send ( newuser->getKey() );
+		    if ( get_env ( "bytes_sent", envp ) !=NULL ){
+			    context->acctsocketbackgr.send(get_env("bytes_sent", envp));
+		    }else{
+			    context->acctsocketbackgr.send("0");
+		    }
+		    if ( get_env ( "bytes_received", envp ) !=NULL ){
+			    context->acctsocketbackgr.send(get_env("bytes_received", envp));
+		    }else{
+			    context->acctsocketbackgr.send("0");
+		    }
 
                     //get the response
                     const int status = context->acctsocketbackgr.recvInt();
@@ -983,6 +993,7 @@ void  * auth_user_pass_verify(void * c)
             }
             else //AUTH failed
             {
+		    /* should wait for disconnect call
                 if ( newuser->isAccounted() ) //user is already known, delete him from the accounting
                 {
                     cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Error ar rekeying!" << endl;
@@ -1004,10 +1015,8 @@ void  * auth_user_pass_verify(void * c)
                         cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: User is deleted from the user map!" << endl;
                     }
                 }
+		*/
                 cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Error receiving auth confirmation from background process." << endl;
-                //clean up: nas port, context, memory
-                context->delNasPort(newuser->getPortnumber());
-                context->delUser(newuser->getKey());
 
                 if (newuser->getAuthControlFile().length()>0 && context->conf.getUseAuthControlFile())
                 {
@@ -1020,7 +1029,12 @@ void  * auth_user_pass_verify(void * c)
                     pthread_cond_signal( context->getCondRecv( ));
                     pthread_mutex_unlock (context->getMutexRecv());
                 }
-                delete newuser;
+                //clean up: nas port, context, memory
+		if ( ! newuser->isAccounted() ){
+			context->delNasPort(newuser->getPortnumber());
+			context->delUser(newuser->getKey());
+			delete newuser;
+		}
             }
         }
         else
