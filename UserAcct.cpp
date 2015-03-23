@@ -291,7 +291,11 @@ int UserAcct::sendStartPacket(PluginContext * context)
 						ra8(ATTRIB_Service_Type),
 						ra9(ATTRIB_Acct_Session_ID, this->getSessionId()),
 		                                ra10(ATTRIB_Acct_Status_Type,string("1")), // "Start"
-						ra11(ATTRIB_Framed_Protocol);
+						ra11(ATTRIB_Framed_Protocol),
+						ra12(ATTRIB_Calling_Station_Plat, this->getCallingStationPlat()),
+						ra13(ATTRIB_Calling_Station_Hwaddr, this->getCallingStationHwaddr()),
+						ra14(ATTRIB_Calling_Station_Ver, this->getCallingStationVer()),
+						ra15(ATTRIB_Calling_Station_Port, this->getUntrustedPort());
 				
 	
 	
@@ -375,6 +379,18 @@ int UserAcct::sendStartPacket(PluginContext * context)
 			{
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Framed_Protocol.\n";
 			}
+	}
+	if (packet.addRadiusAttribute(&ra12)) {
+		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Calling_Station_Plat.\n";
+	}
+	if (packet.addRadiusAttribute(&ra13)) {
+		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Calling_Station_Hwaddr.\n";
+	}
+	if (packet.addRadiusAttribute(&ra14)) {
+		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Calling_Station_Ver.\n";
+	}
+	if (packet.addRadiusAttribute(&ra15)) {
+		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Calling_Station_Port.\n";
 	}
 	
 	//send the packet	

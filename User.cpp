@@ -231,6 +231,33 @@ void User::setCallingStationId(string id)
 	this->callingstationid=id;
 }
 
+string User::getCallingStationPlat(void)
+{
+	return this->callingstationplat;
+}
+void User::setCallingStationPlat(string plat)
+{
+	this->callingstationplat=plat;
+}
+
+string User::getCallingStationHwaddr(void)
+{
+	return this->callingstationhwaddr;
+}
+void User::setCallingStationHwaddr(string hwaddr)
+{
+	this->callingstationhwaddr=hwaddr;
+}
+
+string User::getCallingStationVer(void)
+{
+	return this->callingstationver;
+}
+void User::setCallingStationVer(string ver)
+{
+	this->callingstationver=ver;
+}
+
 /** The getter method for the portnumber.
  *  @return The portnumber as an integer.*/
 int User::getPortnumber(void)

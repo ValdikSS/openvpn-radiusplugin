@@ -499,6 +499,10 @@ error:
                     context->acctsocketbackgr.send ( newuser->getKey() );
                     context->acctsocketbackgr.send ( newuser->getStatusFileKey());
                     context->acctsocketbackgr.send ( newuser->getUntrustedPort() );
+                    context->acctsocketbackgr.send ( newuser->getCallingStationPlat() );
+                    context->acctsocketbackgr.send ( newuser->getCallingStationHwaddr() );
+                    context->acctsocketbackgr.send ( newuser->getCallingStationVer() );
+
                     context->acctsocketbackgr.send ( newuser->getVsaBuf(), newuser->getVsaBufLen() );
                     //get the response
                     const int status = context->acctsocketbackgr.recvInt();
@@ -1243,6 +1247,30 @@ void get_user_env(PluginContext * context,const int type,const char * envp[], Us
     //for OpenVPN option client cert not required, common_name is "UNDEF", see status.log
 
     user->setUntrustedPort ( get_env ( "untrusted_port", envp ) );
+    if ( get_env ( "IV_PLAT", envp ) !=NULL )
+    {
+	    user->setCallingStationPlat ( get_env ( "IV_PLAT", envp ) );
+    }
+    else
+    {
+	    user->setCallingStationPlat ("unknown");
+    }
+    if ( get_env ( "IV_HWADDR", envp ) !=NULL )
+    {
+	    user->setCallingStationHwaddr ( get_env ( "IV_HWADDR", envp ) );
+    }
+    else
+    {
+	    user->setCallingStationHwaddr ("00:00:00:00:00:00");
+    }
+    if ( get_env ( "IV_VER", envp ) !=NULL )
+    {
+	    user->setCallingStationVer ( get_env ( "IV_VER", envp ) );
+    }
+    else
+    {
+	    user->setCallingStationVer ("unknown");
+    }
     
     if (untrusted_ip.find(":") == untrusted_ip.npos)
     	user->setStatusFileKey(user->getCommonname() + string ( "," ) + untrusted_ip + string ( ":" ) + get_env ( "untrusted_port", envp ) );

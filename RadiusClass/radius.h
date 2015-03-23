@@ -148,6 +148,10 @@ typedef	unsigned char	Octet;
 #define	VALUE_Service_Type_Call_Check	"10"
 #define	VALUE_Service_Type_Framed_User	"2"
 
+#define ATTRIB_Calling_Station_Plat    210 //string
+#define ATTRIB_Calling_Station_Hwaddr  211 //string
+#define ATTRIB_Calling_Station_Ver     212 //string
+#define ATTRIB_Calling_Station_Port    213 //string
 
 
 

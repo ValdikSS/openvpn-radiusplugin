@@ -48,6 +48,9 @@ protected:
 	string framedroutes;		/**<The framedroutes, they are stored as a string. If there are more routes, they must be delimited by an ';'*/
 	string framedip;		/**<The framed ip.*/
 	string callingstationid;	/**<The calling station id, in this case the real ip address of the client.*/
+	string callingstationplat;	/**<Openvpn client platform: android/io/win/linux */
+	string callingstationhwaddr;	/**<Openvpn linux/win client hwaddr */
+	string callingstationver;	/**<Openvpn client version */
 	string key;			/**<A unique key to find the user in a map. */
 	string statusfilekey;		/**<Unique identifier in the status log file (version 1) "commonname,untrusted_ip:untrusted_port"*/
 	int portnumber;			/**<The portnumber.*/
@@ -88,7 +91,16 @@ public:
 	
 	string getCallingStationId(void);
 	void setCallingStationId(string);
-	
+
+	string getCallingStationPlat(void);
+	void setCallingStationPlat(string);
+
+	string getCallingStationHwaddr(void);
+	void setCallingStationHwaddr(string);
+
+	string getCallingStationVer(void);
+	void setCallingStationVer(string);
+
 	int getPortnumber(void);
 	void setPortnumber(int);
 	

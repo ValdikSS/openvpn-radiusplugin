@@ -111,6 +111,9 @@ void AccountingProcess::Accounting(PluginContext * context)
                     user->setKey(context->acctsocketforegr.recvStr());
                     user->setStatusFileKey(context->acctsocketforegr.recvStr());
                     user->setUntrustedPort(context->acctsocketforegr.recvStr());
+		    user->setCallingStationPlat(context->acctsocketforegr.recvStr());
+		    user->setCallingStationHwaddr(context->acctsocketforegr.recvStr());
+		    user->setCallingStationVer(context->acctsocketforegr.recvStr());
                     context->acctsocketforegr.recvBuf(user);
                     if (DEBUG (context->getVerbosity()))
                         cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: New user acct: username: " << user->getUsername() << ", interval: " << user->getAcctInterimInterval() << ", calling station: " << user->getCallingStationId() << ", commonname: " << user->getCommonname() << ", framed ip: " << user->getFramedIp() <<".\n";
