@@ -110,6 +110,7 @@ void PluginContext::addUser(UserPlugin * newuser)
 	
 	if(success.second==false)
 	{
+		delete newuser;
 		throw Exception(Exception::ALREADYAUTHENTICATED);
 	}
 	else
