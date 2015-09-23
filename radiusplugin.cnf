@@ -59,6 +59,11 @@ overwriteccfiles=true
 # default is false
 nonfatalaccounting=false
 
+# Default value for Acct-Interim-Interval in seconds.
+# Useful if you use only accounting but want periodical updates.
+# 0 means disabled
+defacctinteriminterval=0
+
 # Path to a script for vendor specific attributes.
 # Leave it out if you don't use an own script.
 # vsascript=/root/workspace/radiusplugin_v2.0.5_beta/vsascript.pl

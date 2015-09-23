@@ -25,6 +25,7 @@
 #include <fstream>
 #include <iostream>
 #include <cstring>
+#include <stdlib.h>
 
 #include "RadiusClass/error.h"
 
@@ -53,6 +54,7 @@ private:
         bool useauthcontrolfile;                /**<If true and the OpenVPN version supports auth control files, the acf is used.*/
         bool accountingonly;			/**<Only the accounting is done by the plugin.*/
 	bool nonfatalaccounting;		/**<If errors during the accounting occurs, the users can still connect.*/
+	int defacctinteriminterval;		/**<Default Acct-Interim-Interval in seconds.*/
 	void deletechars(string * );
 	
 public:
@@ -104,6 +106,9 @@ public:
 	
 	bool getNonFatalAccounting(void);
 	void setNonFatalAccounting(bool);
+
+	int getDefAcctInterimInterval(void);
+	void setDefAcctInterimInterval(int);
 	
 	string getOpenVPNConfig(void);
 	void setOpenVPNConfig(string);

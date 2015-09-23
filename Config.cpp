@@ -35,6 +35,7 @@ Config::Config(void)
         this->useauthcontrolfile=false;
 	this->accountingonly=false;
 	this->nonfatalaccounting=false;
+	this->defacctinteriminterval=0;
 	this->ccdPath="";
 	this->openvpnconfig="";
 	this->vsanamedpipe="";
@@ -65,6 +66,7 @@ Config::Config(char * configfile)
         this->useauthcontrolfile=false;
 	this->accountingonly=false;
 	this->nonfatalaccounting=false;
+	this->defacctinteriminterval=0;
 	this->parseConfigFile(configfile);
 	
 }
@@ -176,6 +178,18 @@ int Config::parseConfigFile(const char * configfile)
 					else if (stmp =="false") this->nonfatalaccounting=false;
 					else return BAD_FILE;
 						
+				}
+				if (strncmp(line.c_str(),"defacctinteriminterval=",23)==0)
+				{
+
+					string stmp=line.substr(23,line.size()-23);
+					deletechars(&stmp);
+					char *stemp;
+					long defacctinteriminterval = 0;
+					defacctinteriminterval = strtol(stmp.c_str(), &stemp, 0);
+					if (stemp == stmp.c_str() || *stemp != '\0' || defacctinteriminterval < 0)
+						return BAD_FILE;
+					this->defacctinteriminterval=(int)defacctinteriminterval;
 				}
 			}
 			
@@ -563,4 +577,14 @@ bool Config::getNonFatalAccounting(void)
 void Config::setNonFatalAccounting(bool b)
 {
  this->nonfatalaccounting=b; 
+}
+
+int Config::getDefAcctInterimInterval(void)
+{
+ return this->defacctinteriminterval; 
+}
+
+void Config::setDefAcctInterimInterval(int b)
+{
+ this->defacctinteriminterval=b; 
 }

@@ -457,6 +457,8 @@ error:
 			newuser->setAuthenticated(true); //the plugin does not care about it
 			newuser->setPortnumber ( context->addNasPort() );
                         newuser->setSessionId ( createSessionId ( newuser ) );
+                        if (!newuser->getAcctInterimInterval())
+                            newuser->setAcctInterimInterval(context->conf.getDefAcctInterimInterval());
                         //add the user to the context
                         context->addUser(newuser);
                     }
