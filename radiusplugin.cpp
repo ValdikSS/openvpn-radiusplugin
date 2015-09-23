@@ -1035,7 +1035,7 @@ void  * auth_user_pass_verify(void * c)
 
                 if (newuser->getAuthControlFile().length()>0 && context->conf.getUseAuthControlFile())
                 {
-                    write_auth_control_file(context, newuser->getAuthControlFile(), '1');
+                    write_control_file(context, newuser->getAuthControlFile(), '1');
                 }
                 else
                 {
@@ -1078,7 +1078,7 @@ void  * auth_user_pass_verify(void * c)
 
                 if (newuser->getAuthControlFile().length()>0 && context->conf.getUseAuthControlFile())
                 {
-                    write_auth_control_file(context, newuser->getAuthControlFile(), '0');
+                    write_control_file(context, newuser->getAuthControlFile(), '0');
                 }
                 else
                 {
@@ -1099,7 +1099,7 @@ void  * auth_user_pass_verify(void * c)
             //return OPENVPN_PLUGIN_FUNC_ERROR;
             if (newuser->getAuthControlFile().length()>0 && context->conf.getUseAuthControlFile())
             {
-                write_auth_control_file(context, newuser->getAuthControlFile(), '0');
+                write_control_file(context, newuser->getAuthControlFile(), '0');
             }
             else
             {
@@ -1118,16 +1118,16 @@ void  * auth_user_pass_verify(void * c)
 }
 
 
-/** Writes the result of the authentication to the auth control file (0: failure, 1: success).
- * @param filename The auth control file.
+/** Writes the result of the authentication or accounting to the auth or client-connect control file (0: failure, 1: success).
+ * @param filename The control file.
  * @param c The authentication result.
  */
-void write_auth_control_file(PluginContext * context, string filename, char c)
+void write_control_file(PluginContext * context, string filename, char c)
 {
     ofstream file;
     file.open(filename.c_str(),ios::out);
     if ( DEBUG ( context->getVerbosity() ))
-        cerr << getTime() << "RADIUS-PLUGIN: Write " << c << " to auth_control_file "<< filename << ".\n";
+        cerr << getTime() << "RADIUS-PLUGIN: Write " << c << " to control file "<< filename << ".\n";
     if (file.is_open())
     {
         file << c;
@@ -1135,7 +1135,7 @@ void write_auth_control_file(PluginContext * context, string filename, char c)
     }
     else
     {
-        cerr << getTime() << "RADIUS-PLUGIN: Could not open auth_control_file "<< filename << ".\n";
+        cerr << getTime() << "RADIUS-PLUGIN: Could not open control file "<< filename << ".\n";
     }
 
 }
