@@ -68,6 +68,7 @@ public:
 	int				intFromBuf(void);
 	 
 	string			ipFromBuf(void); 
+	string			ip6FromBuf(void); 
 		
 	void			dumpRadiusAttrib(void);
 	

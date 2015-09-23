@@ -41,6 +41,7 @@ Config::Config(void)
 	this->vsascript="";
 	memset(this->subnet,0,16);
 	memset(this->p2p,0,16);
+	memset(this->p2p6,0,40);
 }
 
 /** The constructor initializes all char arrays with 0. After the initialization
@@ -53,6 +54,7 @@ Config::Config(char * configfile)
 {
 	memset(this->subnet,0,16);
 	memset(this->p2p,0,16);
+	memset(this->p2p6,0,40);
 	this->ccdPath="";
 	this->openvpnconfig="";
 	this->vsanamedpipe="";
@@ -113,6 +115,14 @@ int Config::parseConfigFile(const char * configfile)
 						return BAD_FILE;
 					}
 					line.copy(this->p2p,line.size()-4,4);
+				}
+				if (strncmp(line.c_str(),"p2p6=",5)==0)
+				{
+					if((line.size()-5)>39)
+					{
+						return BAD_FILE;
+					}
+					line.copy(this->p2p6,line.size()-5,5);
 				}
 				if (strncmp(line.c_str(),"vsascript=",10)==0)
 				{
@@ -397,6 +407,23 @@ void Config::setP2p(char * ip)
 char * Config::getP2p(void)
 {
 	return this->p2p;
+}
+
+/** The setter method for the p2p6 address.
+ * @param ip A string with p2p6 address.
+ */	
+void Config::setP2p6(char * ip)
+{
+	strncpy(this->p2p6,ip, 40);
+}
+
+
+/** The getter method for the p2p6 address.
+ * @return A pointer to the p2p6 address.
+ */
+char * Config::getP2p6(void)
+{
+	return this->p2p6;
 }
 
 /** The setter method for the vsascript.

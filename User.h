@@ -45,8 +45,11 @@ class User
 protected:
 	string username;		/**<The username.*/
 	string commonname;		/**<The commonname.*/
+	string dev;			/**<The device.*/
 	string framedroutes;		/**<The framedroutes, they are stored as a string. If there are more routes, they must be delimited by an ';'*/
 	string framedip;		/**<The framed ip.*/
+	string framedroutes6;		/**<The framed IPv6 routes, they are stored as a string. If there are more routes, they must be delimited by an ';'*/
+	string framedip6;		/**<The framed ipv6.*/
 	string callingstationid;	/**<The calling station id, in this case the real ip address of the client.*/
 	string callingstationplat;	/**<Openvpn client platform: android/io/win/linux */
 	string callingstationhwaddr;	/**<Openvpn linux/win client hwaddr */
@@ -76,12 +79,20 @@ public:
 	string getCommonname(void);
 	void setCommonname(string);
 		
+	string getDev(void);
+	void setDev(string);
 	
 	string getFramedRoutes(void);
 	void setFramedRoutes(string);
 	
 	string getFramedIp(void);
 	void setFramedIp(string);
+	
+	string getFramedRoutes6(void);
+	void setFramedRoutes6(string);
+	
+	string getFramedIp6(void);
+	void setFramedIp6(string);
 	
 	string getKey(void);
 	void setKey(string);

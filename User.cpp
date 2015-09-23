@@ -24,8 +24,11 @@
 /** The constructor sets the acctinteriminterval and the portnumber to 0.*/
 User::User()
 {
+	this->dev="";
 	this->framedip="";
 	this->framedroutes="";
+	this->framedip6="";
+	this->framedroutes6="";
 	this->key="";
         this->statusfilekey="";
 	this->untrustedport="";
@@ -41,8 +44,11 @@ User::User()
  * @param num  The portnumber.*/
 /*User::User(int num)
 {
+	this->dev="";
 	this->framedip="";
 	this->framedroutes="";
+	this->framedip6="";
+	this->framedroutes6="";
 	this->key="";
 	this->untrustedport="";
 	this->acctinteriminterval=0;
@@ -68,8 +74,11 @@ User & User::operator=(const User & u)
 {
 	this->username=u.username;
 	this->commonname=u.commonname;
-	this->framedroutes=u.framedroutes;
+	this->dev=u.dev;
 	this->framedip=u.framedip;
+	this->framedroutes=u.framedroutes;
+	this->framedip6=u.framedip6;
+	this->framedroutes6=u.framedroutes6;
 	this->key=u.key;
         this->statusfilekey=u.statusfilekey;
 	this->callingstationid=u.callingstationid;
@@ -108,8 +117,11 @@ User::User(const User & u)
 {
 	this->username=u.username;
 	this->commonname=u.commonname;
-	this->framedroutes=u.framedroutes;
+	this->dev=u.dev;
 	this->framedip=u.framedip;
+	this->framedroutes=u.framedroutes;
+	this->framedip6=u.framedip6;
+	this->framedroutes6=u.framedroutes6;
 	this->key=u.key;
         this->statusfilekey=u.statusfilekey;
 	this->callingstationid=u.callingstationid;
@@ -163,6 +175,19 @@ void User::setCommonname(string cn)
 	this->commonname=cn;
 }
 
+/** The getter method for the device.
+ *  @return The device as a string.*/
+string User::getDev(void)
+{
+	return this->dev;
+}
+/** The setter method for the device.
+ * @param dev The device.*/
+void User::setDev(string dev)
+{
+	this->dev=dev;
+}
+
 /** The getter method for the framed routes.
  *  @return The framed routes as a string.*/	
 string User::getFramedRoutes(void)
@@ -171,7 +196,7 @@ string User::getFramedRoutes(void)
 }
 /** The setter method for the framedroutes.
  * @param froutes The framedroutes, if there are more 
- * routes they are diveded through a ';'.*/
+ * routes they are divided through a ';'.*/
 void User::setFramedRoutes(string froutes)
 {
 	this->framedroutes=froutes;
@@ -188,6 +213,33 @@ string User::getFramedIp(void)
 void User::setFramedIp(string ip)
 {
 	this->framedip=ip;
+}
+
+/** The getter method for the framed IPv6 routes.
+ *  @return The framed IPv6 routes as a string.*/
+string User::getFramedRoutes6(void)
+{
+	return this->framedroutes6;
+}
+/** The setter method for the framed IPv6 routes.
+ * @param froutes6 The framed IPv6 routes, if there are more 
+ * routes they are divided through a ';'.*/
+void User::setFramedRoutes6(string froutes6)
+{
+	this->framedroutes6=froutes6;
+}
+
+/** The getter method for the framed IPv6.
+ *  @return The framed IPv6 as a string.*/
+string User::getFramedIp6(void)
+{
+	return this->framedip6;
+}
+/** The setter method for the framedip6.
+ * @param ip The framedip.*/
+void User::setFramedIp6(string ip)
+{
+	this->framedip6=ip;
 }
 
 /** The getter method for the fkey.

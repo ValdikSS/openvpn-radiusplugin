@@ -490,12 +490,15 @@ error:
                     context->acctsocketbackgr.send ( ADD_USER );
                     context->acctsocketbackgr.send ( newuser->getUsername() );
                     context->acctsocketbackgr.send ( newuser->getSessionId() );
+                    context->acctsocketbackgr.send ( newuser->getDev() );
                     context->acctsocketbackgr.send ( newuser->getPortnumber() );
                     context->acctsocketbackgr.send ( newuser->getCallingStationId() );
                     context->acctsocketbackgr.send ( newuser->getFramedIp() );
+                    context->acctsocketbackgr.send ( newuser->getFramedIp6() );
                     context->acctsocketbackgr.send ( newuser->getCommonname() );
                     context->acctsocketbackgr.send ( newuser->getAcctInterimInterval() );
                     context->acctsocketbackgr.send ( newuser->getFramedRoutes() );
+                    context->acctsocketbackgr.send ( newuser->getFramedRoutes6() );
                     context->acctsocketbackgr.send ( newuser->getKey() );
                     context->acctsocketbackgr.send ( newuser->getStatusFileKey());
                     context->acctsocketbackgr.send ( newuser->getUntrustedPort() );
@@ -985,6 +988,7 @@ void  * auth_user_pass_verify(void * c)
             context->authsocketbackgr.send ( COMMAND_VERIFY );
             context->authsocketbackgr.send ( newuser->getUsername() );
             context->authsocketbackgr.send ( newuser->getPassword() );
+            context->authsocketbackgr.send ( newuser->getDev() );
             context->authsocketbackgr.send ( newuser->getPortnumber() );
             context->authsocketbackgr.send ( newuser->getSessionId() );
             context->authsocketbackgr.send ( newuser->getCallingStationId() );
@@ -1006,6 +1010,14 @@ void  * auth_user_pass_verify(void * c)
                 newuser->setFramedIp ( context->authsocketbackgr.recvStr() );
                 if ( DEBUG ( context->getVerbosity() ) )
                     cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Received framed ip for user: "<< newuser->getFramedIp() << "." << endl;
+                //get the routes from background process
+                newuser->setFramedRoutes6 ( context->authsocketbackgr.recvStr() );
+                if ( DEBUG ( context->getVerbosity() ) )
+                    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Received IPv6 routes for user: "<< newuser->getFramedRoutes6() << ".\n";
+                //get the framed IPv6
+                newuser->setFramedIp6 ( context->authsocketbackgr.recvStr() );
+                if ( DEBUG ( context->getVerbosity() ) )
+                    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Received framed IPv6 for user: "<< newuser->getFramedIp6() << "." << endl;
 
 
                 // get the interval from the background process
@@ -1231,6 +1243,8 @@ void get_user_env(PluginContext * context,const int type,const char * envp[], Us
         if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Commonname set to Username\n";
         user->setCommonname ( get_env ( "username", envp ) );
     }
+
+    user->setDev ( get_env ( "dev", envp ) );
 
     string untrusted_ip;
     // it's ipv4

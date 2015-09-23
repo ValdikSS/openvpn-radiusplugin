@@ -72,6 +72,7 @@ void AuthenticationProcess::Authentication(PluginContext * context)
 			    //get the user informations
 			    user->setUsername(context->authsocketforegr.recvStr());
 			    user->setPassword(context->authsocketforegr.recvStr());
+			    user->setDev(context->authsocketforegr.recvStr());
 			    user->setPortnumber(context->authsocketforegr.recvInt());
 			    user->setSessionId(context->authsocketforegr.recvStr());
 			    user->setCallingStationId(context->authsocketforegr.recvStr());
@@ -104,6 +105,12 @@ void AuthenticationProcess::Authentication(PluginContext * context)
 					
 				//send the framed ip to the parent process
 			     	context->authsocketforegr.send(user->getFramedIp());
+										
+			     	//send the IPv6 routes to the parent process
+			     	context->authsocketforegr.send(user->getFramedRoutes6());
+					
+				//send the framed IPv6 to the parent process
+			     	context->authsocketforegr.send(user->getFramedIp6());
 										
 					//send the interval to the parent process
 			     	context->authsocketforegr.send(user->getAcctInterimInterval());
