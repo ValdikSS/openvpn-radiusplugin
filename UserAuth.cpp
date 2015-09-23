@@ -1792,7 +1792,6 @@ int UserAuth::createCcdFile(PluginContext *context)
 					{
 						j=0;k=0;
 						//set everything back for the next route entry
-						memset(mask_part,0,6);
 						memset(framednetmask_cidr,0,4);
 						memset(framedip,0,40);
 						memset(framednetmask,0,40);
