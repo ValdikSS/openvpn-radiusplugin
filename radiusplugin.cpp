@@ -429,6 +429,8 @@ error:
                 cerr << getTime() << "Unknown Exception!";
 
             }
+            pthread_mutex_unlock (context->getMutexSend());
+            pthread_mutex_unlock (context->getMutexRecv());
             return OPENVPN_PLUGIN_FUNC_ERROR;
             /////////////////////////// CLIENT_CONNECT
         }
@@ -910,7 +912,9 @@ void  * auth_user_pass_verify(void * c)
             if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Waiting for new user." << endl;
             cout.flush();
 	    pthread_mutex_lock(context->getMutexSend());
-            pthread_cond_wait(context->getCondSend(),context->getMutexSend());
+            while(context->UserWaitingtoAuth() == false) {
+                pthread_cond_wait(context->getCondSend(),context->getMutexSend());
+            }
 	    pthread_mutex_unlock(context->getMutexSend());
         }
         if (context->getStopThread()==true)
@@ -1098,6 +1102,7 @@ void  * auth_user_pass_verify(void * c)
             delete newuser;
         }
     }
+    pthread_mutex_unlock(context->getMutexRecv());
     pthread_mutex_unlock(context->getMutexSend());
     cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Thread finished.\n";
     pthread_exit(NULL);
