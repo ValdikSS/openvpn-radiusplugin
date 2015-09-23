@@ -3,7 +3,7 @@ CXX ?=g++
 INCL=
 
 LIBS=-lgcrypt -lpthread
-CXXFLAGS ?= -O2 -g
+CXXFLAGS ?= -O2
 CXXFLAGS +=-Wall -shared -fPIC -DPIC
 
 
