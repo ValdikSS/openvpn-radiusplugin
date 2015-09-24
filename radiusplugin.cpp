@@ -462,11 +462,8 @@ error:
                 {
                     pthread_mutex_lock(context->getAcctMutexSend());
                     context->addNewAcctUser(tmpuser);
-                    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Pushed new user.\n";
                     pthread_cond_signal( context->getAcctCondSend( ));
-                    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Condition signal sent.\n";
                     pthread_mutex_unlock (context->getAcctMutexSend());
-                    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Returning deferred.\n";
                     return OPENVPN_PLUGIN_FUNC_DEFERRED; 
                 }
                 else
