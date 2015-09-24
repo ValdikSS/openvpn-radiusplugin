@@ -863,9 +863,7 @@ void  * auth_user_pass_verify(void * c)
             if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Waiting for new user." << endl;
             cout.flush();
 	    pthread_mutex_lock(context->getMutexSend());
-            while(context->UserWaitingtoAuth() == false) {
-                pthread_cond_wait(context->getCondSend(),context->getMutexSend());
-            }
+            pthread_cond_wait(context->getCondSend(),context->getMutexSend());
 	    pthread_mutex_unlock(context->getMutexSend());
         }
         if (context->getStopThread()==true)
