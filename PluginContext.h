@@ -56,6 +56,7 @@ private:
   
   	map<string, UserPlugin *> users; 	/**< The user list of the plugin in for the foreground process which are authenticated.*/
   	list< UserPlugin *> newusers; 	        /**< The user list of the plugin in for the foreground process which are waiting for authentication.*/
+  	list< UserPlugin *> newacctusers; 	/**< The user list of the plugin in for the foreground process which are waiting for accounting.*/
 	
         list <int> nasportlist; 		/**< The port list. Every user gets an unipue port on connect. The number is deleted if the user disconnects, a new user can
 									get the number again. This is important for dynamic IP address assignment via the radius server.*/
@@ -67,6 +68,11 @@ private:
         pthread_cond_t condrecv;
         pthread_mutex_t mutexrecv;
         pthread_t thread; 
+        pthread_cond_t acctcondsend;
+        pthread_mutex_t acctmutexsend;
+        pthread_cond_t acctcondrecv;
+        pthread_mutex_t acctmutexrecv;
+        pthread_t acctthread; 
         bool stopthread;
         bool startthread;
         int result;
@@ -113,10 +119,21 @@ public:
         pthread_mutex_t * getMutexRecv(void);
         //void setMutex(pthread_mutex_t);
 
+        pthread_cond_t * getAcctCondSend(void);
+        //void setCond(pthread_cond_t);
+        pthread_cond_t * getAcctCondRecv(void);
+      
+        pthread_mutex_t * getAcctMutexSend(void);
+        pthread_mutex_t * getAcctMutexRecv(void);
+        //void setMutex(pthread_mutex_t);
+        
         UserPlugin * getNewUser();
+        UserPlugin * getNewAcctUser();
         void addNewUser(UserPlugin * newuser);
+        void addNewAcctUser(UserPlugin * newuser);
 
         pthread_t * getThread();
+        pthread_t * getAcctThread();
         
         int getResult();
         void setResult(int);
@@ -125,6 +142,7 @@ public:
         void setStopThread(bool);
 
         bool UserWaitingtoAuth();
+        bool UserWaitingtoAcct();
 
         bool getStartThread();
         void setStartThread(bool);

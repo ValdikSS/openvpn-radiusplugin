@@ -37,6 +37,7 @@ class UserPlugin : public User
 private:
 	string password;	/**<The user password.*/
         string authcontrolfile; /**<The auth control file of the user.*/
+        string clientconnectdeferfile; /**<The client-connect defer file of the user.*/
 	bool authenticated; 	/**<Indicates if a user is authenticated.*/
 	bool accounted;		/**<Indicates if a user is accounted.*/
 	
@@ -55,6 +56,9 @@ public:
 
         string getAuthControlFile(void);
 	void setAuthControlFile(string);
+
+        string getClientConnectDeferFile(void);
+	void setClientConnectDeferFile(string);
 	
 	UserPlugin & operator=(const UserPlugin &);
 	

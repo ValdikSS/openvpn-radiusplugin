@@ -29,6 +29,7 @@ UserPlugin::UserPlugin() : User()
 	this->accounted=false;
 	this->authenticated=false;
         this->authcontrolfile="";
+        this->clientconnectdeferfile="";
 }
 
 /**The destructor, nothing happens here.*/
@@ -51,6 +52,7 @@ UserPlugin & UserPlugin::operator=(const UserPlugin &u)
 		this->password=u.password;
 		this->untrustedport=u.untrustedport;
                 this->authcontrolfile=u.authcontrolfile;
+                this->clientconnectdeferfile=u.clientconnectdeferfile;
 	}
 	return *this;
 	
@@ -78,6 +80,7 @@ UserPlugin::UserPlugin(const UserPlugin &u) : User(u)
 	this->accounted=u.accounted;
 	this->untrustedport=u.untrustedport;
         this->authcontrolfile=u.authcontrolfile;
+        this->clientconnectdeferfile=u.clientconnectdeferfile;
 }
 
 /**The getter method of the password.
@@ -147,6 +150,16 @@ string UserPlugin::getAuthControlFile(void )
 void UserPlugin::setAuthControlFile(string file)
 {
   authcontrolfile=file;
+}
+
+string UserPlugin::getClientConnectDeferFile(void )
+{
+  return clientconnectdeferfile;
+}
+
+void UserPlugin::setClientConnectDeferFile(string file)
+{
+  clientconnectdeferfile=file;
 }
 
 

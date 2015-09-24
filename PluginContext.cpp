@@ -213,7 +213,15 @@ void PluginContext::addNewUser(UserPlugin * newuser)
   this->newusers.push_back(newuser);
 }
 
-/**The method return the first element in the list of waiting users.
+/**The method adds an new user to the user list of users waiting for accounting
+ * @param newuser A pointer to the user.
+ */
+void PluginContext::addNewAcctUser(UserPlugin * newuser)
+{
+  this->newacctusers.push_back(newuser);
+}
+
+/**The method return the first element in the list of waiting for authentication users.
  */
 UserPlugin * PluginContext::getNewUser()
 {
@@ -221,6 +229,18 @@ UserPlugin * PluginContext::getNewUser()
     
       UserPlugin * user = this->newusers.front();
       this->newusers.pop_front();
+      return user;
+	
+}
+
+/**The method return the first element in the list of waiting for accounting users.
+ */
+UserPlugin * PluginContext::getNewAcctUser()
+{
+    
+    
+      UserPlugin * user = this->newacctusers.front();
+      this->newacctusers.pop_front();
       return user;
 	
 }
@@ -244,10 +264,34 @@ pthread_mutex_t * PluginContext::getMutexRecv(void )
   return &mutexrecv;
 }
 
+pthread_cond_t  * PluginContext::getAcctCondSend(void )
+{
+  return &acctcondsend;
+}
+pthread_cond_t  * PluginContext::getAcctCondRecv(void )
+{
+  return &acctcondrecv;
+}
+
+pthread_mutex_t * PluginContext::getAcctMutexSend(void )
+{
+  return &acctmutexsend;
+}
+
+pthread_mutex_t * PluginContext::getAcctMutexRecv(void )
+{
+  return &acctmutexrecv;
+}
+
 
 pthread_t * PluginContext::getThread()
 {
   return &thread;
+}
+
+pthread_t * PluginContext::getAcctThread()
+{
+  return &acctthread;
 }
 
 int PluginContext::getResult()
@@ -263,6 +307,12 @@ void PluginContext::setResult(int r)
 bool PluginContext::UserWaitingtoAuth()
 {
   if (this->newusers.size()>0) return true;
+  else return false;
+} 
+
+bool PluginContext::UserWaitingtoAcct()
+{
+  if (this->newacctusers.size()>0) return true;
   else return false;
 } 
 

@@ -334,7 +334,7 @@ error:
      * CLIENT_DISCONNECT: The user is deleted from the
      * accounting by sending the information to the backgrund process.
      * @param The handle which was allocated in the open function.
-     * @param The type of plugin, maybe client_conect, client_disconnect, auth_user_pass_verify
+     * @param The type of plugin, maybe client_connect, client_disconnect, auth_user_pass_verify
      * @param A list of arguments which are set in the openvpn configuration file.
      * @param The list of environmental variables, it is created by the OpenVpn-Process.
      * @return An integer with the status of the function (OPENVPN_PLUGIN_FUNC_SUCCESS or OPENVPN_PLUGIN_FUNC_ERROR).
@@ -362,10 +362,20 @@ error:
             pthread_mutex_init (context->getMutexSend(), NULL);
             pthread_cond_init (context->getCondRecv(), NULL);
             pthread_mutex_init (context->getMutexRecv(), NULL);
+            pthread_cond_init (context->getAcctCondSend(), NULL);
+            pthread_mutex_init (context->getAcctMutexSend(), NULL);
+            pthread_cond_init (context->getAcctCondRecv(), NULL);
+            pthread_mutex_init (context->getAcctMutexRecv(), NULL);
 
+            if (pthread_create(context->getThread(), NULL, &client_connect, (void *) context) != 0)
+            {
+                cerr << getTime() << "RADIUS-PLUGIN: client_connect thread creation failed.\n";
+                return OPENVPN_PLUGIN_FUNC_ERROR;
+                //goto error;
+            }
             if (context->conf.getAccountingOnly()==false && pthread_create(context->getThread(), NULL, &auth_user_pass_verify, (void *) context) != 0)
             {
-                cerr << getTime() << "RADIUS-PLUGIN: Thread creation failed.\n";
+                cerr << getTime() << "RADIUS-PLUGIN: auth_user_pass_verify thread creation failed.\n";
                 return OPENVPN_PLUGIN_FUNC_ERROR;
                 //goto error;
             }
@@ -447,96 +457,29 @@ error:
             {
                 tmpuser=new UserPlugin();
                 get_user_env(context,type,envp, tmpuser);
-                //find the user in the context, he was added at the OPENVPN_PLUGIN_AUTH_USER_PASS_VERIFY
-                //string key=common_name + string ( "," ) +untrusted_ip+string ( ":" ) + string ( get_env ( "untrusted_port", envp ) );
 
-                newuser=context->findUser(tmpuser->getKey());
-                if (newuser == NULL)
+                if (tmpuser->getClientConnectDeferFile().length() > 0 && context->conf.getUseClientConnectDeferFile())
                 {
-                    if (context->conf.getAccountingOnly()==true) //Authentication part is missing, where this is done else
-                    {
-                        newuser=tmpuser;
-			newuser->setAuthenticated(true); //the plugin does not care about it
-			newuser->setPortnumber ( context->addNasPort() );
-                        newuser->setSessionId ( createSessionId ( newuser ) );
-                        if (!newuser->getAcctInterimInterval())
-                            newuser->setAcctInterimInterval(context->conf.getDefAcctInterimInterval());
-                        //add the user to the context
-                        context->addUser(newuser);
-                    }
-                    else
-                    {
-                        throw Exception ( "RADIUS-PLUGIN: FOREGROUND: User should be accounted but is unknown, should only occur if accountingonly=true.\n" );
-                    }
-                }
-                else
-		delete(tmpuser);
-
-                if ( DEBUG ( context->getVerbosity() ) )
-                    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Set FramedIP to the IP (" << newuser->getFramedIp() << ") OpenVPN assigned to the user " << newuser->getUsername() << "\n";
-                //the user must be there and must be authenticated but not accounted
-                // isAccounted and isAuthenticated is true it is client connect for renegotiation, the user is already in the accounting process
-                if ( newuser!=NULL && newuser->isAccounted() ==false && newuser->isAuthenticated() )
-                {
-                    //transform the integers to strings to send them over the socket
-
-                    if ( DEBUG ( context->getVerbosity() ) )
-                        cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Add user for accounting: username: " << newuser->getUsername() << ", commonname: " << newuser->getCommonname() << "\n";
-
-                    //send information to the background process
-                    context->acctsocketbackgr.send ( ADD_USER );
-                    context->acctsocketbackgr.send ( newuser->getUsername() );
-                    context->acctsocketbackgr.send ( newuser->getSessionId() );
-                    context->acctsocketbackgr.send ( newuser->getDev() );
-                    context->acctsocketbackgr.send ( newuser->getPortnumber() );
-                    context->acctsocketbackgr.send ( newuser->getCallingStationId() );
-                    context->acctsocketbackgr.send ( newuser->getFramedIp() );
-                    context->acctsocketbackgr.send ( newuser->getFramedIp6() );
-                    context->acctsocketbackgr.send ( newuser->getCommonname() );
-                    context->acctsocketbackgr.send ( newuser->getAcctInterimInterval() );
-                    context->acctsocketbackgr.send ( newuser->getFramedRoutes() );
-                    context->acctsocketbackgr.send ( newuser->getFramedRoutes6() );
-                    context->acctsocketbackgr.send ( newuser->getKey() );
-                    context->acctsocketbackgr.send ( newuser->getStatusFileKey());
-                    context->acctsocketbackgr.send ( newuser->getUntrustedPort() );
-                    context->acctsocketbackgr.send ( newuser->getCallingStationPlat() );
-                    context->acctsocketbackgr.send ( newuser->getCallingStationHwaddr() );
-                    context->acctsocketbackgr.send ( newuser->getCallingStationVer() );
-
-                    context->acctsocketbackgr.send ( newuser->getVsaBuf(), newuser->getVsaBufLen() );
-                    //get the response
-                    const int status = context->acctsocketbackgr.recvInt();
-                    if ( status == RESPONSE_SUCCEEDED )
-                    {
-                        newuser->setAccounted ( true );
-
-                        if ( DEBUG ( context->getVerbosity() ) )
-                            cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Accounting succeeded!\n";
-
-                        return OPENVPN_PLUGIN_FUNC_SUCCESS;
-                    }
-                    else
-                    {
-                        //free the nasport
-                        context->delNasPort ( newuser->getPortnumber() );
-                        string error;
-                        error="RADIUS-PLUGIN: FOREGROUND: Accounting failed for user:";
-                        error+=newuser->getUsername();
-                        error+="!\n";
-                        //delete user from context
-                        context->delUser ( newuser->getKey() );
-                        throw Exception ( error );
-                    }
+                    pthread_mutex_lock(context->getAcctMutexSend());
+                    context->addNewAcctUser(tmpuser);
+                    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Pushed new user.\n";
+                    pthread_cond_signal( context->getAcctCondSend( ));
+                    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Condition signal sent.\n";
+                    pthread_mutex_unlock (context->getAcctMutexSend());
+                    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Returning deferred.\n";
+                    return OPENVPN_PLUGIN_FUNC_DEFERRED; 
                 }
                 else
                 {
+                    pthread_mutex_lock(context->getAcctMutexRecv());
+                    pthread_mutex_lock(context->getAcctMutexSend());
+                    context->addNewAcctUser(tmpuser);
+                    pthread_cond_signal( context->getAcctCondSend( ));
+                    pthread_mutex_unlock (context->getAcctMutexSend());
+                    pthread_cond_wait( context->getAcctCondRecv(), context->getAcctMutexRecv());
+                    pthread_mutex_unlock (context->getAcctMutexRecv());
 
-                    string error;
-                    error="RADIUS-PLUGIN: FOREGROUND: No user with this commonname or he is already authenticated: ";
-                    error+=common_name;
-                    error+="!\n";
-                    throw Exception ( error );
-
+                    return context->getResult();
                 }
             }
             catch ( Exception &e )
@@ -701,24 +644,31 @@ error:
             if ( DEBUG ( context->getVerbosity() ) )
                 cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Stop auth thread .\n";
             
-	    //stop the thread
+	    //stop the threads
             pthread_mutex_lock(context->getMutexSend());
             context->setStopThread(true);
             pthread_cond_signal( context->getCondSend( ));
             pthread_mutex_unlock(context->getMutexSend());
+            pthread_mutex_lock(context->getAcctMutexSend());
+            pthread_cond_signal( context->getAcctCondSend( ));
+            pthread_mutex_unlock(context->getAcctMutexSend());
 	    
             
 	    //wait for the thread to exit
 	    pthread_join(*context->getThread(),NULL);
+            pthread_join(*context->getAcctThread(),NULL);
 	    pthread_cond_destroy(context->getCondSend( ));
 	    pthread_cond_destroy(context->getCondRecv( ));
 	    pthread_mutex_destroy(context->getMutexSend());
 	    pthread_mutex_destroy(context->getMutexRecv());
-	  
+            pthread_cond_destroy(context->getAcctCondSend( ));
+	    pthread_cond_destroy(context->getAcctCondRecv( ));
+	    pthread_mutex_destroy(context->getAcctMutexSend());
+	    pthread_mutex_destroy(context->getAcctMutexRecv());
         }
         else
         {
-            cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Auth thread was not started so far.\n";
+            cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Auth and Acct threads were not started so far.\n";
         }
 
         delete context;
@@ -1122,6 +1072,178 @@ void  * auth_user_pass_verify(void * c)
     pthread_exit(NULL);
 }
 
+/** The function implements the thread for accounting. If the client_connect_deferred_file is specified the thread writes the results in the
+ * client_connect_deferred_file, if the file is not specified the thread forward the OPENVPN_PLUGIN_FUNC_SUCCESS or OPENVPN_PLUGIN_FUNC_ERROR
+ * to the main process.
+ * @param _context The context pointer from OpenVPN.
+ */
+void  * client_connect(void * c)
+{
+    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: client_connect thread started."<< endl;
+    //PluginContext * context = (PluginContext *) c;
+    PluginContext * context = (PluginContext *) c;
+    //pthread_mutex_lock(context->getMutexSend());
+    //main thread loop for authentication
+
+    //ignore signals
+    static sigset_t   signal_mask;
+    sigemptyset (&signal_mask);
+    sigaddset (&signal_mask, SIGINT);
+    sigaddset (&signal_mask, SIGTERM);
+    sigaddset (&signal_mask, SIGHUP);
+    sigaddset (&signal_mask, SIGUSR1);
+    sigaddset (&signal_mask, SIGUSR2);
+    sigaddset (&signal_mask, SIGPIPE);
+    pthread_sigmask (SIG_BLOCK, &signal_mask, NULL);
+    
+    while (!context->getStopThread())
+    {
+        if (context->UserWaitingtoAcct()==false)
+            {
+                if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Waiting for new accounting user." << endl;
+                cout.flush();
+                pthread_mutex_lock(context->getAcctMutexSend());
+                pthread_cond_wait(context->getAcctCondSend(),context->getAcctMutexSend());
+                pthread_mutex_unlock(context->getAcctMutexSend());
+            }
+            if (context->getStopThread()==true)
+            {
+                cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Stop signal received." << endl;
+                break;
+            }
+    
+            //find the user in the context, he was added at the OPENVPN_PLUGIN_AUTH_USER_PASS_VERIFY
+            //string key=common_name + string ( "," ) +untrusted_ip+string ( ":" ) + string ( get_env ( "untrusted_port", envp ) );
+            
+            UserPlugin	*newuser=NULL;	/**<A context for an already known user.*/
+            UserPlugin	*tmpuser=NULL;	/**<A context for the new user.*/
+            tmpuser=context->getNewAcctUser();
+            newuser=context->findUser(tmpuser->getKey());
+            if (newuser == NULL)
+            {
+                if (context->conf.getAccountingOnly()==true) //Authentication part is missing, where this is done else
+                {
+                    newuser=tmpuser;
+                    newuser->setAuthenticated(true); //the plugin does not care about it
+                    newuser->setPortnumber ( context->addNasPort() );
+                    newuser->setSessionId ( createSessionId ( newuser ) );
+                    if (!newuser->getAcctInterimInterval())
+                        newuser->setAcctInterimInterval(context->conf.getDefAcctInterimInterval());
+                    //add the user to the context
+                    context->addUser(newuser);
+                }
+                else
+                {
+                    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: User should be accounted but is unknown, should only occur if accountingonly=true.\n";
+                    pthread_mutex_lock(context->getAcctMutexRecv());
+                    context->setResult(OPENVPN_PLUGIN_FUNC_ERROR);
+                    
+                    pthread_cond_signal( context->getAcctCondRecv( ));
+                    pthread_mutex_unlock (context->getAcctMutexRecv());
+                }
+            }
+            else
+            delete(tmpuser);
+
+            if ( DEBUG ( context->getVerbosity() ) )
+                cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Set FramedIP to the IP (" << newuser->getFramedIp() << ") OpenVPN assigned to the user " << newuser->getUsername() << "\n";
+            //the user must be there and must be authenticated but not accounted
+            // isAccounted and isAuthenticated is true it is client connect for renegotiation, the user is already in the accounting process
+            if ( newuser!=NULL && newuser->isAccounted() ==false && newuser->isAuthenticated() )
+            {
+                //transform the integers to strings to send them over the socket
+
+                if ( DEBUG ( context->getVerbosity() ) )
+                    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Add user for accounting: username: " << newuser->getUsername() << ", commonname: " << newuser->getCommonname() << "\n";
+
+                //send information to the background process
+                context->acctsocketbackgr.send ( ADD_USER );
+                context->acctsocketbackgr.send ( newuser->getUsername() );
+                context->acctsocketbackgr.send ( newuser->getSessionId() );
+                context->acctsocketbackgr.send ( newuser->getDev() );
+                context->acctsocketbackgr.send ( newuser->getPortnumber() );
+                context->acctsocketbackgr.send ( newuser->getCallingStationId() );
+                context->acctsocketbackgr.send ( newuser->getFramedIp() );
+                context->acctsocketbackgr.send ( newuser->getFramedIp6() );
+                context->acctsocketbackgr.send ( newuser->getCommonname() );
+                context->acctsocketbackgr.send ( newuser->getAcctInterimInterval() );
+                context->acctsocketbackgr.send ( newuser->getFramedRoutes() );
+                context->acctsocketbackgr.send ( newuser->getFramedRoutes6() );
+                context->acctsocketbackgr.send ( newuser->getKey() );
+                context->acctsocketbackgr.send ( newuser->getStatusFileKey());
+                context->acctsocketbackgr.send ( newuser->getUntrustedPort() );
+                context->acctsocketbackgr.send ( newuser->getCallingStationPlat() );
+                context->acctsocketbackgr.send ( newuser->getCallingStationHwaddr() );
+                context->acctsocketbackgr.send ( newuser->getCallingStationVer() );
+
+                context->acctsocketbackgr.send ( newuser->getVsaBuf(), newuser->getVsaBufLen() );
+                //get the response
+                const int status = context->acctsocketbackgr.recvInt();
+                if ( status == RESPONSE_SUCCEEDED )
+                {
+                    newuser->setAccounted ( true );
+
+                    if ( DEBUG ( context->getVerbosity() ) )
+                        cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Accounting succeeded!\n";
+
+                    if (newuser->getClientConnectDeferFile().length()>0 && context->conf.getUseClientConnectDeferFile())
+                    {
+                        write_control_file(context, newuser->getClientConnectDeferFile(), '1');
+                    }
+                    else
+                    {
+                        pthread_mutex_lock(context->getAcctMutexRecv());
+                        context->setResult(OPENVPN_PLUGIN_FUNC_SUCCESS);
+                        
+                        pthread_cond_signal( context->getAcctCondRecv( ));
+                        pthread_mutex_unlock (context->getAcctMutexRecv());
+
+                    }
+
+                    //return OPENVPN_PLUGIN_FUNC_SUCCESS;
+                }
+                else
+                {
+                    //free the nasport
+                    context->delNasPort ( newuser->getPortnumber() );
+                    string error;
+                    error="RADIUS-PLUGIN: FOREGROUND THREAD: Accounting failed for user:";
+                    error+=newuser->getUsername();
+                    error+="!\n";
+                    cerr << getTime() << error;
+                    //delete user from context
+                    context->delUser ( newuser->getKey() );
+                    
+                    if (newuser->getClientConnectDeferFile().length()>0 && context->conf.getUseClientConnectDeferFile())
+                    {
+                        write_control_file(context, newuser->getClientConnectDeferFile(), '0');
+
+                    }
+                    pthread_mutex_lock(context->getAcctMutexRecv());
+                    context->setResult(OPENVPN_PLUGIN_FUNC_ERROR);
+                    pthread_cond_signal( context->getAcctCondRecv( ));
+                    pthread_mutex_unlock (context->getAcctMutexRecv());
+
+                }
+            }
+            else
+            {
+                cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: No user with this commonname or he is already authenticated\n";
+                pthread_mutex_lock(context->getAcctMutexRecv());
+                context->setResult(OPENVPN_PLUGIN_FUNC_ERROR);
+
+                pthread_cond_signal( context->getAcctCondRecv( ));
+                pthread_mutex_unlock (context->getAcctMutexRecv());
+
+            }
+    }
+    pthread_mutex_unlock(context->getAcctMutexRecv());
+    pthread_mutex_unlock(context->getAcctMutexSend());
+    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Thread finished.\n";
+    pthread_exit(NULL);
+
+}
+
 
 /** Writes the result of the authentication or accounting to the auth or client-connect control file (0: failure, 1: success).
  * @param filename The control file.
@@ -1202,6 +1324,10 @@ void get_user_env(PluginContext * context,const int type,const char * envp[], Us
         user->setAuthControlFile( get_env ( "auth_control_file", envp ) );
     }
 
+    if (get_env ( "client_connect_deferred_file", envp ) != NULL)
+    {
+        user->setClientConnectDeferFile( get_env ( "client_connect_deferred_file", envp ) );
+    }
 
     // get username, password, unrusted_ip and common_name from envp string array
     // if the username is not defined and only accounting is used, set the username to the commonname
