@@ -470,11 +470,6 @@ error:
                 else
 		delete(tmpuser);
 
-                //set the assigned ip as Framed-IP-Attribute of the user (see RFC2866, chapter 4.1 for more information)
-                if (get_env ( "ifconfig_pool_remote_ip", envp ) !=NULL)
-                {
-                    newuser->setFramedIp ( string ( get_env ( "ifconfig_pool_remote_ip", envp ) ) );
-                }
                 if ( DEBUG ( context->getVerbosity() ) )
                     cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Set FramedIP to the IP (" << newuser->getFramedIp() << ") OpenVPN assigned to the user " << newuser->getUsername() << "\n";
                 //the user must be there and must be authenticated but not accounted
@@ -1238,6 +1233,17 @@ void get_user_env(PluginContext * context,const int type,const char * envp[], Us
     }
     user->setCallingStationId ( untrusted_ip );
     //for OpenVPN option client cert not required, common_name is "UNDEF", see status.log
+
+    //set the assigned ip as Framed-IP-Attribute of the user (see RFC2866, chapter 4.1 for more information)
+    if (get_env ( "ifconfig_pool_remote_ip", envp ) !=NULL)
+    {
+        user->setFramedIp ( string ( get_env ( "ifconfig_pool_remote_ip", envp ) ) );
+    }
+
+    if (get_env ( "ifconfig_ipv6_remote", envp ) !=NULL)
+    {
+        user->setFramedIp6 ( string ( get_env ( "ifconfig_ipv6_remote", envp ) ) );
+    }
 
     user->setUntrustedPort ( get_env ( "untrusted_port", envp ) );
     
