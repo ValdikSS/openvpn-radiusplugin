@@ -596,11 +596,10 @@ error:
 		    }
 
                     //get the response
-                    const int status = context->acctsocketbackgr.recvInt();
-                    if ( status == RESPONSE_SUCCEEDED )
-                    {
-                        if ( DEBUG ( context->getVerbosity() ) )
-                            cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Accounting for user with key" << newuser->getKey()  << " stopped!\n";
+                    //we don't really care of client-disconnect result and we don't want to block
+                    //whole vpn
+                    if ( DEBUG ( context->getVerbosity() ) )
+                        cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Accounting for user with key" << newuser->getKey()  << " stopped!\n";
 
                         //free the nasport
                         context->delNasPort ( newuser->getPortnumber() );
@@ -608,18 +607,6 @@ error:
                         //delete user from context
                         context->delUser ( newuser->getKey() );
                         return OPENVPN_PLUGIN_FUNC_SUCCESS;
-                    }
-                    else
-                    {
-                        //free the nasport
-                        context->delNasPort ( newuser->getPortnumber() );
-
-                        //delete user from context
-                        context->delUser ( newuser->getKey() );
-                        cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Error in ACCT Background Process!\n";
-
-                    }
-
                 }
                 else
                 {
