@@ -367,7 +367,7 @@ error:
             pthread_cond_init (context->getAcctCondRecv(), NULL);
             pthread_mutex_init (context->getAcctMutexRecv(), NULL);
 
-            if (pthread_create(context->getThread(), NULL, &client_connect, (void *) context) != 0)
+            if (pthread_create(context->getAcctThread(), NULL, &client_connect, (void *) context) != 0)
             {
                 cerr << getTime() << "RADIUS-PLUGIN: client_connect thread creation failed.\n";
                 return OPENVPN_PLUGIN_FUNC_ERROR;
@@ -652,7 +652,8 @@ error:
 	    
             
 	    //wait for the thread to exit
-	    pthread_join(*context->getThread(),NULL);
+            if (context->conf.getAccountingOnly()==false)
+                pthread_join(*context->getThread(),NULL);
             pthread_join(*context->getAcctThread(),NULL);
 	    pthread_cond_destroy(context->getCondSend( ));
 	    pthread_cond_destroy(context->getCondRecv( ));
