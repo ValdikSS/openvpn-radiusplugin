@@ -706,7 +706,8 @@ error:
 	    
             
 	    //wait for the thread to exit
-	    pthread_join(*context->getThread(),NULL);
+            if (context->conf.getAccountingOnly()==false)
+                pthread_join(*context->getThread(),NULL);
 	    pthread_cond_destroy(context->getCondSend( ));
 	    pthread_cond_destroy(context->getCondRecv( ));
 	    pthread_mutex_destroy(context->getMutexSend());
