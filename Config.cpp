@@ -33,6 +33,7 @@ Config::Config(void)
 	this->clientcertnotrequired=false;
 	this->overwriteccfiles=true;
         this->useauthcontrolfile=false;
+        this->useclientconnectdeferfile=false;
 	this->accountingonly=false;
 	this->nonfatalaccounting=false;
 	this->defacctinteriminterval=0;
@@ -64,6 +65,7 @@ Config::Config(char * configfile)
 	this->clientcertnotrequired=false;
 	this->overwriteccfiles=true;	
         this->useauthcontrolfile=false;
+        this->useclientconnectdeferfile=false;
 	this->accountingonly=false;
 	this->nonfatalaccounting=false;
 	this->defacctinteriminterval=0;
@@ -158,6 +160,16 @@ int Config::parseConfigFile(const char * configfile)
 					else if (stmp =="false") this->useauthcontrolfile=false;
 					else return BAD_FILE;
 						
+				}
+                                if (strncmp(line.c_str(),"useclientconnectdeferfile=",26)==0)
+				{
+
+					string stmp=line.substr(26,line.size()-26);
+					deletechars(&stmp);
+					if(stmp == "true") this->useclientconnectdeferfile=true;
+					else if (stmp =="false") this->useclientconnectdeferfile=false;
+					else return BAD_FILE;
+
 				}
 				if (strncmp(line.c_str(),"accountingonly=",15)==0)
 				{
@@ -555,6 +567,22 @@ bool Config::getUseAuthControlFile(void)
 void Config::setUseAuthControlFile(bool b)
 {
 	this->useauthcontrolfile=b;	
+}
+
+/** Getter method for the clientconnectdeferfile variable.
+ * @return A bool of clientconnectdeferfile .
+ */
+bool Config::getUseClientConnectDeferFile(void)
+{
+	return this->useclientconnectdeferfile;
+}
+
+/** The setter method for the clientconnectdeferfile  varibale
+ * @param overwrite Set to true if the plugin if client-connect control files should be if supported by the OpenVPN version.
+ */
+void Config::setUseClientConnectDeferFile(bool b)
+{
+	this->useclientconnectdeferfile=b;
 }
 
 

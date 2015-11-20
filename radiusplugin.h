@@ -109,6 +109,7 @@ void set_signals (void);
 string createSessionId (UserPlugin *);
 void get_user_env(PluginContext *, const int type,const char *envp[], UserPlugin *);
 void * auth_user_pass_verify(void *);
+void * client_connect(void *);
 void write_control_file(PluginContext *, string filename, char c);
 string getTime();
 

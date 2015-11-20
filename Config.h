@@ -52,6 +52,7 @@ private:
 	string openvpnconfig;			/**<Path to OpenVPN config.*/
 	bool overwriteccfiles; 			/**<If true the plugin overwrites the client config files.*/
         bool useauthcontrolfile;                /**<If true and the OpenVPN version supports auth control files, the acf is used.*/
+        bool useclientconnectdeferfile;         /**<If true and the OpenVPN version supports client-connect defer files, it is used.*/
         bool accountingonly;			/**<Only the accounting is done by the plugin.*/
 	bool nonfatalaccounting;		/**<If errors during the accounting occurs, the users can still connect.*/
 	int defacctinteriminterval;		/**<Default Acct-Interim-Interval in seconds.*/
@@ -100,6 +101,9 @@ public:
 
         bool getUseAuthControlFile(void);
 	void setUseAuthControlFile(bool);
+
+        bool getUseClientConnectDeferFile(void);
+	void setUseClientConnectDeferFile(bool);
 	
 	bool getAccountingOnly(void);
 	void setAccountingOnly(bool);

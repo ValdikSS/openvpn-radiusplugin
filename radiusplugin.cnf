@@ -41,14 +41,23 @@ overwriteccfiles=true
 # Allows the plugin to use auth control files if OpenVPN (>= 2.1 rc8) provides them.
 # The plugin needs write permission to the folder, by default it is the OpenVPN directory (e.g. /etc/openvpm)
 # The OpenVPN option tmp-dir changes the directory.
+# If this option is disabled, OpenVPN would stall while clients are authenticating.
 # default is false
-# useauthcontrolfile=false
+useauthcontrolfile=true
+
+# Allows the plugin to use client-connect deferred files if OpenVPN provides them.
+# As for OpenVPN 2.3.8 this functionality is not merged upstream and requires patches from Fabian Knittel.
+# The plugin needs write permission to the folder, by default it is the OpenVPN directory (e.g. /etc/openvpn)
+# The OpenVPN option tmp-dir changes the directory.
+# This option would be disable if OpenVPN doesn't support needed functionality.
+# If this option is disabled, OpenVPN would stall while clients are authenticating.
+# default is false
+useclientconnectdeferfile=true
 
 # Only the accouting functionality is used, if no user name to forwarded to the plugin, the common name of certificate is used
 # as user name for radius accounting.
 # default is false
 # accountingonly=false
-
 
 # If the accounting is non essential, nonfatalaccounting can be set to true. 
 # If set to true all errors during the accounting procedure are ignored, which can be
