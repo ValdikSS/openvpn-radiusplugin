@@ -195,9 +195,9 @@ void AccountingProcess::Accounting(PluginContext * context)
                 if (DEBUG (context->getVerbosity()))
                     cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Delete user from accounting.\n";
 
-		// if accounting errors are non fatal return success
-		if(context->conf.getNonFatalAccounting()==true)
-		      context->acctsocketforegr.send(RESPONSE_SUCCEEDED);
+		// Always send successful response since we don't care about disconnection status
+		// and we don't want to stale main thread.
+                context->acctsocketforegr.send(RESPONSE_SUCCEEDED);
 		
                 //receive the information
                 try
@@ -254,11 +254,6 @@ void AccountingProcess::Accounting(PluginContext * context)
                         if (DEBUG (context->getVerbosity()))
                             cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: User with key: " << key << " was deleted from accounting.\n";
 
-                        //send the parent process the ok
-			if(context->conf.getNonFatalAccounting()==false)
-			  context->acctsocketforegr.send(RESPONSE_SUCCEEDED);
-
-
                     }
                     catch (Exception &e)
                     {
@@ -273,8 +268,6 @@ void AccountingProcess::Accounting(PluginContext * context)
                 else
                 {
                     cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: No user with this key "<< key <<".\n";
-		    if(context->conf.getNonFatalAccounting()==false)
-		      context->acctsocketforegr.send(RESPONSE_FAILED);
 
                 }
                 break;
