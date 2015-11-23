@@ -843,14 +843,14 @@ void  * auth_user_pass_verify(void * c)
 
     while (!context->getStopThread())
     {
+        pthread_mutex_lock(context->getMutexSend());
         if (context->UserWaitingtoAuth()==false)
         {
             if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Waiting for new user." << endl;
             cout.flush();
-	    pthread_mutex_lock(context->getMutexSend());
             pthread_cond_wait(context->getCondSend(),context->getMutexSend());
-	    pthread_mutex_unlock(context->getMutexSend());
         }
+        pthread_mutex_unlock(context->getMutexSend());
         if (context->getStopThread()==true)
         {
             cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Stop signal received." << endl;
@@ -1076,14 +1076,14 @@ void  * client_connect(void * c)
     
     while (!context->getStopThread())
     {
+        pthread_mutex_lock(context->getAcctMutexSend());
         if (context->UserWaitingtoAcct()==false)
             {
                 if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Waiting for new accounting user." << endl;
                 cout.flush();
-                pthread_mutex_lock(context->getAcctMutexSend());
                 pthread_cond_wait(context->getAcctCondSend(),context->getAcctMutexSend());
-                pthread_mutex_unlock(context->getAcctMutexSend());
             }
+            pthread_mutex_unlock(context->getAcctMutexSend());
             if (context->getStopThread()==true)
             {
                 cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Stop signal received." << endl;
