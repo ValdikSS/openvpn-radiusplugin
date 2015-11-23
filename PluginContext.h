@@ -77,6 +77,8 @@ private:
         bool startthread;
         int result;
 
+        pthread_mutex_t usermutex;
+
 	
 public:
   	

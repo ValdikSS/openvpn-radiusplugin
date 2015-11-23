@@ -41,6 +41,8 @@ PluginContext::PluginContext()
 
         this->stopthread=false;
 	this->startthread=true;
+
+        pthread_mutex_init(&usermutex, NULL);
 }
 
 /** The destructor clears the users and nasportlist.*/
@@ -48,7 +50,7 @@ PluginContext::~PluginContext()
 {
 	this->users.clear();
 	this->nasportlist.clear();
-	
+	pthread_mutex_destroy(&usermutex);
 }
 
 /** The method searches the first free nas port in a list.
@@ -209,7 +211,9 @@ int PluginContext::getSessionId(void)
  */
 void PluginContext::addNewUser(UserPlugin * newuser)
 {
+  pthread_mutex_lock(&usermutex);
   this->newusers.push_back(newuser);
+  pthread_mutex_unlock(&usermutex);
 }
 
 /**The method adds an new user to the user list of users waiting for accounting
@@ -217,7 +221,9 @@ void PluginContext::addNewUser(UserPlugin * newuser)
  */
 void PluginContext::addNewAcctUser(UserPlugin * newuser)
 {
+  pthread_mutex_lock(&usermutex);
   this->newacctusers.push_back(newuser);
+  pthread_mutex_unlock(&usermutex);
 }
 
 /**The method return the first element in the list of waiting for authentication users.
@@ -225,9 +231,10 @@ void PluginContext::addNewAcctUser(UserPlugin * newuser)
 UserPlugin * PluginContext::getNewUser()
 {
     
-    
+      pthread_mutex_lock(&usermutex);
       UserPlugin * user = this->newusers.front();
       this->newusers.pop_front();
+      pthread_mutex_unlock(&usermutex);
       return user;
 	
 }
@@ -237,9 +244,10 @@ UserPlugin * PluginContext::getNewUser()
 UserPlugin * PluginContext::getNewAcctUser()
 {
     
-    
+      pthread_mutex_lock(&usermutex);
       UserPlugin * user = this->newacctusers.front();
       this->newacctusers.pop_front();
+      pthread_mutex_unlock(&usermutex);
       return user;
 	
 }
@@ -305,14 +313,22 @@ void PluginContext::setResult(int r)
 
 bool PluginContext::UserWaitingtoAuth()
 {
-  if (this->newusers.size()>0) return true;
-  else return false;
+  bool result;
+
+  pthread_mutex_lock(&usermutex);
+  result = this->newusers.size()>0;
+  pthread_mutex_unlock(&usermutex);
+  return result;
 } 
 
 bool PluginContext::UserWaitingtoAcct()
 {
-  if (this->newacctusers.size()>0) return true;
-  else return false;
+  bool result;
+
+  pthread_mutex_lock(&usermutex);
+  result = this->newacctusers.size()>0;
+  pthread_mutex_unlock(&usermutex);
+  return result;
 } 
 
 
