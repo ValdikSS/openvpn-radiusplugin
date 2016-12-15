@@ -240,6 +240,13 @@ int Config::parseConfigFile(const char * configfile)
 							  this->clientcertnotrequired=true;
 						  }
 					  }
+					  if (param == "verify-client-cert")
+					  {
+						  this->deletechars(&line);
+						  line.erase(0, 18);
+						  if (line == "none")
+							  this->clientcertnotrequired=true;
+					  }
 					  if (param == "username-as-common-name")
 					  {
 						  this->deletechars(&line);
