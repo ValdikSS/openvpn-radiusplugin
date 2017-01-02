@@ -738,12 +738,12 @@ void parseResponsePacket(RadiusPacket *packet)
 	if (iter1!=iter2)
 	{
 		acct_interval=iter1->second.intFromBuf();
+		cout << "\nAcct-Interim-Interval: " << acct_interval;
 	}
 	else
 	{
 		cerr << getTime() <<"RADIUS-CLASS: No attributes Acct Interim Interval or bad length.\n";
 	}
-	cout << "\nAcct-Interim-Interval: " << acct_interval;
 	
 	range=packet->findAttributes(26);
 	iter1=range.first;
