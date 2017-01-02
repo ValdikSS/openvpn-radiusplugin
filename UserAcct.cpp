@@ -694,7 +694,6 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 				k=0;
 				if (j<=len) //is there a metric (optional)
 				{
-					k=0;
 					//find the metric
 					while(route[j]!=' ' && j<=len)
 					{
@@ -836,7 +835,6 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 				k=0;
 				if (j<=len) //is there a metric (optional)
 				{
-					k=0;
 					//find the metric
 					while(route[j]!=' ' && j<=len)
 					{
@@ -1000,7 +998,6 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 				k=0;
 				if (j<=len) //is there a metric (optional)
 				{
-					k=0;
 					//find the metric
 					while(route[j]!=' ' && j<=len)
 					{
@@ -1141,7 +1138,6 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 				k=0;
 				if (j<=len) //is there a metric (optional)
 				{
-					k=0;
 					//find the metric
 					while(route[j]!=' ' && j<=len)
 					{
