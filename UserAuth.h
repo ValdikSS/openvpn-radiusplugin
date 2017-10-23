@@ -36,8 +36,11 @@
 #include <list>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
+
 using namespace std;
 
+#define MAX_PASSWORD_LEN 128 // in bytes
 
 
 /**The class represents an user for the authentication process.**/

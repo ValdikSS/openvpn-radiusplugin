@@ -22,7 +22,6 @@
 #include "UserAuth.h"
 
 
-
 /** The constructor. Nothing happens here.*/
 UserAuth::UserAuth():User()
 {
@@ -31,6 +30,12 @@ UserAuth::UserAuth():User()
 /** The constructor. Nothing happens here.*/
 UserAuth::~UserAuth()
 {
+}
+
+std::string
+limited_string(const std::string& src, size_t max_len)
+{
+	return std::string(src, 0, max_len);
 }
 
 /**The method send an authentication packet to the radius server and
@@ -74,7 +79,8 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 		cerr << getTime() << "RADIUS-PLUGIN: Build password packet:  password: *****, sharedSecret: *****.\n";
 	
 	//add the attributes
-	ra2.setValue(this->password);
+	ra2.setValue(limited_string(this->password, MAX_PASSWORD_LEN));
+
 	if(packet.addRadiusAttribute(&ra1))
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: Fail to add attribute ATTRIB_User_Name.\n";
