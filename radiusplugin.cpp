@@ -355,6 +355,22 @@ error:
         //restore the context which was created at the function openvpn_plugin_open_v1
         PluginContext *context = ( struct PluginContext * ) handle;
 
+        if (DEBUG(context->getVerbosity())) {
+            cerr << "ENVP VALUES: \n";
+            int i = 0;
+            while (envp[i] != NULL) {
+                cerr << envp[i] << "\n";
+                i++;
+            }
+
+            cerr << "ARGV VALUES: \n";
+            i = 0;
+            while (argv[i] != NULL) {
+                cerr << envp[i] << "\n";
+                i++;
+            }
+        }
+
         if (context->getStartThread())
         {
 
@@ -1377,7 +1393,11 @@ void get_user_env(PluginContext * context,const int type,const char * envp[], Us
     else
     	user->setStatusFileKey(user->getCommonname() + string ( "," ) + untrusted_ip);
 
-    if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: StatusFileKey: " << user->getStatusFileKey() << endl;
-    user->setKey(untrusted_ip + string ( ":" ) + get_env ( "untrusted_port", envp ) );
-    if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Key: " << user->getKey() << ".\n";
+    if ( DEBUG ( context->getVerbosity() ) )
+        cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: StatusFileKey: " << user->getStatusFileKey() << endl;
+
+    user->setKey(get_env("auth_control_file", envp));
+
+    if ( DEBUG ( context->getVerbosity() ) )
+        cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Key: " << user->getKey() << ".\n";
 }
