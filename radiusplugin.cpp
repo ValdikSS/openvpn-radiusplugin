@@ -22,6 +22,8 @@
 //The callback functions of the plugin infrastructure.
 
 #include "radiusplugin.h"
+#include "Hasher.h"
+
 #define NEED_LIBGCRYPT_VERSION "1.2.0"
 GCRY_THREAD_OPTION_PTHREAD_IMPL;
 
@@ -354,6 +356,22 @@ error:
 
         //restore the context which was created at the function openvpn_plugin_open_v1
         PluginContext *context = ( struct PluginContext * ) handle;
+
+        if (DEBUG(context->getVerbosity())) {
+            cerr << "ENVP VALUES: \n";
+            int i = 0;
+            while (envp[i] != NULL) {
+                cerr << envp[i] << "\n";
+                i++;
+            }
+
+            cerr << "ARGV VALUES: \n";
+            i = 0;
+            while (argv[i] != NULL) {
+                cerr << envp[i] << "\n";
+                i++;
+            }
+        }
 
         if (context->getStartThread())
         {
@@ -771,58 +789,25 @@ void set_signals ( void )
  * @param A pointer to the user for which the session ID is created.
  * @return A string with the hash.
  */
-string createSessionId ( UserPlugin * user )
-{
-    unsigned char digest[16];
-    char text[33]; 	//The digest.
-    gcry_md_hd_t  context;						//the hash context
-    int i;
+string createSessionId(UserPlugin *user) {
     time_t rawtime;
     string strtime;
     ostringstream portnumber;
-    memset ( digest,0,16 );
-    if (!gcry_control (GCRYCTL_ANY_INITIALIZATION_P))
-    { /* No other library has already initialized libgcrypt. */
-
-      gcry_control(GCRYCTL_SET_THREAD_CBS,&gcry_threads_pthread);
-
-      if (!gcry_check_version (NEED_LIBGCRYPT_VERSION) )
-	{
-	    cerr << "libgcrypt is too old (need " << NEED_LIBGCRYPT_VERSION << ", have " << gcry_check_version (NULL) << ")\n";
-	}
-	/* Disable secure memory.  */
-      gcry_control (GCRYCTL_DISABLE_SECMEM, 0);
-      gcry_control (GCRYCTL_INITIALIZATION_FINISHED);
-    }
-    //build the hash
-    gcry_md_open ( &context, GCRY_MD_MD5, 0 );
-    gcry_md_write ( context, user->getCommonname().c_str(), user->getCommonname().length() );
-    gcry_md_write ( context, user->getCallingStationId().c_str(), user->getCallingStationId().length() );
-    gcry_md_write ( context, user->getUntrustedPort().c_str(), user->getUntrustedPort().length() );
-    gcry_md_write ( context, user->getUntrustedPort().c_str(), user->getUntrustedPort().length() );
 
     portnumber << user->getPortnumber();
-    gcry_md_write ( context,portnumber.str().c_str(), portnumber.str().length());
-    time ( &rawtime );
-    strtime=ctime ( &rawtime );
-    gcry_md_write ( context, strtime.c_str(),strtime.length() );
-    memcpy ( digest, gcry_md_read ( context, GCRY_MD_MD5 ), 16 );
-    gcry_md_close ( context );
+
+    time(&rawtime);
+    strtime = ctime(&rawtime);
 
 
-    unsigned int h,l;
-    char *p=text;
-    unsigned char *c=digest;
-    for ( i=0; i<16; i++ )
-    {
-        h = *c / 16;
-        l = *c % 16;
-        c++;
-        *p++ = "01234567890ABCDEF"[h];
-        *p++ = "01234567890ABCDEF"[l];
-    }
-    text[32]='\0';
-    return string ( text );
+    string args[] = {
+            user->getCommonname(),
+            user->getCallingStationId(),
+            user->getUntrustedPort(),
+            portnumber.str(),
+            strtime};
+
+    return Hasher::makeHash(args);
 }
 
 
@@ -1371,13 +1356,22 @@ void get_user_env(PluginContext * context,const int type,const char * envp[], Us
     }
 
     user->setUntrustedPort ( get_env ( "untrusted_port", envp ) );
-    
-    if (untrusted_ip.find(":") == untrusted_ip.npos)
-    	user->setStatusFileKey(user->getCommonname() + string ( "," ) + untrusted_ip + string ( ":" ) + get_env ( "untrusted_port", envp ) );
-    else
-    	user->setStatusFileKey(user->getCommonname() + string ( "," ) + untrusted_ip);
 
-    if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: StatusFileKey: " << user->getStatusFileKey() << endl;
-    user->setKey(untrusted_ip + string ( ":" ) + get_env ( "untrusted_port", envp ) );
-    if ( DEBUG ( context->getVerbosity() ) ) cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Key: " << user->getKey() << ".\n";
+    string args[] = {get_env("auth_control_file", envp)};
+    string key = Hasher::makeHash(args);
+
+    if (untrusted_ip.find(":") == untrusted_ip.npos)
+        user->setStatusFileKey( user->getCommonname() + string(",") + untrusted_ip + string(":") + get_env("untrusted_port", envp));
+    else
+        user->setStatusFileKey(user->getCommonname() + string(",") + untrusted_ip);
+
+//    user->setStatusFileKey(key);
+
+    if ( DEBUG ( context->getVerbosity() ) )
+        cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: StatusFileKey: " << user->getStatusFileKey() << endl;
+
+    user->setKey(key);
+
+    if ( DEBUG ( context->getVerbosity() ) )
+        cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: Key: " << user->getKey() << ".\n";
 }

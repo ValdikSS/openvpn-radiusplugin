@@ -27,7 +27,8 @@ OBJECTS=\
   main.o \
   UserAcct.o \
   UserPlugin.o \
-  Config.o
+  Config.o \
+  Hasher.o
 
 ifeq ($(V),1)
 Q=
