@@ -1360,7 +1360,12 @@ void get_user_env(PluginContext * context,const int type,const char * envp[], Us
     string args[] = {get_env("auth_control_file", envp)};
     string key = Hasher::makeHash(args);
 
-    user->setStatusFileKey(key);
+    if (untrusted_ip.find(":") == untrusted_ip.npos)
+        user->setStatusFileKey( user->getCommonname() + string(",") + untrusted_ip + string(":") + get_env("untrusted_port", envp));
+    else
+        user->setStatusFileKey(user->getCommonname() + string(",") + untrusted_ip);
+
+//    user->setStatusFileKey(key);
 
     if ( DEBUG ( context->getVerbosity() ) )
         cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND: StatusFileKey: " << user->getStatusFileKey() << endl;
