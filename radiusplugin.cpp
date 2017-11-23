@@ -403,28 +403,28 @@ error:
             try
             {
                 newuser=new UserPlugin();
-		get_user_env(context,type,envp, newuser);
-                 if (newuser->getAuthControlFile().length() > 0 && context->conf.getUseAuthControlFile())
-                                {
-                                  pthread_mutex_lock(context->getMutexSend());
-                                  context->addNewUser(newuser);
-                                  pthread_cond_signal( context->getCondSend( ));
-                                  pthread_mutex_unlock (context->getMutexSend());
-                                  return OPENVPN_PLUGIN_FUNC_DEFERRED;  
-                                }
-                                else
-                                {
-                                  pthread_mutex_lock(context->getMutexRecv());
-				  pthread_mutex_lock(context->getMutexSend());
-                                  context->addNewUser(newuser);
-                                  pthread_cond_signal( context->getCondSend( ));
-                                  pthread_mutex_unlock (context->getMutexSend());
+                get_user_env(context,type,envp, newuser);
+                if (newuser->getAuthControlFile().length() > 0 && context->conf.getUseAuthControlFile())
+                {
+                  pthread_mutex_lock(context->getMutexSend());
+                  context->addNewUser(newuser);
+                  pthread_cond_signal( context->getCondSend( ));
+                  pthread_mutex_unlock (context->getMutexSend());
+                  return OPENVPN_PLUGIN_FUNC_DEFERRED;
+                }
+                else
+                {
+                  pthread_mutex_lock(context->getMutexRecv());
+                  pthread_mutex_lock(context->getMutexSend());
+                  context->addNewUser(newuser);
+                  pthread_cond_signal( context->getCondSend( ));
+                  pthread_mutex_unlock (context->getMutexSend());
 				  
 				  pthread_cond_wait( context->getCondRecv(), context->getMutexRecv());
 				  pthread_mutex_unlock (context->getMutexRecv());
                                   
 				  return context->getResult();
-                                }
+                }
             }
             catch ( Exception &e )
             {
@@ -1135,7 +1135,15 @@ void  * client_connect(void * c)
                 }
             }
             else
-            delete(tmpuser);
+            {
+                newuser->setFramedIp(tmpuser->getFramedIp());
+                newuser->setFramedIp6(tmpuser->getFramedIp6());
+                newuser->setFramedRoutes(tmpuser->getFramedRoutes());
+                newuser->setFramedRoutes6(tmpuser->getFramedRoutes6());
+                newuser->setClientConnectDeferFile(tmpuser->getClientConnectDeferFile());
+
+                delete(tmpuser);
+            }
 
             if ( DEBUG ( context->getVerbosity() ) )
                 cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Set FramedIP to the IP (" << newuser->getFramedIp() << ") OpenVPN assigned to the user " << newuser->getUsername() << "\n";
