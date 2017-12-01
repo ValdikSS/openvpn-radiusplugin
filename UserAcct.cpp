@@ -135,7 +135,7 @@ int UserAcct::sendUpdatePacket(PluginContext *context)
 		
 	if (packet.addRadiusAttribute(&ra2))
 	{
-		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_User_Password.\n";
+		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Framed_IP_Address.\n";
 	}
 	
 	if (packet.addRadiusAttribute(&ra3))
@@ -309,7 +309,7 @@ int UserAcct::sendStartPacket(PluginContext * context)
 	
 	if (packet.addRadiusAttribute(&ra2))
 	{
-		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_User_Password.\n";
+		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Framed_IP_Address.\n";
 	}
 	if (packet.addRadiusAttribute(&ra3))
 	{
