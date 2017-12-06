@@ -1271,13 +1271,11 @@ string getTime()
 {
     time_t rawtime;
     time ( &rawtime );
-    string t(ctime(&rawtime));
-    t.replace(t.find("\n"),1," ");
-    size_t str_pos=t.find("\n");
-    if (str_pos!=string::npos)
-    {
-         t.replace(str_pos,1," ");
-    }
+    char time_char[60];
+    std::strftime(time_char,sizeof(time_char),"%c ",std::localtime(&rawtime));
+
+    string t(time_char);
+
     return t;
 }
 
