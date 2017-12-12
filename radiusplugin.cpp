@@ -22,6 +22,7 @@
 //The callback functions of the plugin infrastructure.
 
 #include "radiusplugin.h"
+#include <time.h>
 #define NEED_LIBGCRYPT_VERSION "1.2.0"
 GCRY_THREAD_OPTION_PTHREAD_IMPL;
 
@@ -1272,7 +1273,8 @@ string getTime()
     time_t rawtime;
     time ( &rawtime );
     char time_char[60];
-    std::strftime(time_char,sizeof(time_char),"%c ",std::localtime(&rawtime));
+    struct tm temp_tm;
+    std::strftime(time_char,sizeof(time_char),"%c ",localtime_r(&rawtime,&temp_tm));
 
     string t(time_char);
 
