@@ -884,8 +884,8 @@ void  * auth_user_pass_verify(void * c)
                      << "\nRADIUS-PLUGIN: FOREGROUND THREAD:\t newuser ip: " << olduser->getCallingStationId()
                      << "\nRADIUS-PLUGIN: FOREGROUND THREAD:\t newuser port: " << olduser->getUntrustedPort()
                      << "\n";
-            cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: isAuthenticated()" <<  olduser->isAuthenticated();
-            cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: isAcct()" <<  olduser->isAccounted();
+            cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: isAuthenticated()" <<  olduser->isAuthenticated() << endl;
+            cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: isAcct()" <<  olduser->isAccounted() << endl;
             // update password and username, can happen when a new connection is established from the same client with the same port before the timeout in the openvpn server occurs!
             olduser->setPassword(newuser->getPassword());
             olduser->setUsername(newuser->getUsername());
