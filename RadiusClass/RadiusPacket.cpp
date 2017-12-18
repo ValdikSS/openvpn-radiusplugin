@@ -355,9 +355,12 @@ int RadiusPacket::unShapeRadiusPacket(void)
 		{
 			return TO_BIG_ATTRIBUTE_LENGTH;
 		}
+        else if (ra->getLength()<2)
+        {
+            return BAD_LENGTH;
+        }
 		else
 		{
-				
 			value=new char [ra->getLength()-2];
 			for(i=0;i<(ra->getLength()-2);i++)
 			{
