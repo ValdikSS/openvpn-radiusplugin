@@ -986,7 +986,7 @@ void  * auth_user_pass_verify(void * c)
                     pthread_mutex_lock(context->getMutexRecv());
                     context->setResult(OPENVPN_PLUGIN_FUNC_SUCCESS);
                     
-		    pthread_cond_signal( context->getCondRecv( ));
+                    pthread_cond_signal( context->getCondRecv( ));
                     pthread_mutex_unlock (context->getMutexRecv());
 
                 }

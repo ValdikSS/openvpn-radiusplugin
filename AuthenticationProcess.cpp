@@ -59,6 +59,7 @@ void AuthenticationProcess::Authentication(PluginContext * context)
    	// Event loop
   	while (1)
     {
+        step=0;
     	// get a command from foreground process 
       	command = context->authsocketforegr.recvInt();
       
@@ -71,22 +72,22 @@ void AuthenticationProcess::Authentication(PluginContext * context)
 		  	{
 			    user=new UserAuth;
 			    //get the user informations
-                step++;
+                step++;//1
 			    user->setUsername(context->authsocketforegr.recvStr());
-                step++;
+                step++;//2
                 user->setPassword(context->authsocketforegr.recvStr());
-                step++;
+                step++;//3
                 user->setDev(context->authsocketforegr.recvStr());
-                step++;
+                step++;//4
                 user->setPortnumber(context->authsocketforegr.recvInt());
-                step++;
+                step++;//5
                 user->setSessionId(context->authsocketforegr.recvStr());
-                step++;
+                step++;//6
                 user->setCallingStationId(context->authsocketforegr.recvStr());
-                step++;
+                step++;//7
                 user->setCommonname(context->authsocketforegr.recvStr());
 				// framed-ip is an @IP if we're renegotiating, "" otherwise
-                step++;
+                step++;//8
                 user->setFramedIp(context->authsocketforegr.recvStr());
 		 		
                 if (DEBUG (context->getVerbosity()) && (user->getFramedIp().compare("") == 0))
@@ -96,49 +97,49 @@ void AuthenticationProcess::Authentication(PluginContext * context)
 			    cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND  AUTH: Old user ReAuth: username: " << user->getUsername() << ", password: *****, calling station: " << user->getCallingStationId() << ", commonname: " << user->getCommonname() << ".\n";
 			    
 			    //send the AcceptRequestPacket
-                step++;
+                step++;//9
                 if (user->sendAcceptRequestPacket(context)==0) /* Succeeded */
 			    {
 			     	//if the authentication succeeded
 			     	//create the user configuration file
 			     	//Unless this is a renegotiation (ie: if FramedIP is already set)
-                    step++;
+                    step++;//10
                     if (user->createCcdFile(context)>0 && (user->getFramedIp().compare("") == 0))
 			     	{
 			     		throw Exception ("RADIUS-PLUGIN: BACKGROUND AUTH: Ccd-file could not created for user with commonname: "+user->getCommonname()+"!\n");
 			     	}
 			     				     	
 			     	//tell the parent process
-                    step++;
+                    step++;//11
                     context->authsocketforegr.send(RESPONSE_SUCCEEDED);
 								     	
 			     	//send the routes to the parent process
-                    step++;
+                    step++;//12
                     context->authsocketforegr.send(user->getFramedRoutes());
 					
 				//send the framed ip to the parent process
-                    step++;
+                    step++;//13
                     context->authsocketforegr.send(user->getFramedIp());
 										
 			     	//send the IPv6 routes to the parent process
-                    step++;
+                    step++;//14
                     context->authsocketforegr.send(user->getFramedRoutes6());
 					
 				//send the framed IPv6 to the parent process
-                    step++;
+                    step++;//15
                     context->authsocketforegr.send(user->getFramedIp6());
 										
 					//send the interval to the parent process
-                    step++;
+                    step++;//16
                     context->authsocketforegr.send(user->getAcctInterimInterval());
 			     	
 			     	//send the vsa buffer
-                    step++;
+                    step++;//17
                     context->authsocketforegr.send(user->getVsaBuf(), user->getVsaBufLen());
 			     	
 			     	
 			     	//free user_context_auth
-                    step++;
+                    step++;//18
                     delete user;
 			     	
 			     	if (DEBUG (context->getVerbosity()))
@@ -147,7 +148,7 @@ void AuthenticationProcess::Authentication(PluginContext * context)
 			    }
 			    else /* Failed */
 			    {
-                    step++;
+                    step++;//10
                     context->authsocketforegr.send(RESPONSE_FAILED);
 					throw Exception("RADIUS-PLUGIN: BACKGROUND  AUTH: Auth failed!.\n");	
 			    }
