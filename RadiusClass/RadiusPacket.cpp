@@ -317,10 +317,11 @@ int RadiusPacket::unShapeRadiusPacket(void)
 {
 	RadiusAttribute		*ra;
 	int					pos,i;
-	char				*value; 			
+    char				*value;
+    unsigned int        len;
 	
 	//if the buffer is empty
-	if(!this->recvbuffer||this->recvbufferlen<=0)
+    if(!this->recvbuffer||this->recvbufferlen<=4)
 	{
 		return NO_BUFFER_TO_UNSHAPE;
 	}
@@ -329,15 +330,23 @@ int RadiusPacket::unShapeRadiusPacket(void)
 	//	RADIUS packet header decoding
 	this->code=this->recvbuffer[0];
 	//cerr << getTime() << "\n\nCODE: %s\n\n", this->code);
-	
+
 	this->identifier=this->recvbuffer[1];
+
+    len = this->recvbuffer[2]*256 + this->recvbuffer[3];
+
+    if (this->recvbufferlen < len)
+    {
+        return BAD_LENGTH;
+    }
+
 	memcpy(this->authenticator,recvbuffer+4,RADIUS_PACKET_AUTHENTICATOR_LEN);
 	
 	
 	//	RADIUS packet attributes decoding
 	pos=20;
 			
-	while(pos<this->recvbufferlen)
+    while(pos<len)
 	{
 		//for every turn create a new attribute
 		if(!(ra=new RadiusAttribute))
@@ -376,7 +385,7 @@ int RadiusPacket::unShapeRadiusPacket(void)
 		delete ra;
 	}
 	//set the right length
-	this->length=this->recvbufferlen;
+    this->length=len;
 	
 	
 	return 0;
