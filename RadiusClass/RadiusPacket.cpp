@@ -317,10 +317,11 @@ int RadiusPacket::unShapeRadiusPacket(void)
 {
 	RadiusAttribute		*ra;
 	int					pos,i;
-	char				*value; 			
+    char				*value;
+    unsigned int        len;
 	
 	//if the buffer is empty
-	if(!this->recvbuffer||this->recvbufferlen<=0)
+    if(!this->recvbuffer||this->recvbufferlen<=4)
 	{
 		return NO_BUFFER_TO_UNSHAPE;
 	}
@@ -329,15 +330,23 @@ int RadiusPacket::unShapeRadiusPacket(void)
 	//	RADIUS packet header decoding
 	this->code=this->recvbuffer[0];
 	//cerr << getTime() << "\n\nCODE: %s\n\n", this->code);
-	
+
 	this->identifier=this->recvbuffer[1];
+
+    len = this->recvbuffer[2]*256 + this->recvbuffer[3];
+
+    if (this->recvbufferlen < len)
+    {
+        return BAD_LENGTH;
+    }
+
 	memcpy(this->authenticator,recvbuffer+4,RADIUS_PACKET_AUTHENTICATOR_LEN);
 	
 	
 	//	RADIUS packet attributes decoding
 	pos=20;
 			
-	while(pos<this->recvbufferlen)
+    while(pos<len)
 	{
 		//for every turn create a new attribute
 		if(!(ra=new RadiusAttribute))
@@ -355,9 +364,12 @@ int RadiusPacket::unShapeRadiusPacket(void)
 		{
 			return TO_BIG_ATTRIBUTE_LENGTH;
 		}
+        else if (ra->getLength()<2)
+        {
+            return BAD_LENGTH;
+        }
 		else
 		{
-				
 			value=new char [ra->getLength()-2];
 			for(i=0;i<(ra->getLength()-2);i++)
 			{
@@ -373,7 +385,7 @@ int RadiusPacket::unShapeRadiusPacket(void)
 		delete ra;
 	}
 	//set the right length
-	this->length=this->recvbufferlen;
+    this->length=len;
 	
 	
 	return 0;
@@ -479,54 +491,61 @@ int RadiusPacket::radiusReceive(list<RadiusServer> *serverlist)
 	int i_server=serverlist->size(),i=0;
 	server=serverlist->begin();
 	
+    int step = 0;
+
 	while (i<i_server)
 	{		
+        try
+        {
 		//	Get server IP address (no check if input is IP address or DNS name
 	    if(!(h=gethostbyname(server->getName().c_str())))
 		{
 			return UNKNOWN_HOST;
 		}
-		
 	    remoteServAddr.sin_family=h->h_addrtype;
 	    
-	    remoteServAddr.sin_port=htons(server->getAuthPort());
+        remoteServAddr.sin_port=htons(server->getAuthPort());
 		
 		
 	    //retry the sending if there is no result
-	    while (retries<=server->getRetry())
+        while (retries<=server->getRetry())
 	    {
+            step = 0;
 		    // wait for the specified time for a response
 		    tv.tv_sec = server->getWait();  
 		    tv.tv_usec = 0;
 		    FD_ZERO(&set);				// clear out the set 
 		    FD_SET(this->sock, &set);	// wait only for the RADIUS UDP socket 
-			result = select(FD_SETSIZE, &set, NULL, NULL, &tv);
+            step++;
+            result = select(FD_SETSIZE, &set, NULL, NULL, &tv);
 				
 			if (result>0)
 			{
-				
 				//clear the attributes
 				attribs.clear();
-		
 				
 				//allocate enough space for the buffer (RFC says maximum 4096=RADIUS_MAX_PACKET_LEN Bytes)
-				if(!(this->recvbuffer=new Octet[RADIUS_MAX_PACKET_LEN]))
+                step++;
+                if(!(this->recvbuffer=new Octet[RADIUS_MAX_PACKET_LEN]))
 				{
 					return (ALLOC_ERROR);
 				}
 				//set the buffer to 0
 				memset(this->recvbuffer,0,RADIUS_MAX_PACKET_LEN); 	
 				len=sizeof(struct sockaddr_in);
-				this->recvbufferlen=recvfrom(this->sock,this->recvbuffer,RADIUS_MAX_PACKET_LEN,0,(struct sockaddr*)&remoteServAddr,&len);
+                step++;
+                this->recvbufferlen=recvfrom(this->sock,this->recvbuffer,RADIUS_MAX_PACKET_LEN,0,(struct sockaddr*)&remoteServAddr,&len);
 				close(this->sock);
 				this->sock=0;
 				//unshape the packet
-				if(this->unShapeRadiusPacket()!=0)
+                step++;
+                if(this->unShapeRadiusPacket()!=0)
 				{
 					return UNSHAPE_ERROR;
 				}
 				
-				if (this->authenticateReceivedPacket(server->getSharedSecret().c_str())!=0)
+                step++;
+                if (this->authenticateReceivedPacket(server->getSharedSecret().c_str())!=0)
 				{
 					
 					return WRONG_AUTHENTICATOR_IN_RECV_PACKET;
@@ -541,7 +560,8 @@ int RadiusPacket::radiusReceive(list<RadiusServer> *serverlist)
 				//the server retries
 				if(retries <= server->getRetry())
 				{
-					this->radiusSend(server);
+                    step+=100;
+                    this->radiusSend(server);
 				}
 			}
 			retries++;
@@ -551,6 +571,12 @@ int RadiusPacket::radiusReceive(list<RadiusServer> *serverlist)
 		i++;
 		//set the retries=0, for the new server
 		retries=0;
+        }
+        catch(std::bad_alloc&)
+        {
+            cerr << "-------- RADIUS-PLUGIN: radiusReceive bad_alloc. (step = "<<step<< ")" << endl;
+            throw;
+        }
 	}
 	
 	return NO_RESPONSE;

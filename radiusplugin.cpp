@@ -22,6 +22,7 @@
 //The callback functions of the plugin infrastructure.
 
 #include "radiusplugin.h"
+#include <time.h>
 #define NEED_LIBGCRYPT_VERSION "1.2.0"
 GCRY_THREAD_OPTION_PTHREAD_IMPL;
 
@@ -403,28 +404,28 @@ error:
             try
             {
                 newuser=new UserPlugin();
-		get_user_env(context,type,envp, newuser);
-                 if (newuser->getAuthControlFile().length() > 0 && context->conf.getUseAuthControlFile())
-                                {
-                                  pthread_mutex_lock(context->getMutexSend());
-                                  context->addNewUser(newuser);
-                                  pthread_cond_signal( context->getCondSend( ));
-                                  pthread_mutex_unlock (context->getMutexSend());
-                                  return OPENVPN_PLUGIN_FUNC_DEFERRED;  
-                                }
-                                else
-                                {
-                                  pthread_mutex_lock(context->getMutexRecv());
-				  pthread_mutex_lock(context->getMutexSend());
-                                  context->addNewUser(newuser);
-                                  pthread_cond_signal( context->getCondSend( ));
-                                  pthread_mutex_unlock (context->getMutexSend());
+                get_user_env(context,type,envp, newuser);
+                if (newuser->getAuthControlFile().length() > 0 && context->conf.getUseAuthControlFile())
+                {
+                  pthread_mutex_lock(context->getMutexSend());
+                  context->addNewUser(newuser);
+                  pthread_cond_signal( context->getCondSend( ));
+                  pthread_mutex_unlock (context->getMutexSend());
+                  return OPENVPN_PLUGIN_FUNC_DEFERRED;
+                }
+                else
+                {
+                  pthread_mutex_lock(context->getMutexRecv());
+                  pthread_mutex_lock(context->getMutexSend());
+                  context->addNewUser(newuser);
+                  pthread_cond_signal( context->getCondSend( ));
+                  pthread_mutex_unlock (context->getMutexSend());
 				  
 				  pthread_cond_wait( context->getCondRecv(), context->getMutexRecv());
 				  pthread_mutex_unlock (context->getMutexRecv());
                                   
 				  return context->getResult();
-                                }
+                }
             }
             catch ( Exception &e )
             {
@@ -883,8 +884,8 @@ void  * auth_user_pass_verify(void * c)
                      << "\nRADIUS-PLUGIN: FOREGROUND THREAD:\t newuser ip: " << olduser->getCallingStationId()
                      << "\nRADIUS-PLUGIN: FOREGROUND THREAD:\t newuser port: " << olduser->getUntrustedPort()
                      << "\n";
-            cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: isAuthenticated()" <<  olduser->isAuthenticated();
-            cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: isAcct()" <<  olduser->isAccounted();
+            cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: isAuthenticated()" <<  olduser->isAuthenticated() << endl;
+            cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: isAcct()" <<  olduser->isAccounted() << endl;
             // update password and username, can happen when a new connection is established from the same client with the same port before the timeout in the openvpn server occurs!
             olduser->setPassword(newuser->getPassword());
             olduser->setUsername(newuser->getUsername());
@@ -985,7 +986,7 @@ void  * auth_user_pass_verify(void * c)
                     pthread_mutex_lock(context->getMutexRecv());
                     context->setResult(OPENVPN_PLUGIN_FUNC_SUCCESS);
                     
-		    pthread_cond_signal( context->getCondRecv( ));
+                    pthread_cond_signal( context->getCondRecv( ));
                     pthread_mutex_unlock (context->getMutexRecv());
 
                 }
@@ -1135,7 +1136,15 @@ void  * client_connect(void * c)
                 }
             }
             else
-            delete(tmpuser);
+            {
+                newuser->setFramedIp(tmpuser->getFramedIp());
+                newuser->setFramedIp6(tmpuser->getFramedIp6());
+                newuser->setFramedRoutes(tmpuser->getFramedRoutes());
+                newuser->setFramedRoutes6(tmpuser->getFramedRoutes6());
+                newuser->setClientConnectDeferFile(tmpuser->getClientConnectDeferFile());
+
+                delete(tmpuser);
+            }
 
             if ( DEBUG ( context->getVerbosity() ) )
                 cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Set FramedIP to the IP (" << newuser->getFramedIp() << ") OpenVPN assigned to the user " << newuser->getUsername() << "\n";
@@ -1263,13 +1272,12 @@ string getTime()
 {
     time_t rawtime;
     time ( &rawtime );
-    string t(ctime(&rawtime));
-    t.replace(t.find("\n"),1," ");
-    size_t str_pos=t.find("\n");
-    if (str_pos!=string::npos)
-    {
-         t.replace(str_pos,1," ");
-    }
+    char time_char[60];
+    struct tm temp_tm;
+    std::strftime(time_char,sizeof(time_char),"%c ",localtime_r(&rawtime,&temp_tm));
+
+    string t(time_char);
+
     return t;
 }
 

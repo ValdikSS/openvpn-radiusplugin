@@ -60,11 +60,14 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 				ra9(ATTRIB_Framed_IP_Address),
 				ra10(ATTRIB_Acct_Session_ID, this->getSessionId());
 	
-	
+    int step =0;
+    try
+    {
 	if (DEBUG (context->getVerbosity()))
     	cerr << getTime() << "RADIUS-PLUGIN: radius_server().\n";
 		
 	//get the server list
+    step++;
 	serverlist=context->radiusconf.getRadiusServer();
 	//set server to the first server
 	server=serverlist->begin();
@@ -74,37 +77,43 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 		cerr << getTime() << "RADIUS-PLUGIN: Build password packet:  password: *****, sharedSecret: *****.\n";
 	
 	//add the attributes
-	ra2.setValue(this->password);
+    step++;
+    ra2.setValue(this->password);
 	if(packet.addRadiusAttribute(&ra1))
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: Fail to add attribute ATTRIB_User_Name.\n";
 	}
 	
-	if (packet.addRadiusAttribute(&ra2))
+    step++;
+    if (packet.addRadiusAttribute(&ra2))
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: Fail to add attribute ATTRIB_User_Password.\n";
 	}
-	if (packet.addRadiusAttribute(&ra3))
+    step++;
+    if (packet.addRadiusAttribute(&ra3))
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: Fail to add attribute ATTRIB_NAS_Port.\n";
 	}
-	if (packet.addRadiusAttribute(&ra4))
+    step++;
+    if (packet.addRadiusAttribute(&ra4))
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: Fail to add attribute ATTRIB_Calling_Station_Id.\n";
 	}
 	//get information from the config and add it to the packet
-	if(strcmp(context->radiusconf.getNASIdentifier(),""))
+    step++;
+    if(strcmp(context->radiusconf.getNASIdentifier(),""))
 	{
-			ra5.setValue(context->radiusconf.getNASIdentifier());
-			if (packet.addRadiusAttribute(&ra5))
+            ra5.setValue(context->radiusconf.getNASIdentifier());
+            if (packet.addRadiusAttribute(&ra5))
 			{
 				cerr << getTime() << "RADIUS-PLUGIN: Fail to add attribute ATTRIB_NAS_Identifier.\n";
 			}
 	}
 	
-	if(strcmp(context->radiusconf.getNASIpAddress(),""))
+    step++;
+    if(strcmp(context->radiusconf.getNASIpAddress(),""))
 	{
-			if(ra6.setValue(context->radiusconf.getNASIpAddress())!=0)
+            if(ra6.setValue(context->radiusconf.getNASIpAddress())!=0)
 			{
 				cerr << getTime() << "RADIUS-PLUGIN: Fail to set value ATTRIB_NAS_Ip_Address.\n";
 			}
@@ -114,7 +123,8 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 				cerr << getTime() << "RADIUS-PLUGIN: Fail to add attribute ATTRIB_NAS_Ip_Address.\n";
 			}
 	}
-	if(strcmp(context->radiusconf.getNASPortType(),""))
+    step++;
+    if(strcmp(context->radiusconf.getNASPortType(),""))
 	{
 			ra7.setValue(context->radiusconf.getNASPortType());
 			if (packet.addRadiusAttribute(&ra7))
@@ -123,12 +133,14 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 			}
 	}
 	
-	if (packet.addRadiusAttribute(&ra10))
+    step++;
+    if (packet.addRadiusAttribute(&ra10))
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: Fail to add attribute ATTRIB_Acct_Session_ID.\n";
 	}
 	
-	if(strcmp(context->radiusconf.getServiceType(),""))
+    step++;
+    if(strcmp(context->radiusconf.getServiceType(),""))
 	{
 			ra8.setValue(context->radiusconf.getServiceType());
 			if (packet.addRadiusAttribute(&ra8))
@@ -137,7 +149,8 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 			}
 	}
 	
-	if(this->getFramedIp().compare("") != 0)
+    step++;
+    if(this->getFramedIp().compare("") != 0)
 	{
 		if (DEBUG (context->getVerbosity()))
 			cerr << getTime() << "RADIUS-PLUGIN: Send packet Re-Auth packet for framedIP="<< this->getFramedIp().c_str() << ".\n";
@@ -148,17 +161,19 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 			}
 	}
 	
-	
-	
-	if (DEBUG (context->getVerbosity()))
+    step++;
+    if (DEBUG (context->getVerbosity()))
 		cerr << getTime() << "RADIUS-PLUGIN: Send packet to " << server->getName().c_str() <<".\n";
 	//send the packet
-	if (packet.radiusSend(server)<0)
+
+    step++;
+    if (packet.radiusSend(server)<0)
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: Packet was not sent.\n";
 	}
 	//receive the packet
-	int rc=packet.radiusReceive(serverlist);
+    step++;
+    int rc=packet.radiusReceive(serverlist);
 	if (rc==0)
 	{
 		//is it a accept?
@@ -193,7 +208,13 @@ int UserAuth::sendAcceptRequestPacket(PluginContext * context)
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: Got no response from radius server, return code:" << rc << endl;
 	}
-	
+    }
+    catch(std::bad_alloc&)
+    {
+        cerr << getTime() << "RADIUS-PLUGIN: sendAcceptRequestPacket bad_alloc. (step = "<<step<< ")" << endl;
+        throw;
+    }
+
 	return 1;
 		
 }
