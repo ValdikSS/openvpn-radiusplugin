@@ -896,7 +896,8 @@ void  * auth_user_pass_verify(void * c)
         }
         else //new user for authentication, no renegotiation
         {
-            cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: New user." << endl;
+            if ( DEBUG ( context->getVerbosity() ) )
+		    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: New user." << endl;
             newuser->setPortnumber ( context->addNasPort() );
             newuser->setSessionId ( createSessionId ( newuser ) );
             //add the user to the context
@@ -967,13 +968,15 @@ void  * auth_user_pass_verify(void * c)
 
                 if ( newuser->isAuthenticated() ==false )
                 {
-                    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Add user to map." << endl;
+                    if ( DEBUG ( context->getVerbosity() ) )
+			    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Add user to map." << endl;
                     //save the success
                     newuser->setAuthenticated ( true );
                 }
                 else if ( newuser->isAuthenticated() && olduser!=NULL )
                 {
-                    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Don't add the user to the map, it is a rekeying." << endl;
+                    if ( DEBUG ( context->getVerbosity() ) )
+			    cerr << getTime() << "RADIUS-PLUGIN: FOREGROUND THREAD: Don't add the user to the map, it is a rekeying." << endl;
                 }
 
                 if (newuser->getAuthControlFile().length()>0 && context->conf.getUseAuthControlFile())
