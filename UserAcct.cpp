@@ -1295,7 +1295,8 @@ int UserAcct::deleteCcdFile(PluginContext * context)
 	}
 	else
 	{
-		cerr << getTime() << "RADIUS-PLUGIN: Client config file was not deleted, overwriteccfiles is false \n.";
+		if (DEBUG (context->getVerbosity()))
+			cerr << getTime() << "RADIUS-PLUGIN: Client config file was not deleted, overwriteccfiles is false.\n";
 	}
 	return 0;
 }
