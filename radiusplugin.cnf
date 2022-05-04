@@ -23,9 +23,9 @@ OpenVPNConfig=/etc/openvpn/server.conf
 
 
 # Support for topology option in OpenVPN 2.1
-# If you don't specify anything, option "net30" (default in OpenVPN) is used. 
+# If you don't specify anything, option "net30" (default in OpenVPN) is used.
 # You can only use one of the options at the same time.
-# If you use topology option "subnet", fill in the right netmask, e.g. from OpenVPN option "--server NETWORK NETMASK"  
+# If you use topology option "subnet", fill in the right netmask, e.g. from OpenVPN option "--server NETWORK NETMASK"
 subnet=255.255.255.0
 # If you use topology option "p2p", fill in the right network, e.g. from OpenVPN option "--server NETWORK NETMASK"
 # p2p=10.8.0.1
@@ -59,7 +59,12 @@ useclientconnectdeferfile=true
 # default is false
 # accountingonly=false
 
-# If the accounting is non essential, nonfatalaccounting can be set to true. 
+# Allows to disable accounting
+# Some RADIUS servers apparently do not support accounting packets which in turn breakes the auth process
+# default is true
+# accountingenabled=true
+
+# If the accounting is non essential, nonfatalaccounting can be set to true.
 # If set to true all errors during the accounting procedure are ignored, which can be
 # - radius accounting can fail
 # - FramedRouted (if configured) maybe not configured correctly

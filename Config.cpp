@@ -1,7 +1,7 @@
 /*
- *  radiusplugin -- An OpenVPN plugin for do radius authentication 
+ *  radiusplugin -- An OpenVPN plugin for do radius authentication
  *					and accounting.
- * 
+ *
  *  Copyright (C) 2005 EWE TEL GmbH/Ralf Luebben <ralfluebben@gmx.de>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -28,12 +28,12 @@
 
 Config::Config(void)
 {
-	
+
 	this->usernameascommonname=false;
 	this->clientcertnotrequired=false;
 	this->overwriteccfiles=true;
-        this->useauthcontrolfile=false;
-        this->useclientconnectdeferfile=false;
+    this->useauthcontrolfile=false;
+    this->useclientconnectdeferfile=false;
 	this->accountingonly=false;
 	this->nonfatalaccounting=false;
 	this->defacctinteriminterval=0;
@@ -41,6 +41,7 @@ Config::Config(void)
 	this->openvpnconfig="";
 	this->vsanamedpipe="";
 	this->vsascript="";
+	this->accountingenabled=true;
 	memset(this->subnet,0,16);
 	memset(this->p2p,0,16);
 	memset(this->p2p6,0,40);
@@ -63,36 +64,37 @@ Config::Config(char * configfile)
 	this->vsascript="";
 	this->usernameascommonname=false;
 	this->clientcertnotrequired=false;
-	this->overwriteccfiles=true;	
-        this->useauthcontrolfile=false;
-        this->useclientconnectdeferfile=false;
+	this->overwriteccfiles=true;
+    this->useauthcontrolfile=false;
+	this->accountingenabled=true;
+    this->useclientconnectdeferfile=false;
 	this->accountingonly=false;
 	this->nonfatalaccounting=false;
 	this->defacctinteriminterval=0;
 	this->parseConfigFile(configfile);
-	
+
 }
 
 
 /** The destructur clears the serverlist. */
 Config::~Config(void)
 {
-	
-	
+
+
 }
 
 
 
-/** The method parse the configfile for attributes and 
+/** The method parse the configfile for attributes and
  * radius server, the attributes are copied to the
  * member variables.
  * @param configfile The name of the configfile.
- * @return An integer, 0 if everything is ok 
+ * @return An integer, 0 if everything is ok
  * or PARSING_ERROR or BAD_FILE if something is wrong.*/
 int Config::parseConfigFile(const char * configfile)
 {
 	string line;
-	
+
 	ifstream file;
 	file.open(configfile, ios::in);
 	if (file.is_open())
@@ -105,16 +107,16 @@ int Config::parseConfigFile(const char * configfile)
 			{
 				if (strncmp(line.c_str(),"subnet=",7)==0)
 				{
-					if((line.size()-7)>15)
+					if ((line.size()-7)>15)
 					{
 						return BAD_FILE;
 					}
 					line.copy(this->subnet,line.size()-7,7);
-					
+
 				}
 				if (strncmp(line.c_str(),"p2p=",4)==0)
 				{
-					if((line.size()-4)>15)
+					if ((line.size()-4)>15)
 					{
 						return BAD_FILE;
 					}
@@ -122,7 +124,7 @@ int Config::parseConfigFile(const char * configfile)
 				}
 				if (strncmp(line.c_str(),"p2p6=",5)==0)
 				{
-					if((line.size()-5)>39)
+					if ((line.size()-5)>39)
 					{
 						return BAD_FILE;
 					}
@@ -136,34 +138,29 @@ int Config::parseConfigFile(const char * configfile)
 				{
 					this->vsanamedpipe=line.substr(13,line.size()-13);
 				}
-							
+
 				if (strncmp(line.c_str(),"OpenVPNConfig=",14)==0)
 				{
 					this->openvpnconfig=line.substr(14,line.size()-14);
 				}
 				if (strncmp(line.c_str(),"overwriteccfiles=",17)==0)
 				{
-					
 					string stmp=line.substr(17,line.size()-17);
 					deletechars(&stmp);
 					if(stmp == "true") this->overwriteccfiles=true;
 					else if (stmp =="false") this->overwriteccfiles=false;
 					else return BAD_FILE;
-						
 				}
-                                if (strncmp(line.c_str(),"useauthcontrolfile=",19)==0)
+                if (strncmp(line.c_str(),"useauthcontrolfile=",19)==0)
 				{
-					
 					string stmp=line.substr(19,line.size()-19);
 					deletechars(&stmp);
 					if(stmp == "true") this->useauthcontrolfile=true;
 					else if (stmp =="false") this->useauthcontrolfile=false;
 					else return BAD_FILE;
-						
 				}
-                                if (strncmp(line.c_str(),"useclientconnectdeferfile=",26)==0)
+                if (strncmp(line.c_str(),"useclientconnectdeferfile=",26)==0)
 				{
-
 					string stmp=line.substr(26,line.size()-26);
 					deletechars(&stmp);
 					if(stmp == "true") this->useclientconnectdeferfile=true;
@@ -173,27 +170,31 @@ int Config::parseConfigFile(const char * configfile)
 				}
 				if (strncmp(line.c_str(),"accountingonly=",15)==0)
 				{
-					
+
 					string stmp=line.substr(15,line.size()-15);
 					deletechars(&stmp);
 					if(stmp == "true") this->accountingonly=true;
 					else if (stmp =="false") this->accountingonly=false;
 					else return BAD_FILE;
-						
 				}
 				if (strncmp(line.c_str(),"nonfatalaccounting=",19)==0)
 				{
-					
 					string stmp=line.substr(19,line.size()-19);
 					deletechars(&stmp);
 					if(stmp == "true") this->nonfatalaccounting=true;
 					else if (stmp =="false") this->nonfatalaccounting=false;
 					else return BAD_FILE;
-						
+				}
+				if (strncmp(line.c_str(),"accountingenabled=",18)==0)
+				{
+					string stmp=line.substr(18,line.size()-18);
+					deletechars(&stmp);
+					if(stmp == "true") this->accountingenabled=true;
+					else if (stmp =="false") this->accountingenabled=false;
+					else return BAD_FILE;
 				}
 				if (strncmp(line.c_str(),"defacctinteriminterval=",23)==0)
 				{
-
 					string stmp=line.substr(23,line.size()-23);
 					deletechars(&stmp);
 					char *stemp;
@@ -204,12 +205,12 @@ int Config::parseConfigFile(const char * configfile)
 					this->defacctinteriminterval=(int)defacctinteriminterval;
 				}
 			}
-			
+
 		}
 		file.close();
 		// if the main files contains references to other config files
 		// we don't need to care about recursive includes, OpenVPN does it already
-		list<string> configfiles; 
+		list<string> configfiles;
 		configfiles.push_back(this->openvpnconfig);
 		//open OpenVPN config
 		while(configfiles.size() > 0)
@@ -223,7 +224,7 @@ int Config::parseConfigFile(const char * configfile)
 			  while(file2.eof()==false)
 			  {
 				  getline(file2,line);
-				  
+
 				  if(line.empty()==false)
 				  {
 					  string param=line;
@@ -264,7 +265,7 @@ int Config::parseConfigFile(const char * configfile)
 					  {
 						  //method deletechars don't work, entry has formet: status <file> [time]
 						  pos  = line.find_first_of("#");
-						  if (pos != string::npos) 
+						  if (pos != string::npos)
 						  {
 							  line.erase(pos);
 						  }
@@ -281,10 +282,10 @@ int Config::parseConfigFile(const char * configfile)
 						  this->deletechars(&line);
 						  if(!line.empty())
 						  {
-							    
+
 						    this->statusfile=line;
 						  }
-					  }	
+					  }
 				  }
 			  }
 			  file.close();
@@ -302,39 +303,39 @@ int Config::parseConfigFile(const char * configfile)
 	}
 	return 0;
 }
-	
-	
+
+
 /** The method deletes chars from a string.
  * This is used to delete tabs, spaces, # and '\0'
  * from a string.
  * @param text The string which should be cleaned.
- */ 
+ */
 void Config::deletechars(string * line)
 {
 	char const* delims = " \t\r\n\0";
-    
+
    // trim leading whitespace
    string::size_type  pos = line->find_first_not_of(delims);
    if (pos != string::npos) line->erase(0,pos );
    // trim trailing whitespace
-   pos  = line->find_last_not_of(delims); 
+   pos  = line->find_last_not_of(delims);
    if (pos != string::npos)  line->erase(pos+1);
-    
+
    //trim whitespaces in line
    pos  = line->find_first_of(delims);
-   while (pos != string::npos) 
+   while (pos != string::npos)
    {
    	 line->erase(pos,1);
    	 pos  = line->find_first_of(delims);
    }
-   
+
    // trim comments
    pos  = line->find_first_of("#");
-   if (pos != string::npos) 
+   if (pos != string::npos)
    {
    	line->erase(pos);
    }
-   
+
 }
 
 
@@ -362,7 +363,7 @@ void Config::getValue(const char * text, char * value)
 
 
 
-	
+
 /** The getter methid for the client config dir (ccd).
  * @return A string to the ccd.
  */
@@ -379,7 +380,7 @@ void Config::setCcdPath(string path)
 {
 	if(path[path.length()]!= '/')
 	{
-		path +='/';	
+		path +='/';
 	}
 	this->ccdPath=path;
 }
@@ -397,13 +398,13 @@ string Config::getStatusFile(void)
  */
 void Config::setStatusFile(string file)
 {
-	
+
 	this->statusfile=file;
 }
 
 /** The setter method for the nas ip address.
  * @param ip A string with ip address.
- */	
+ */
 void Config::setSubnet(char * ip)
 {
 	strncpy(this->subnet,ip, 16);
@@ -420,7 +421,7 @@ char * Config::getSubnet(void)
 
 /** The setter method for the p2p address.
  * @param ip A string with p2p address.
- */	
+ */
 void Config::setP2p(char * ip)
 {
 	strncpy(this->p2p,ip, 16);
@@ -437,7 +438,7 @@ char * Config::getP2p(void)
 
 /** The setter method for the p2p6 address.
  * @param ip A string with p2p6 address.
- */	
+ */
 void Config::setP2p6(char * ip)
 {
 	strncpy(this->p2p6,ip, 40);
@@ -454,7 +455,7 @@ char * Config::getP2p6(void)
 
 /** The setter method for the vsascript.
  * @param script A path of the script.
- */	
+ */
 void Config::setVsaScript(string script)
 {
 	this->vsascript=script;
@@ -471,7 +472,7 @@ string Config::getVsaScript(void)
 
 /** The setter method for the usernameascommonname value.
  * @param b A boolean for option usernameascommonname.
- */	
+ */
 void Config::setUsernameAsCommonname(bool b)
 {
 	this->usernameascommonname=b;
@@ -488,7 +489,7 @@ bool Config::getUsernameAsCommonname(void)
 
 /** The setter method for the vsanamedpipe.
  * @param script A path of the pipe.
- */	
+ */
 void Config::setVsaNamedPipe(string pipe)
 {
 	this->vsanamedpipe=pipe;
@@ -506,7 +507,7 @@ string Config::getVsaNamedPipe(void)
 
 /** The setter method for the clientcertnotrequired value.
  * @param b A boolean for option clientcertnotrequired.
- */	
+ */
 void Config::setClientCertNotRequired(bool b)
 {
 	this->clientcertnotrequired=b;
@@ -526,7 +527,7 @@ bool Config::getClientCertNotRequired(void)
  */
 string Config::getOpenVPNConfig(void)
 {
-	return this->openvpnconfig;	
+	return this->openvpnconfig;
 }
 
 /** The setter method for the path to the OpenVPN config
@@ -550,7 +551,7 @@ bool Config::getOverWriteCCFiles(void)
  */
 void Config::setOverWriteCCFiles(bool overwrite)
 {
-	this->overwriteccfiles=overwrite;	
+	this->overwriteccfiles=overwrite;
 }
 
 /** Getter method for the authcontrolfile variable.
@@ -566,7 +567,7 @@ bool Config::getUseAuthControlFile(void)
  */
 void Config::setUseAuthControlFile(bool b)
 {
-	this->useauthcontrolfile=b;	
+	this->useauthcontrolfile=b;
 }
 
 /** Getter method for the clientconnectdeferfile variable.
@@ -588,31 +589,41 @@ void Config::setUseClientConnectDeferFile(bool b)
 
 bool Config::getAccountingOnly(void)
 {
- return this->accountingonly; 
+ return this->accountingonly;
 }
 
 void Config::setAccountingOnly(bool b)
 {
- this->accountingonly=b; 
+ this->accountingonly=b;
+}
+
+bool Config::getAccountingEnabled(void)
+{
+	return this->accountingenabled;
+}
+
+void Config::setAccountingEnabled(bool b)
+{
+	this->accountingenabled=b;
 }
 
 
 bool Config::getNonFatalAccounting(void)
 {
- return this->nonfatalaccounting; 
+ return this->nonfatalaccounting;
 }
 
 void Config::setNonFatalAccounting(bool b)
 {
- this->nonfatalaccounting=b; 
+ this->nonfatalaccounting=b;
 }
 
 int Config::getDefAcctInterimInterval(void)
 {
- return this->defacctinteriminterval; 
+ return this->defacctinteriminterval;
 }
 
 void Config::setDefAcctInterimInterval(int b)
 {
- this->defacctinteriminterval=b; 
+ this->defacctinteriminterval=b;
 }

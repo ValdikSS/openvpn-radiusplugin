@@ -1,7 +1,7 @@
 /*
- *  radiusplugin -- An OpenVPN plugin for do radius authentication 
+ *  radiusplugin -- An OpenVPN plugin for do radius authentication
  *					and accounting.
- * 
+ *
  *  Copyright (C) 2005 EWE TEL GmbH/Ralf Luebben <ralfluebben@gmx.de>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
- 
+
 #include "UserAcct.h"
 #include "radiusplugin.h"
 
@@ -43,7 +43,7 @@ UserAcct::~UserAcct()
  * @param u A refernece to a UserAcct.*/
 UserAcct & UserAcct::operator=(const UserAcct &u)
 {
-	
+
 	if (this!=&u)
 	{
 		this->User::operator=(u);
@@ -71,13 +71,13 @@ UserAcct::UserAcct(const UserAcct &u):User(u)
 	this->bytesout=u.bytesout;
 	this->nextupdate=u.nextupdate;
 	this->starttime=u.starttime;
-	
+
 }
 
 /** The method sends an accounting update packet for the user to the radius server.
  * The accounting information are read from the OpenVpn
  * status file. The following attributes are sent to the radius server:
- * - User_Name, 
+ * - User_Name,
  * - Framed_IP_Address,
  * - NAS_Port,
  * - Calling_Station_Id,
@@ -97,10 +97,14 @@ UserAcct::UserAcct(const UserAcct &u):User(u)
  * @return An integer, 0 is everything is ok, else 1.*/
 int UserAcct::sendUpdatePacket(PluginContext *context)
 {
-	
+	if (context->conf.getAccountingEnabled() == false) {
+		cerr << getTime() << "RADIUS-PLUGIN: Skip accounting user::sendUpdatePacket\n";
+		return 0;
+	}
+
 	list<RadiusServer> * serverlist;
 	list<RadiusServer>::iterator server;
-	
+
 	RadiusPacket		packet(ACCOUNTING_REQUEST);
 	RadiusAttribute		ra1(ATTRIB_User_Name,this->getUsername()),
 				ra2(ATTRIB_Framed_IP_Address,this->getFramedIp()),
@@ -117,37 +121,37 @@ int UserAcct::sendUpdatePacket(PluginContext *context)
 				ra13(ATTRIB_Acct_Output_Octets, this->bytesout),
 				ra14(ATTRIB_Acct_Session_Time),
 				ra15(ATTRIB_Acct_Input_Gigawords, this->gigain),
-				ra16(ATTRIB_Acct_Output_Gigawords, this->gigaout);				
-	
-	
-	
+				ra16(ATTRIB_Acct_Output_Gigawords, this->gigaout);
+
+
+
 	//get the server list
 	serverlist=context->radiusconf.getRadiusServer();
-	
+
 	//set server on the first server
 	server=serverlist->begin();
-	
-	//add the attributes to the radius packet		
+
+	//add the attributes to the radius packet
 	if(packet.addRadiusAttribute(&ra1))
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Fail to add attribute ATTRIB_User_Name.\n";
 	}
-		
+
 	if (packet.addRadiusAttribute(&ra2))
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_User_Password.\n";
 	}
-	
+
 	if (packet.addRadiusAttribute(&ra3))
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Port.\n";
 	}
-	
+
 	if (packet.addRadiusAttribute(&ra4))
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Calling_Station_Id.\n";
 	}
-	
+
 	//get the values from the config and add them to the packet
 	if(strcmp(context->radiusconf.getNASIdentifier(),""))
 	{
@@ -157,7 +161,7 @@ int UserAcct::sendUpdatePacket(PluginContext *context)
 			cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Identifier.\n";
 		}
 	}
-		
+
 	if(strcmp(context->radiusconf.getNASIpAddress(),""))
 	{
 			if(ra6.setValue(context->radiusconf.getNASIpAddress())!=0)
@@ -169,7 +173,7 @@ int UserAcct::sendUpdatePacket(PluginContext *context)
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Ip_Address.\n";
 			}
 	}
-	
+
 	if(strcmp(context->radiusconf.getNASPortType(),""))
 	{
 			ra7.setValue(context->radiusconf.getNASPortType());
@@ -178,7 +182,7 @@ int UserAcct::sendUpdatePacket(PluginContext *context)
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Port_Type.\n";
 			}
 	}
-	
+
 	if(strcmp(context->radiusconf.getServiceType(),""))
 	{
 			ra8.setValue(context->radiusconf.getServiceType());
@@ -187,17 +191,17 @@ int UserAcct::sendUpdatePacket(PluginContext *context)
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Service_Type.\n";
 			}
 	}
-	
+
 	if (packet.addRadiusAttribute(&ra9))
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_ID.\n";
 	}
-	
+
 	if (packet.addRadiusAttribute(&ra10))
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_ID.\n";
 	}
-	
+
 	if(strcmp(context->radiusconf.getFramedProtocol(),""))
 	{
 			ra11.setValue(context->radiusconf.getFramedProtocol());
@@ -206,12 +210,12 @@ int UserAcct::sendUpdatePacket(PluginContext *context)
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Framed_Protocol.\n";
 			}
 	}
-	
+
 	if (packet.addRadiusAttribute(&ra12))
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Input_Packets.\n";
 	}
-	
+
 	if (packet.addRadiusAttribute(&ra13))
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Output_Packets.\n";
@@ -229,13 +233,13 @@ int UserAcct::sendUpdatePacket(PluginContext *context)
 	if (packet.addRadiusAttribute(&ra16)) {
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Output_Gigawords.\n";
 	}
-	
+
 	//send the packet to the server
 	if (packet.radiusSend(server)<0)
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Packet was not sent.\n";
 	}
-	
+
 	//get the response
 	if (packet.radiusReceive(serverlist)>=0)
 	{
@@ -245,9 +249,9 @@ int UserAcct::sendUpdatePacket(PluginContext *context)
 			if (DEBUG (context->getVerbosity()))
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: Get ACCOUNTING_RESPONSE-Packet.\n";
 
-		
+
 			return 0;
-			
+
 		}
 		else
 		{
@@ -255,15 +259,15 @@ int UserAcct::sendUpdatePacket(PluginContext *context)
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT: No response on accounting request.\n";
 			return 1;
 		}
-		
-		
+
+
 	}
 	return 1;
 }
 
 /** The method sends an accounting start packet for the user to the radius server.
  *  The following attributes are sent to the radius server:
- * - User_Name, 
+ * - User_Name,
  * - Framed_IP_Address,
  * - NAS_Port,
  * - Calling_Station_Id,
@@ -278,6 +282,11 @@ int UserAcct::sendUpdatePacket(PluginContext *context)
  * @return An integer, 0 is everything is ok, else 1.*/
 int UserAcct::sendStartPacket(PluginContext * context)
 {
+	if (context->conf.getAccountingEnabled() == false) {
+		cerr << getTime() << "RADIUS-PLUGIN: Skip accounting user::sendStartPacket\n";
+		return 0;
+	}
+
 	list<RadiusServer>* serverlist;
 	list<RadiusServer>::iterator server;
 	RadiusPacket		packet(ACCOUNTING_REQUEST);
@@ -292,21 +301,21 @@ int UserAcct::sendStartPacket(PluginContext * context)
 						ra9(ATTRIB_Acct_Session_ID, this->getSessionId()),
 		                                ra10(ATTRIB_Acct_Status_Type,string("1")), // "Start"
 						ra11(ATTRIB_Framed_Protocol);
-				
-	
-	
+
+
+
 	//get the radius server from the config
 	serverlist=context->radiusconf.getRadiusServer();
-	
+
 	//set server to the first from the list
 	server=serverlist->begin();
-	
+
 	//add the attributes to the packet
 	if(packet.addRadiusAttribute(&ra1))
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_User_Name.\n";
 	}
-	
+
 	if (packet.addRadiusAttribute(&ra2))
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_User_Password.\n";
@@ -319,7 +328,7 @@ int UserAcct::sendStartPacket(PluginContext * context)
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Calling_Station_Id.\n";
 	}
-	
+
 	//get information from the config and add the attributes to the packet
 	if(strcmp(context->radiusconf.getNASIdentifier(),""))
 	{
@@ -329,14 +338,14 @@ int UserAcct::sendStartPacket(PluginContext * context)
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Identifier.\n";
 			}
 	}
-	
+
 	if(strcmp(context->radiusconf.getNASIpAddress(),""))
 	{
 			if(ra6.setValue(context->radiusconf.getNASIpAddress())!=0)
 			{
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to set value ATTRIB_NAS_Ip_Address.\n";
 			}
-	
+
 			if (packet.addRadiusAttribute(&ra6))
 			{
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Ip_Address.\n";
@@ -350,7 +359,7 @@ int UserAcct::sendStartPacket(PluginContext * context)
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Port_Type.\n";
 			}
 	}
-	
+
 	if(strcmp(context->radiusconf.getServiceType(),""))
 	{
 			ra8.setValue(context->radiusconf.getServiceType());
@@ -359,15 +368,15 @@ int UserAcct::sendStartPacket(PluginContext * context)
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Service_Type.\n";
 			}
 	}
-	
+
 	if (packet.addRadiusAttribute(&ra9)) {
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_ID.\n";
 	}
-	
+
 	if (packet.addRadiusAttribute(&ra10)) {
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_ID.\n";
 	}
-	
+
 	if(strcmp(context->radiusconf.getFramedProtocol(),""))
 	{
 			ra11.setValue(context->radiusconf.getFramedProtocol());
@@ -376,13 +385,13 @@ int UserAcct::sendStartPacket(PluginContext * context)
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Framed_Protocol.\n";
 			}
 	}
-	
-	//send the packet	
+
+	//send the packet
 	if (packet.radiusSend(server)<0)
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Packet was not sent.\n";
 	}
-	
+
 	//receive the response
 	int ret=packet.radiusReceive(serverlist);
 	if (ret>=0)
@@ -394,7 +403,7 @@ int UserAcct::sendStartPacket(PluginContext * context)
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Get ACCOUNTING_RESPONSE-Packet.\n";
 
 			return 0;
-			
+
 		}
 		else
 		{
@@ -402,13 +411,13 @@ int UserAcct::sendStartPacket(PluginContext * context)
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Get no ACCOUNTING_RESPONSE-Packet.\n";
 			return 1;
 		}
-		
+
 	}
 	else
 	{
 	  cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Error on receiving radius response, code: " <<  ret << endl;
 	}
-	
+
 	return 1;
 }
 
@@ -417,7 +426,7 @@ int UserAcct::sendStartPacket(PluginContext * context)
 /** The method sends an accounting stop packet for the user to the radius server.
  * The accounting information are read from the OpenVpn
  * status file. The following attributes are sent to the radius server:
- * - User_Name, 
+ * - User_Name,
  * - Framed_IP_Address,
  * - NAS_Port,
  * - Calling_Station_Id,
@@ -435,6 +444,11 @@ int UserAcct::sendStartPacket(PluginContext * context)
  * @return An integer, 0 is everything is ok, else 1.*/
 int UserAcct::sendStopPacket(PluginContext * context)
 {
+	if (context->conf.getAccountingEnabled() == false) {
+		cerr << getTime() << "RADIUS-PLUGIN: Skip accounting user::sendStopPacket\n";
+		return 0;
+	}
+
 	list<RadiusServer> * serverlist;
 	list<RadiusServer>::iterator server;
 	RadiusPacket		packet(ACCOUNTING_REQUEST);
@@ -453,22 +467,22 @@ int UserAcct::sendStopPacket(PluginContext * context)
 				ra13(ATTRIB_Acct_Output_Octets, this->bytesout),
 				ra14(ATTRIB_Acct_Session_Time),
 				ra15(ATTRIB_Acct_Input_Gigawords, this->gigain),
-				ra16(ATTRIB_Acct_Output_Gigawords, this->gigaout);				
-	
-	
-		
+				ra16(ATTRIB_Acct_Output_Gigawords, this->gigaout);
+
+
+
 	//get the server from the config
 	serverlist=context->radiusconf.getRadiusServer();
-	
+
 	//set server to the first server
 	server=serverlist->begin();
-	
+
 	//add the attributes to the packet
 	if(packet.addRadiusAttribute(&ra1))
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_User_Name.\n";
 	}
-	
+
 	if (packet.addRadiusAttribute(&ra2))
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_FramedIP_Address.\n";
@@ -481,7 +495,7 @@ int UserAcct::sendStopPacket(PluginContext * context)
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Calling_Station_Id.\n";
 	}
-	
+
 	//get information from th config and ad it to the packet
 	if(strcmp(context->radiusconf.getNASIdentifier(),""))
 	{
@@ -491,7 +505,7 @@ int UserAcct::sendStopPacket(PluginContext * context)
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Identifier.\n";
 			}
 	}
-	
+
 	if(strcmp(context->radiusconf.getNASIpAddress(),""))
 	{
 			if(ra6.setValue(context->radiusconf.getNASIpAddress())!=0)
@@ -512,7 +526,7 @@ int UserAcct::sendStopPacket(PluginContext * context)
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_NAS_Port_Type.\n";
 			}
 	}
-	
+
 	if(strcmp(context->radiusconf.getServiceType(),""))
 	{
 			ra8.setValue(context->radiusconf.getServiceType());
@@ -529,7 +543,7 @@ int UserAcct::sendStopPacket(PluginContext * context)
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Session_ID.\n";
 	}
-	
+
 	if(strcmp(context->radiusconf.getFramedProtocol(),""))
 	{
 			ra11.setValue(context->radiusconf.getFramedProtocol());
@@ -538,9 +552,9 @@ int UserAcct::sendStopPacket(PluginContext * context)
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Framed_Protocol.\n";
 			}
 	}
-	
-	
-	
+
+
+
 	if (packet.addRadiusAttribute(&ra12))
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Input_Packets.\n";
@@ -549,7 +563,7 @@ int UserAcct::sendStopPacket(PluginContext * context)
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Output_Packets.\n";
 	}
-	
+
 	//calculate the session time
 	ra14.setValue(time(NULL)-this->starttime);
 	if (packet.addRadiusAttribute(&ra14)) {
@@ -563,13 +577,13 @@ int UserAcct::sendStopPacket(PluginContext * context)
 	if (packet.addRadiusAttribute(&ra16)) {
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Fail to add attribute ATTRIB_Acct_Output_Gigawords.\n";
 	}
-	
+
 	//send the packet
 	if (packet.radiusSend(server)<0)
 	{
 		cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Packet was not sent.\n";
 	}
-	
+
 	//get the response
 	if (packet.radiusReceive(serverlist)>=0)
 	{
@@ -580,7 +594,7 @@ int UserAcct::sendStopPacket(PluginContext * context)
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Get ACCOUNTING_RESPONSE-Packet.\n";
 
 			return 0;
-			
+
 		}
 		else
 		{
@@ -589,7 +603,7 @@ int UserAcct::sendStopPacket(PluginContext * context)
 			return 1;
 		}
 	}
-		
+
 	return 1;
 }
 
@@ -600,14 +614,14 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 {
 	char * route;
 	char framedip[40];
-	
+
 	char routestring[200];
-	char framednetmask_cidr[4]; 
+	char framednetmask_cidr[4];
 	char framedgw[40];
-	char framedmetric[5];  
+	char framedmetric[5];
 	char * framedroutes, * framedroutes6;
 	int j=0,k=0,len=0;
-	
+
 	//copy the framed route string to an char array, it is easier to
 	//analyse
 	try{
@@ -618,10 +632,10 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 	  cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: New failed for framedroutes." << endl;
 	}
 	memset(framedroutes,0,this->getFramedRoutes().size()+1);
-	
+
 	// copy in a temp-string, because strtok deletes the delimiter, if it used anywhere
 	strncpy(framedroutes,this->getFramedRoutes().c_str(),this->getFramedRoutes().size());
-	
+
 	//are there framed routes
 	if (framedroutes[0]!='\0')
 	{
@@ -635,14 +649,14 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 		else
 		{
 			while (route!=NULL)
-			{		
+			{
 				//set the arrays to 0
 				memset(routestring,0,100);
 				memset(framednetmask_cidr,0,3);
 				memset(framedip,0,16);
 				memset(framedgw,0,16);
 				memset(framedmetric,0,5);
-							
+
 				j=0;k=0;
 				//get ip address and add it to framedip
 				while(route[j]!='/' && j<len)
@@ -703,7 +717,7 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 							j++;
 					}
 				}
-															
+
 				//create system call
 				strncat(routestring, "ip route del ",13);
 				strncat(routestring, framedip ,16);
@@ -724,13 +738,13 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 				strncat(routestring," proto static",13);
 				//redirect the output stderr to /dev/null
 				strncat(routestring," 2> /dev/null",13);
-				
-						
+
+
 				if (DEBUG (context->getVerbosity()))
 	    			cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Create route string "<< routestring <<".\n";
-				
+
 				//system call
-				if(system(routestring)!=0) 
+				if(system(routestring)!=0)
 				//if(1)//-> the debugg can't context system()
 				{
 					cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Route " << routestring << " could not set. Route already set or bad route string.\n";
@@ -739,13 +753,13 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 				{
 					if (DEBUG (context->getVerbosity()))
 	    				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Add route to system routing table.\n";
-					
+
 				}
 				//get the next route
-				route=strtok(NULL,";");	
+				route=strtok(NULL,";");
 			}
 		}
-		
+
 	}
 	else
 	{
@@ -754,16 +768,16 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 	}
 	//free the char array
 	delete [] framedroutes;
-		
+
 
 	//copy the framed route string to an char array, it is easier to
 	//analyse
 	framedroutes6=new char[this->getFramedRoutes6().size()+1];
 	memset(framedroutes6,0,this->getFramedRoutes6().size()+1);
-	
+
 	// copy in a temp-string, because strtok deletes the delimiter, if it used anywhere
 	strncpy(framedroutes6,this->getFramedRoutes6().c_str(),this->getFramedRoutes6().size());
-	
+
 	//are there framed routes
 	if (framedroutes6[0]!='\0')
 	{
@@ -777,14 +791,14 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 		else
 		{
 			while (route!=NULL)
-			{		
+			{
 				//set the arrays to 0
 				memset(routestring,0,200);
 				memset(framednetmask_cidr,0,4);
 				memset(framedip,0,40);
 				memset(framedgw,0,40);
 				memset(framedmetric,0,5);
-							
+
 				j=0;k=0;
 				//get ip address and add it to framedip
 				while(route[j]!='/' && j<len)
@@ -845,7 +859,7 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 							j++;
 					}
 				}
-															
+
 				//create system call
 				strncat(routestring, "ip -6 route del ",16);
 				strncat(routestring, framedip ,40);
@@ -866,13 +880,13 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 				strncat(routestring," proto static",13);
 				//redirect the output stderr to /dev/null
 				strncat(routestring," 2> /dev/null",13);
-				
-						
+
+
 				if (DEBUG (context->getVerbosity()))
 	    			cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Create IPv6 route string "<< routestring <<".\n";
-				
+
 				//system call
-				if(system(routestring)!=0) 
+				if(system(routestring)!=0)
 				//if(1)//-> the debugg can't context system()
 				{
 					cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Route " << routestring << " could not set. Route already set or bad route string.\n";
@@ -881,13 +895,13 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 				{
 					if (DEBUG (context->getVerbosity()))
 	    				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Add route to system routing table.\n";
-					
+
 				}
 				//get the next route
-				route=strtok(NULL,";");	
+				route=strtok(NULL,";");
 			}
 		}
-		
+
 	}
 	else
 	{
@@ -896,7 +910,7 @@ void UserAcct::delSystemRoutes(PluginContext * context)
 	}
 	//free the char array
 	delete [] framedroutes6;
-		
+
 }
 
 /** The method adds ths routes of the user to the system routing table.
@@ -906,14 +920,14 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 {
 	char * route;
 	char framedip[40];
-	
+
 	char routestring[200];
-	char framednetmask_cidr[4]; 
+	char framednetmask_cidr[4];
 	char framedgw[40];
-	char framedmetric[5];  
+	char framedmetric[5];
 	char * framedroutes, * framedroutes6;
 	int j=0,k=0,len=0;
-	
+
 	//copy the framed route string to an char array, it is easier to
 	//analyse
 	try{
@@ -924,10 +938,10 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 	  cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND ACCT: New failed for framedroutes." << endl;
 	}
 	memset(framedroutes,0,this->getFramedRoutes().size()+1);
-	
+
 	// copy in a temp-string, becaue strtok deletes the delimiter, if it used anywhere
 	strncpy(framedroutes,this->getFramedRoutes().c_str(),this->getFramedRoutes().size());
-	
+
 	//are there framed routes
 	if (framedroutes[0]!='\0')
 	{
@@ -941,14 +955,14 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 		else
 		{
 			while (route!=NULL)
-			{		
+			{
 				//set the arrays to 0
 				memset(routestring,0,100);
 				memset(framednetmask_cidr,0,3);
 				memset(framedip,0,16);
 				memset(framedgw,0,16);
 				memset(framedmetric,0,5);
-							
+
 				j=0;k=0;
 				//get ip address and add it to framedip
 				while(route[j]!='/' && j<len)
@@ -1009,8 +1023,8 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 							j++;
 					}
 				}
-															
-														
+
+
 				//create system call
 				strncat(routestring, "ip route add ",13);
 				strncat(routestring, framedip ,16);
@@ -1031,13 +1045,13 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 				strncat(routestring," proto static",13);
 				//redirect the output stderr to /dev/null
 				strncat(routestring," 2> /dev/null",13);
-				
-						
+
+
 				if (DEBUG (context->getVerbosity()))
 	    			cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Create route string "<< routestring << ".\n";
-				
+
 				//system call route
-				if(system(routestring)!=0) 
+				if(system(routestring)!=0)
 				//if(1)//-> the debugg can't context system()
 				{
 					cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Route " << routestring << " could not set. Route already set or bad route string.\n";
@@ -1046,10 +1060,10 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 				{
 					if (DEBUG (context->getVerbosity()))
 	    				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Add route to system routing table.\n";
-												
+
 				}
 				//get the next route
-				route=strtok(NULL,";");	
+				route=strtok(NULL,";");
 			}
 		}
 	}
@@ -1060,15 +1074,15 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 	}
 	//free the char array
 	delete [] framedroutes;
-	
+
 	//copy the framed route string to an char array, it is easier to
 	//analyse
 	framedroutes6=new char[this->getFramedRoutes6().size()+1];
 	memset(framedroutes6,0,this->getFramedRoutes6().size()+1);
-	
+
 	// copy in a temp-string, becaue strtok deletes the delimiter, if it used anywhere
 	strncpy(framedroutes6,this->getFramedRoutes6().c_str(),this->getFramedRoutes6().size());
-	
+
 	//are there framed routes
 	if (framedroutes6[0]!='\0')
 	{
@@ -1082,14 +1096,14 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 		else
 		{
 			while (route!=NULL)
-			{		
+			{
 				//set the arrays to 0
 				memset(routestring,0,200);
 				memset(framednetmask_cidr,0,4);
 				memset(framedip,0,40);
 				memset(framedgw,0,40);
 				memset(framedmetric,0,5);
-							
+
 				j=0;k=0;
 				//get ip address and add it to framedip
 				while(route[j]!='/' && j<len)
@@ -1150,8 +1164,8 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 							j++;
 					}
 				}
-															
-														
+
+
 				//create system call
 				strncat(routestring, "ip -6 route add ",21);
 				strncat(routestring, framedip ,40);
@@ -1172,13 +1186,13 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 				strncat(routestring," proto static",13);
 				//redirect the output stderr to /dev/null
 				strncat(routestring," 2> /dev/null",13);
-				
-						
+
+
 				if (DEBUG (context->getVerbosity()))
 				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Create IPv6 route string "<< routestring << " dev " << this->getDev() << ".\n";
-				
+
 				//system call route
-				if(system(routestring)!=0) 
+				if(system(routestring)!=0)
 				//if(1)//-> the debugg can't context system()
 				{
 					cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Route " << routestring << " could not set. Route already set or bad route string.\n";
@@ -1187,10 +1201,10 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 				{
 					if (DEBUG (context->getVerbosity()))
 	    				cerr << getTime() << "RADIUS-PLUGIN: BACKGROUND-ACCT:  Add route to system routing table.\n";
-												
+
 				}
 				//get the next route
-				route=strtok(NULL,";");	
+				route=strtok(NULL,";");
 			}
 		}
 	}
@@ -1201,7 +1215,7 @@ void UserAcct::addSystemRoutes(PluginContext * context)
 	}
 	//free the char array
 	delete [] framedroutes6;
-	
+
 }
 
 
