@@ -60,7 +60,7 @@ useclientconnectdeferfile=true
 # accountingonly=false
 
 # Allows to disable accounting
-# Some RADIUS servers apparently does not support accounting packets which in turn breakes the auth process
+# Some RADIUS servers apparently do not support accounting packets which in turn breakes the auth process
 # default is true
 # accountingenabled=true
 
